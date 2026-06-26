@@ -1,0 +1,205 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+
+  *,
+  html,
+  body {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  /* Display headings — Inter with tighter tracking for impact */
+  .font-display {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.03em;
+  }
+
+  /* Mono labels — Inter still, just styled differently via tracking */
+  .font-mono {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.06em;
+  }
+}
+
+:root {
+  --primary: #CCFF00;
+  --accent: #FF4E20;
+  --dark: #0B0B0B;
+  --dark2: #1C1C1C;
+  --dark3: #2D2D2D;
+  --cream: #FFFFFF;
+  --cream2: #FAF9F6;
+  --cream3: #F3F2EE;
+}
+
+/* ===== Soft Grain Texture Overlay ===== */
+.bg-grain::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+/* ===== Floating Animation ===== */
+@keyframes float-slow {
+  0% {
+    transform: translateY(0px) rotate(-6deg);
+  }
+
+  50% {
+    transform: translateY(-10px) rotate(-4deg);
+  }
+
+  100% {
+    transform: translateY(0px) rotate(-6deg);
+  }
+}
+
+@keyframes float-fast {
+  0% {
+    transform: translateY(0px) rotate(6deg);
+  }
+
+  50% {
+    transform: translateY(-14px) rotate(8deg);
+  }
+
+  100% {
+    transform: translateY(0px) rotate(6deg);
+  }
+}
+
+.animate-float-1 {
+  animation: float-slow 6s ease-in-out infinite;
+}
+
+.animate-float-2 {
+  animation: float-fast 5s ease-in-out infinite;
+}
+
+/* ===== Scroll Reveal Animations ===== */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 1s cubic-bezier(0.25, 1, 0.5, 1), transform 1s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-active {
+  opacity: 1;
+  transform: translateY(0px);
+}
+
+/* ===== Infinite Marquee Scroll Left ===== */
+@keyframes marquee-left {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* ===== Infinite Marquee Scroll Right ===== */
+@keyframes marquee-right {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-marquee-left {
+  animation: marquee-left 22s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-right {
+  animation: marquee-right 22s linear infinite;
+  will-change: transform;
+}
+
+/* Custom Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(11, 11, 11, 0.2) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(11, 11, 11, 0.2);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(11, 11, 11, 0.5);
+}
+
+/* Premium Card hover style swap helper */
+.card-image-swap {
+  transition: opacity 0.5s ease-in-out, transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Glass panel */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Subtle dot background grid */
+.bg-grid-dots {
+  background-image: radial-gradient(rgba(0, 0, 0, 0.05) 1.5px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* 3D Perspective container */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+/* Disable native browser password reveal eye and clear button icons */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar,
+.scrollbar-none {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
