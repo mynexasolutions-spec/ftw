@@ -100,6 +100,23 @@ export default function Home() {
 
   // Hero images
   const [heroImages, setHeroImages] = useState('')
+  const [allProducts, setAllProducts] = useState([])
+
+  const getProductForHeroImage = (item) => {
+    if (!item) return null;
+    let parsedItem = item;
+    if (typeof item === 'string' && item.trim().startsWith('{')) {
+      try { parsedItem = JSON.parse(item); } catch (e) {}
+    }
+    const assignedId = typeof parsedItem === 'object' ? parsedItem?.productId : null;
+
+    // Only match if assignedId is explicitly set from Admin panel
+    if (assignedId && allProducts && allProducts.length > 0) {
+      return allProducts.find(p => p.id === assignedId) || null;
+    }
+
+    return null;
+  }
 
   // Featured products
   const [featuredProducts, setFeaturedProducts] = useState(DEFAULT_FEATURED_PRODUCTS)
@@ -242,6 +259,10 @@ export default function Home() {
           getHomepageConfig(),
           getProducts()
         ])
+
+        if (dbProducts && dbProducts.length > 0) {
+          setAllProducts(dbProducts)
+        }
 
         if (config) {
           if (config.hero_images && config.hero_images.length > 0) {
@@ -866,15 +887,27 @@ export default function Home() {
 
         <div className="deck-hero" id="deck">
           {[0, 1, 2, 3, 4].map((i) => {
-            const currentImg = heroImages[(i + offset) % heroImages.length]
-            const prevImg = heroImages[(i + prevOffset) % heroImages.length]
+            const currentImg = Array.isArray(heroImages) && heroImages.length > 0 ? heroImages[(i + offset) % heroImages.length] : heroImages
+            let parsedImg = currentImg
+            if (typeof currentImg === 'string' && currentImg.trim().startsWith('{')) {
+              try { parsedImg = JSON.parse(currentImg); } catch(e){}
+            }
+            const imgSrc = typeof parsedImg === 'string' ? parsedImg : (parsedImg?.url || '')
+            const targetProduct = getProductForHeroImage(currentImg)
+            const targetUrl = targetProduct ? `/product/${targetProduct.id}` : null
 
             return (
-              <div key={i} className={`card-hero ${i === 0 || i === 4 ? 'hidden md:block' : ''}`} data-pos={i}>
+              <div 
+                key={i} 
+                className={`card-hero ${i === 0 || i === 4 ? 'hidden md:block' : ''} ${targetUrl ? 'cursor-pointer group/heroCard' : 'cursor-default'}`} 
+                data-pos={i}
+                onClick={() => targetUrl && navigate(targetUrl)}
+                title={targetProduct ? `View ${targetProduct.name}` : undefined}
+              >
                 <AnimatePresence initial={false} custom={direction}>
                   <motion.img
-                    key={`${currentImg}-${i}`}
-                    src={currentImg}
+                    key={`${imgSrc}-${i}`}
+                    src={imgSrc}
                     custom={direction}
                     variants={{
                       enter: (dir) => ({

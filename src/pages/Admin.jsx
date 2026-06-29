@@ -296,7 +296,8 @@ export default function Admin() {
       fabric_info: '',
       washing_instructions: '',
       size_guide: '',
-      size_chart: {}
+      size_chart: {},
+      variants: []
     })
     setShowProductModal(true)
   }
@@ -327,23 +328,47 @@ export default function Admin() {
       fabric_info: prod.fabric_info || prod.fabric || '',
       washing_instructions: prod.washing_instructions || prod.washing || '',
       size_guide: prod.size_guide || '',
-      size_chart: prod.size_chart || {}
+      size_chart: prod.size_chart || {},
+      variants: Array.isArray(prod.variants) ? prod.variants : []
     })
     setShowProductModal(true)
   }
 
   const handleSaveProduct = async (e) => {
     e.preventDefault()
+    
+    // Filter variants to keep ONLY active colors from the colors list
+    const activeColorsCleaned = (productForm.colors || []).map(c => c.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim().toLowerCase());
+    const variants = (productForm.variants || []).filter(v => {
+      const vColorClean = v.color ? v.color.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim().toLowerCase() : '';
+      return activeColorsCleaned.includes(vColorClean);
+    });
+
+    const defaultColorClean = productForm.default_color
+      ? productForm.default_color.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim()
+      : (productForm.colors && productForm.colors[0]
+        ? productForm.colors[0].replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim()
+        : '');
+
+    const defaultVariant = variants.find(v => v.color && v.color.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim() === defaultColorClean)
+      || variants.find(v => v.price !== undefined)
+      || {};
+
+    const calcPrice = defaultVariant.price !== undefined ? Number(defaultVariant.price) : 0;
+    const calcOriginalPrice = defaultVariant.originalPrice !== undefined ? Number(defaultVariant.originalPrice) : null;
+    const calcStock = variants.reduce((sum, v) => sum + (v.stock !== undefined ? Number(v.stock) : 0), 0);
+
     const productPayload = {
       ...productForm,
-      price: Number(productForm.price),
-      originalPrice: productForm.mrp ? Number(productForm.mrp) : null,
-      stock: Number(productForm.stock),
+      price: calcPrice,
+      originalPrice: calcOriginalPrice,
+      stock: calcStock,
       description: productForm.short_description,
       fabric_info: productForm.fabric_info,
       washing_instructions: productForm.washing_instructions,
       size_guide: productForm.size_guide,
-      size_chart: productForm.size_chart || {}
+      size_chart: productForm.size_chart || {},
+      variants: variants
     }
 
     try {
@@ -1243,63 +1268,63 @@ export default function Admin() {
               </button>
 
               <div className="border-b border-cream3 pb-4 mb-6 select-none">
-                <span className="text-[9px] text-accent font-black uppercase tracking-widest font-mono">Catalog Operations</span>
-                <h3 className="font-display text-xl font-black uppercase text-dark tracking-tight mt-0.5">
+                <span className="text-[9px] lg:text-[10.5px] text-accent font-black uppercase tracking-widest font-mono">Catalog Operations</span>
+                <h3 className="font-display text-xl lg:text-2xl font-black uppercase text-dark tracking-tight mt-0.5">
                   {categoryModalMode === 'add' ? 'Publish Category' : 'Modify Category'}
                 </h3>
               </div>
 
               <form onSubmit={handleAddCategory} className="space-y-5">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase font-black text-dark2/50 block">Category Name *</label>
+                  <label className="text-[10px] lg:text-xs uppercase font-black text-dark2/50 block">Category Name *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. Men, Women, Accessories"
                     value={newCategoryName}
                     onChange={(e) => setNewCategoryName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-cream2/50 border border-cream3 rounded-xl focus:outline-none focus:bg-white focus:border-dark text-xs font-sans font-bold text-dark transition-all"
+                    className="w-full px-3.5 lg:px-4 py-2.5 lg:py-3 bg-cream2/50 border border-cream3 rounded-xl focus:outline-none focus:bg-white focus:border-dark text-xs lg:text-sm font-sans font-bold text-dark transition-all"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase font-black text-dark2/50 block">Parent Category (optional)</label>
+                  <label className="text-[10px] lg:text-xs uppercase font-black text-dark2/50 block">Parent Category (optional)</label>
                   <select
                     value={newCategoryParent}
                     onChange={(e) => setNewCategoryParent(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-cream2/50 border border-cream3 rounded-xl focus:outline-none focus:bg-white focus:border-dark text-xs font-sans font-bold text-dark transition-all"
+                    className="w-full px-3.5 lg:px-4 py-2.5 lg:py-3 bg-cream2/50 border border-cream3 rounded-xl focus:outline-none focus:bg-white focus:border-dark text-xs lg:text-sm font-sans font-bold text-dark transition-all"
                   >
                     <option value="">— Main category (no parent) —</option>
                     {categoriesList.filter(c => !c.parent).map(cat => (
                       <option key={cat.id} value={cat.name}>{cat.name}</option>
                     ))}
                   </select>
-                  <span className="text-[9px] text-dark/35 font-medium block leading-relaxed mt-1">
+                  <span className="text-[9px] lg:text-[10.5px] text-dark/35 font-medium block leading-relaxed mt-1">
                     Leave empty for main categories. Only pick a parent if this is a subcategory.
                   </span>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase font-black text-dark2/50 block">Description (optional)</label>
+                  <label className="text-[10px] lg:text-xs uppercase font-black text-dark2/50 block">Description (optional)</label>
                   <textarea
                     placeholder="Provide a brief summary of catalog items under this label..."
                     value={newCategoryDescription}
                     onChange={(e) => setNewCategoryDescription(e.target.value)}
                     rows="4"
-                    className="w-full px-3.5 py-2.5 bg-cream2/50 border border-cream3 rounded-xl focus:outline-none focus:bg-white focus:border-dark text-xs font-sans text-dark transition-all"
+                    className="w-full px-3.5 lg:px-4 py-2.5 lg:py-3 bg-cream2/50 border border-cream3 rounded-xl focus:outline-none focus:bg-white focus:border-dark text-xs lg:text-sm font-sans text-dark transition-all"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase font-black text-dark2/50 block">Sort Order Index (optional)</label>
+                  <label className="text-[10px] lg:text-xs uppercase font-black text-dark2/50 block">Sort Order Index (optional)</label>
                   <input
                     type="number"
                     placeholder="0"
                     value={newCategorySortOrder}
                     onChange={(e) => setNewCategorySortOrder(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-cream2/50 border border-cream3 rounded-xl focus:outline-none focus:bg-white focus:border-dark text-xs font-sans font-bold text-dark transition-all"
+                    className="w-full px-3.5 lg:px-4 py-2.5 lg:py-3 bg-cream2/50 border border-cream3 rounded-xl focus:outline-none focus:bg-white focus:border-dark text-xs lg:text-sm font-sans font-bold text-dark transition-all"
                   />
-                  <span className="text-[9px] text-dark/35 font-medium block leading-relaxed mt-1">
+                  <span className="text-[9px] lg:text-[10.5px] text-dark/35 font-medium block leading-relaxed mt-1">
                     Used to define category display sequence. Lower values appear first.
                   </span>
                 </div>
@@ -1308,13 +1333,13 @@ export default function Admin() {
                   <button
                     type="button"
                     onClick={() => setShowCategoryModal(false)}
-                    className="flex-1 py-3.5 bg-white hover:bg-cream3 text-dark font-sans font-bold uppercase tracking-wider rounded-2xl border border-cream3 transition-colors cursor-pointer text-center text-xs"
+                    className="flex-1 py-3.5 lg:py-4 bg-white hover:bg-cream3 text-dark font-sans font-bold uppercase tracking-wider rounded-2xl border border-cream3 transition-colors cursor-pointer text-center text-xs lg:text-sm"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-3.5 bg-[#161616] hover:bg-accent text-white font-sans font-black uppercase tracking-wider rounded-2xl transition-colors cursor-pointer text-center shadow-md text-xs border-none"
+                    className="flex-1 py-3.5 lg:py-4 bg-[#161616] hover:bg-accent text-white font-sans font-black uppercase tracking-wider rounded-2xl transition-colors cursor-pointer text-center shadow-md text-xs lg:text-sm border-none"
                   >
                     Save Category
                   </button>

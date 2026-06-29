@@ -9,19 +9,49 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { getProducts, getApprovedReviews } from '../lib/supabase'
 
 const COLOR_MAP = {
-  'Black': '#0F0F0F',
-  'White': '#FFFFFF',
-  'Lime': '#CCFF00',
-  'Charcoal': '#3E3E3E',
-  'Beige': '#E1D9C1',
-  'Cream': '#FDF6E2',
-  'Navy': '#1A2536',
-  'Olive': '#4D5844',
-  'Cyber Blue': '#00E5FF',
-  'Acid Purple': '#583F72',
-  'Acid Olive': '#595C43',
-  'Sand': '#D2C4A8',
-  'Off-White': '#FAF9F6'
+  'black': '#0F0F0F',
+  'white': '#FFFFFF',
+  'off-white': '#FAF9F6',
+  'cream': '#FDF6E2',
+  'beige': '#E1D9C1',
+  'sand': '#D2C4A8',
+  'charcoal': '#3E3E3E',
+  'navy': '#1A2536',
+  'olive': '#4D5844',
+  'acid olive': '#595C43',
+  'lime': '#CCFF00',
+  'cyber blue': '#00E5FF',
+  'acid purple': '#583F72',
+  'dusty rose': '#DCAE96',
+  'rose': '#E8A5A5',
+  'pastel lavender': '#D8B4F8',
+  'lavender': '#E6E6FA',
+  'sage green': '#9CAF88',
+  'sage': '#9CAF88',
+  'peach': '#FFDAB9',
+  'pink': '#FFC0CB',
+  'brown': '#8B4513',
+  'maroon': '#800000',
+  'burgundy': '#800020',
+  'terracotta': '#E2725B',
+  'rust': '#B7410E',
+  'teal': '#008080',
+  'mint': '#98FF98',
+  'lilac': '#C8A2C8'
+}
+
+const resolveColorHex = (colorStr) => {
+  if (!colorStr) return '#CCCCCC';
+  const hexMatch = colorStr.match(/#([0-9a-fA-F]{3,6})/);
+  if (hexMatch) return `#${hexMatch[1]}`;
+  
+  const clean = colorStr.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim().toLowerCase();
+  if (COLOR_MAP[clean]) return COLOR_MAP[clean];
+  
+  for (const key in COLOR_MAP) {
+    if (clean.includes(key)) return COLOR_MAP[key];
+  }
+  return '#CCCCCC';
 }
 
 // Dummy T-shirt Database
@@ -165,14 +195,24 @@ export default function ProductDetail() {
           }
           setProduct(resolvedProduct)
           if (sizesArr.length > 0) setSelectedSize(sizesArr[0])
-          if (colorsArr.length > 0) setSelectedColor(colorsArr[0])
+          let initialColor = colorsArr[0]
+          if (found.default_color) {
+            const matched = colorsArr.find(c => c.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim() === found.default_color)
+            if (matched) initialColor = matched
+          }
+          if (colorsArr.length > 0) setSelectedColor(initialColor)
         } else {
           const fallback = PRODUCTS_DB[id]
           if (fallback) {
             resolvedProduct = fallback
             setProduct(fallback)
             if (fallback.sizes.length > 0) setSelectedSize(fallback.sizes[0])
-            if (fallback.colors.length > 0) setSelectedColor(fallback.colors[0])
+            let initialColor = fallback.colors[0]
+            if (fallback.default_color) {
+              const matched = fallback.colors.find(c => c.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim() === fallback.default_color)
+              if (matched) initialColor = matched
+            }
+            if (fallback.colors.length > 0) setSelectedColor(initialColor)
           }
         }
 
@@ -244,15 +284,87 @@ export default function ProductDetail() {
   }
 
 
+  // Resolve active variant pricing & images
+  const cleanColor = (c) => c ? c.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim().toLowerCase() : '';
+  
+  // Find exact size + color variant combination
+  const matchingVariant = (product.variants || []).find(
+    v => cleanColor(v.color) === cleanColor(selectedColor) && v.size === selectedSize
+  );
+
+  // Find any variant of the selected color that has overrides set
+  const colorVariantWithPrice = (product.variants || []).find(
+    v => cleanColor(v.color) === cleanColor(selectedColor) && v.price !== undefined && v.price !== null && v.price !== ''
+  );
+
+  const colorVariantWithOriginalPrice = (product.variants || []).find(
+    v => cleanColor(v.color) === cleanColor(selectedColor) && v.originalPrice !== undefined && v.originalPrice !== null && v.originalPrice !== ''
+  );
+
+  // If size override doesn't exist, we can fallback to any variant matching the color to get the images,
+  // since images are color-specific
+  const colorVariantForImages = (product.variants || []).find(
+    v => cleanColor(v.color) === cleanColor(selectedColor) && v.images && v.images.length > 0
+  );
+
+  // Get all image URLs that are mapped to OTHER colors in the variants list (match by filename segment to avoid URL parameter mismatches)
+  const getUrlId = (url) => {
+    if (!url) return '';
+    const parts = url.split('/');
+    return parts[parts.length - 1];
+  };
+
+  const otherColorsMappedImages = (product.variants || [])
+    .filter(v => cleanColor(v.color) !== cleanColor(selectedColor))
+    .reduce((acc, v) => {
+      if (Array.isArray(v.images)) {
+        v.images.forEach(img => acc.add(getUrlId(img)));
+      }
+      return acc;
+    }, new Set());
+
+  // Filter global product images list to exclude images explicitly mapped to other colors
+  const filteredProductImages = (product.images || []).filter(img => !otherColorsMappedImages.has(getUrlId(img)));
+
+  // Fallbacks if global properties are empty (since configuration is exclusively color-wise)
+  const firstVariantWithPrice = (product.variants || []).find(v => v.price !== undefined) || {};
+  const firstVariantWithImages = (product.variants || []).find(v => v.images && v.images.length > 0) || {};
+
+  const displayPrice = matchingVariant && matchingVariant.price !== undefined && matchingVariant.price !== null && matchingVariant.price !== ''
+    ? Number(matchingVariant.price)
+    : (colorVariantWithPrice && colorVariantWithPrice.price !== undefined && colorVariantWithPrice.price !== null && colorVariantWithPrice.price !== ''
+        ? Number(colorVariantWithPrice.price)
+        : (product.price !== undefined && product.price !== null && product.price !== 0 ? Number(product.price) : Number(firstVariantWithPrice.price || 0)));
+
+  const displayOriginalPrice = matchingVariant && matchingVariant.originalPrice !== undefined && matchingVariant.originalPrice !== null && matchingVariant.originalPrice !== ''
+    ? Number(matchingVariant.originalPrice)
+    : (colorVariantWithOriginalPrice && colorVariantWithOriginalPrice.originalPrice !== undefined && colorVariantWithOriginalPrice.originalPrice !== null && colorVariantWithOriginalPrice.originalPrice !== ''
+        ? Number(colorVariantWithOriginalPrice.originalPrice)
+        : (product.originalPrice ? Number(product.originalPrice) : (firstVariantWithPrice.originalPrice ? Number(firstVariantWithPrice.originalPrice) : null)));
+
+  const displayStock = matchingVariant && matchingVariant.stock !== undefined && matchingVariant.stock !== null && matchingVariant.stock !== ''
+    ? Number(matchingVariant.stock)
+    : (product.variants && product.variants.some(v => cleanColor(v.color) === cleanColor(selectedColor))
+        ? 0 // If color variants exist, but not for this specific size, default to 0 (out of stock)
+        : (product.stock !== undefined && product.stock !== null ? Number(product.stock) : 0));
+
+  const displayImages = (colorVariantForImages && colorVariantForImages.images && colorVariantForImages.images.length > 0)
+    ? colorVariantForImages.images
+    : (filteredProductImages.length > 0 ? filteredProductImages : (product.images && product.images.length > 0 ? product.images : (firstVariantWithImages.images || ['/images/1.1.jpeg'])));
+
+  // Ensure activeImageIdx is valid for current set of images
+  const imagesToRender = displayImages || [];
+  const safeActiveImageIdx = activeImageIdx < imagesToRender.length ? activeImageIdx : 0;
+
   const handleMouseMove = (e) => {
     const { left, top, width, height } = e.target.getBoundingClientRect()
     const x = ((e.clientX - left) / width) * 100
     const y = ((e.clientY - top) / height) * 100
     setZoomStyle({
       display: 'block',
-      backgroundImage: `url(${product.images[activeImageIdx]})`,
+      backgroundImage: `url(${imagesToRender[safeActiveImageIdx]})`,
       backgroundPosition: `${x}% ${y}%`,
-      backgroundSize: activeImageIdx === 2 ? '150%' : '220%',
+      backgroundSize: safeActiveImageIdx === 2 ? '150%' : '220%',
       backgroundColor: 'white'
     })
   }
@@ -262,8 +374,15 @@ export default function ProductDetail() {
   }
 
   const handleAddToBag = () => {
-    // Pass raw product, size and color directly
-    addToCart(product, selectedSize, selectedColor)
+    const resolvedProduct = {
+      ...product,
+      price: displayPrice,
+      originalPrice: displayOriginalPrice,
+      stock: displayStock,
+      image: imagesToRender[0] || product.image,
+      images: imagesToRender
+    }
+    addToCart(resolvedProduct, selectedSize, selectedColor)
     toast.success(`Added ${product.name} [Size ${selectedSize} / Color ${selectedColor}] to bag!`, {
       style: { background: '#0B0B0B', color: '#FFFFFF', fontFamily: "'Space Grotesk', sans-serif" }
     })
@@ -278,7 +397,15 @@ export default function ProductDetail() {
       navigate(`/auth?redirect=/product/${product.id}`)
       return
     }
-    addToCart(product, selectedSize, selectedColor, true)
+    const resolvedProduct = {
+      ...product,
+      price: displayPrice,
+      originalPrice: displayOriginalPrice,
+      stock: displayStock,
+      image: imagesToRender[0] || product.image,
+      images: imagesToRender
+    }
+    addToCart(resolvedProduct, selectedSize, selectedColor, true)
     toast.loading("Initiating express secure checkout...", { duration: 1200 })
     setTimeout(() => {
       toast.dismiss()
@@ -348,11 +475,11 @@ export default function ProductDetail() {
           {/* Main Display Image wrapper */}
           <div className="flex-grow relative aspect-[3.4/5] max-h-[650px] bg-cream3 rounded-3xl overflow-hidden border border-cream3 shadow-sm select-none group">
             <img
-              src={product.images[activeImageIdx]}
+              src={imagesToRender[safeActiveImageIdx]}
               alt={product.name}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
-              className={`w-full h-full cursor-zoom-in transition-all duration-300 ${activeImageIdx === 2 ? 'object-contain bg-white p-4' : 'object-cover'
+              className={`w-full h-full cursor-zoom-in transition-all duration-300 ${safeActiveImageIdx === 2 ? 'object-contain bg-white p-4' : 'object-cover'
                 }`}
             />
             {/* Custom Hover Zoom overlay lens panel */}
@@ -370,15 +497,15 @@ export default function ProductDetail() {
           </div>
 
           {/* Alternate Thumbnail selector strip */}
-          {product.images.length > 1 && (
+          {imagesToRender.length > 1 && (
             <div className="flex flex-row md:flex-col gap-4 shrink-0 justify-start">
-              {product.images.map((img, idx) => (
+              {imagesToRender.map((img, idx) => (
                 <motion.button
                   key={idx}
                   whileHover={{ y: -2 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setActiveImageIdx(idx)}
-                  className={`w-14 sm:w-20 aspect-[4/5] rounded-2xl overflow-hidden border-2 transition-all bg-cream3 ${activeImageIdx === idx ? 'border-dark scale-105 shadow-md' : 'border-neutral-200 hover:border-dark/30'
+                  className={`w-14 sm:w-20 aspect-[4/5] rounded-2xl overflow-hidden border-2 transition-all bg-cream3 ${safeActiveImageIdx === idx ? 'border-dark scale-105 shadow-md' : 'border-neutral-200 hover:border-dark/30'
                     }`}
                 >
                   <img src={img} alt="thumbnail" className="w-full h-full object-cover" />
@@ -397,21 +524,21 @@ export default function ProductDetail() {
                 <Clock className="w-3.5 h-3.5 text-amber-600" />
                 <span>COMING SOON / STOCK NOT CONFIRMED YET</span>
               </div>
-            ) : product.stock !== undefined && product.stock !== null ? (
-              product.stock === 0 ? (
+            ) : displayStock !== undefined && displayStock !== null ? (
+              displayStock === 0 ? (
                 <div className="inline-flex items-center gap-1.5 text-red-600 bg-red-50 border border-red-200 px-3 py-1.5 rounded-xl text-[10px] font-mono uppercase font-black tracking-wider mb-6">
                   <ShieldAlert className="w-3.5 h-3.5 text-red-600 animate-pulse" />
                   <span>SOLD OUT / OUT OF STOCK</span>
                 </div>
-              ) : product.stock <= 8 ? (
+              ) : displayStock <= 8 ? (
                 <div className="inline-flex items-center gap-1.5 text-accent bg-accent/5 border border-accent/15 px-3 py-1.5 rounded-xl text-[10px] font-mono uppercase font-black tracking-wider mb-6 animate-pulse">
                   <Flame className="w-3.5 h-3.5 fill-accent animate-bounce" />
-                  <span>LIMIT ALERT: ONLY {product.stock} PIECES LEFT</span>
+                  <span>LIMIT ALERT: ONLY {displayStock} PIECES LEFT</span>
                 </div>
               ) : (
                 <div className="inline-flex items-center gap-1.5 text-emerald-600 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl text-[10px] font-mono uppercase font-black tracking-wider mb-6">
                   <Check className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>IN STOCK: {product.stock} PIECES AVAILABLE</span>
+                  <span>IN STOCK: {displayStock} PIECES AVAILABLE</span>
                 </div>
               )
             ) : (
@@ -440,12 +567,12 @@ export default function ProductDetail() {
               <div>
                 <span className="text-[9px] text-dark/40 font-mono uppercase block">RETAIL PRICE</span>
                 <div className="flex items-center gap-3 mt-1">
-                  <span className="text-2xl font-black font-mono text-dark">₹{product.price}</span>
-                  {product.originalPrice && (
+                  <span className="text-2xl font-black font-mono text-dark">₹{displayPrice}</span>
+                  {displayOriginalPrice && (
                     <>
-                      <span className="text-sm line-through font-mono text-dark/40">₹{product.originalPrice}</span>
+                      <span className="text-sm line-through font-mono text-dark/40">₹{displayOriginalPrice}</span>
                       <span className="text-[10px] font-mono font-black text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-lg uppercase">
-                        {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
+                        {Math.round(((displayOriginalPrice - displayPrice) / displayOriginalPrice) * 100)}% OFF
                       </span>
                     </>
                   )}
@@ -462,15 +589,7 @@ export default function ProductDetail() {
                 <span className="text-[10px] text-dark/50 uppercase tracking-widest font-mono font-black block mb-3">Choose Color Variant</span>
                 <div className="flex gap-3 items-center">
                   {product.colors.map((color) => {
-                    let hex = COLOR_MAP[color]
-                    if (!hex) {
-                      const hexMatch = color.match(/#([0-9a-fA-F]{3,6})/)
-                      if (hexMatch) {
-                        hex = `#${hexMatch[1]}`
-                      } else {
-                        hex = '#CCCCCC'
-                      }
-                    }
+                    const hex = resolveColorHex(color);
                     const isActive = selectedColor === color;
                     const isLightColor = hex.toLowerCase() === '#ffffff' || hex.toLowerCase() === '#fdf6e2' || hex.toLowerCase() === '#faf9f6' || hex.toLowerCase() === '#e1d9c1'
 
@@ -478,7 +597,10 @@ export default function ProductDetail() {
                       <motion.button
                         key={color}
                         whileTap={{ scale: 0.9 }}
-                        onClick={() => setSelectedColor(color)}
+                        onClick={() => {
+                          setSelectedColor(color)
+                          setActiveImageIdx(0)
+                        }}
                         className={`w-7 h-7 rounded-full border transition-all cursor-pointer flex items-center justify-center relative ${isActive
                           ? 'ring-2 ring-dark border-transparent scale-110 shadow-sm'
                           : 'border-neutral-300 hover:scale-105'
@@ -559,7 +681,7 @@ export default function ProductDetail() {
                       <motion.button
                         whileTap={{ scale: 0.95 }}
                         onClick={() => {
-                          toggleWishlist({ ...product, image: product.images[0] })
+                          toggleWishlist({ ...product, image: imagesToRender[0] || product.image })
                           toast.success(
                             isInWishlist(product.id)
                               ? `${product.name} removed from wishlist.`
@@ -583,6 +705,41 @@ export default function ProductDetail() {
                     >
                       Not Yet Available
                     </button>
+                  </div>
+                )
+              }
+
+              const isOutOfStock = displayStock !== undefined && displayStock !== null && displayStock === 0
+              if (isOutOfStock) {
+                return (
+                  <div className="flex gap-3 w-full">
+                    <button
+                      disabled
+                      className="flex-grow py-4 bg-neutral-100 text-dark/30 border border-neutral-200 font-mono font-black text-xs uppercase tracking-widest rounded-2xl cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      <ShieldAlert className="w-4 h-4 opacity-40" />
+                      Sold Out
+                    </button>
+
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        toggleWishlist({ ...product, image: imagesToRender[0] || product.image })
+                        toast.success(
+                          isInWishlist(product.id)
+                            ? `${product.name} removed from wishlist.`
+                            : `${product.name} added to wishlist!`,
+                          { style: { background: '#161616', color: '#FAF9F6', fontFamily: "'Space Grotesk', sans-serif" } }
+                        )
+                      }}
+                      className={`p-4 border rounded-2xl transition-all duration-300 flex items-center justify-center cursor-pointer shadow-xs shrink-0 ${isInWishlist(product.id)
+                        ? 'border-accent bg-accent/5 text-accent'
+                        : 'border-neutral-200 text-dark bg-cream hover:bg-neutral-100'
+                        }`}
+                      title={isInWishlist(product.id) ? "Remove from wishlist" : "Add to wishlist"}
+                    >
+                      <Heart className={`w-5 h-5 transition-colors ${isInWishlist(product.id) ? 'fill-accent text-accent' : ''}`} />
+                    </motion.button>
                   </div>
                 )
               }
@@ -611,7 +768,7 @@ export default function ProductDetail() {
                     <motion.button
                       whileTap={{ scale: 0.95 }}
                       onClick={() => {
-                        toggleWishlist({ ...product, image: product.images[0] })
+                        toggleWishlist({ ...product, image: imagesToRender[0] || product.image })
                         toast.success(
                           isInWishlist(product.id)
                             ? `${product.name} removed from wishlist.`

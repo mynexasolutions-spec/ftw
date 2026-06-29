@@ -9,31 +9,72 @@ import { motion } from 'framer-motion'
 import { getStoreSettings } from '../lib/supabase'
 
 const getColorHex = (colorName) => {
-  if (!colorName) return '#ccc'
-  const cName = colorName.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim()
+  if (!colorName) return '#0F0F0F'
+  if (typeof colorName !== 'string') return '#0F0F0F'
+  if (colorName.startsWith('#')) return colorName
+  
   const hexMatch = colorName.match(/#([0-9a-fA-F]{3,6})/)
   if (hexMatch) return `#${hexMatch[1]}`
   
+  const clean = colorName.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim().toLowerCase()
+  
   const COLOR_MAP = {
-    'Black': '#0F0F0F',
-    'White': '#FFFFFF',
-    'Lime': '#CCFF00',
-    'Charcoal': '#3E3E3E',
-    'Beige': '#FAD7A0',
-    'Cream': '#FDF6E2',
-    'Navy': '#1A2536',
-    'Olive': '#4D5844',
-    'Cyber Blue': '#00E5FF',
-    'Acid Purple': '#583F72',
-    'Acid Olive': '#595C43',
-    'Sand': '#D2C4A8',
-    'Off-White': '#FAF9F6',
-    'Lavender': '#D2B4DE',
-    'Pista': '#A9DFBF',
-    'Light Blue': '#AED6F1',
-    'Plum': '#F1948A'
+    'black': '#0F0F0F',
+    'white': '#FFFFFF',
+    'off-white': '#FAF9F6',
+    'offwhite': '#FAF9F6',
+    'cream': '#FDF6E2',
+    'beige': '#FAD7A0',
+    'sand': '#D2C4A8',
+    'charcoal': '#3E3E3E',
+    'grey': '#707070',
+    'gray': '#707070',
+    'acid wash gray': '#4A4A4A',
+    'acid gray': '#4A4A4A',
+    'navy': '#1A2536',
+    'navy blue': '#1A2536',
+    'olive': '#4D5844',
+    'acid olive': '#595C43',
+    'lime': '#CCFF00',
+    'cyber blue': '#00E5FF',
+    'blue': '#2196F3',
+    'light blue': '#AED6F1',
+    'acid purple': '#583F72',
+    'purple': '#8E44AD',
+    'violet': '#8E44AD',
+    'dusty rose': '#DCAE96',
+    'rose': '#E8A5A5',
+    'pink': '#FFC0CB',
+    'baby pink': '#FFC0CB',
+    'lavender': '#D2B4DE',
+    'pastel lavender': '#D8B4F8',
+    'sage green': '#9CAF88',
+    'sage': '#9CAF88',
+    'green': '#2ECC71',
+    'peach': '#FFDAB9',
+    'red': '#E74C3C',
+    'maroon': '#800000',
+    'burgundy': '#800020',
+    'plum': '#F1948A',
+    'pista': '#A9DFBF',
+    'yellow': '#F1C40F',
+    'orange': '#E67E22',
+    'brown': '#8B4513',
+    'terracotta': '#E2725B',
+    'rust': '#B7410E',
+    'teal': '#008080',
+    'mint': '#98FF98',
+    'gold': '#D4AF37',
+    'silver': '#C0C0C0'
   }
-  return COLOR_MAP[cName] || '#CCCCCC'
+
+  if (COLOR_MAP[clean]) return COLOR_MAP[clean]
+
+  for (const key in COLOR_MAP) {
+    if (clean.includes(key)) return COLOR_MAP[key]
+  }
+
+  return '#0F0F0F'
 }
 
 export default function Navbar() {

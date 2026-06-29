@@ -879,6 +879,23 @@ export default function Shop() {
                   const tagStr = (product.tag || '').toLowerCase().replace(/[\s-_]+/g, ' ').trim()
                   const isComingSoon = categoryStr === 'coming soon' || tagStr === 'coming soon'
 
+                  const defaultColorCleaned = product.default_color ? product.default_color.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim() : '';
+                  const defaultColorVariant = defaultColorCleaned
+                    ? (product.variants || []).find(v => v.color && v.color.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim() === defaultColorCleaned)
+                    : null;
+
+                  const firstVariantWithPrice = defaultColorVariant && defaultColorVariant.price !== undefined
+                    ? defaultColorVariant
+                    : ((product.variants || []).find(v => v.price !== undefined) || {});
+
+                  const firstVariantWithImages = defaultColorVariant && defaultColorVariant.images && defaultColorVariant.images.length > 0
+                    ? defaultColorVariant
+                    : ((product.variants || []).find(v => v.images && v.images.length > 0) || {});
+
+                  const displayPrice = product.price !== undefined && product.price !== null && product.price !== 0 ? product.price : (firstVariantWithPrice.price || 0)
+                  const displayOriginalPrice = product.originalPrice ? product.originalPrice : firstVariantWithPrice.originalPrice
+                  const displayImage = product.image ? product.image : ((firstVariantWithImages.images && firstVariantWithImages.images[0]) || '/images/1.1.jpeg')
+
                   return (
                     <motion.div
                       key={product.id}
@@ -889,7 +906,7 @@ export default function Shop() {
                     >
                       <Link to={`/product/${product.id}`} className="relative aspect-[4/5] bg-[#F5F3EC] overflow-hidden block">
                         <img
-                          src={product.image}
+                          src={displayImage}
                           alt={product.name}
                           className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-700"
                         />
@@ -936,9 +953,9 @@ export default function Shop() {
                           <div className="flex justify-between items-start gap-2 mb-2">
                             <h3 className="font-sans text-[11px] sm:text-sm font-bold text-dark leading-snug">{product.name}</h3>
                             <div className="flex flex-col items-end shrink-0">
-                              <span className="text-[11px] sm:text-sm font-mono font-black text-dark">₹{product.price}</span>
-                              {product.originalPrice && (
-                                <span className="text-[9px] line-through font-mono" style={{ color: '#aaa' }}>₹{product.originalPrice}</span>
+                              <span className="text-[11px] sm:text-sm font-mono font-black text-dark">₹{displayPrice}</span>
+                              {displayOriginalPrice && (
+                                <span className="text-[9px] line-through font-mono" style={{ color: '#aaa' }}>₹{displayOriginalPrice}</span>
                               )}
                             </div>
                           </div>

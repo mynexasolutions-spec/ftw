@@ -3,7 +3,8 @@
   publish = "dist"
 
 [dev]
-  command = "npx vite"
+  command = "npx vite --port 5173"
+  framework = "#custom"
   port = 8888
   targetPort = 5173
 

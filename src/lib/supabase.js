@@ -46,7 +46,9 @@ function sanitizeProduct(product) {
     fabric_info: product.fabric_info,
     washing_instructions: product.washing_instructions,
     size_guide: product.size_guide,
-    size_chart: product.size_chart
+    size_chart: product.size_chart,
+    variants: product.variants || [],
+    default_color: product.default_color
   }
 }
 
@@ -101,23 +103,40 @@ export async function deleteProduct(productId) {
   }
 }
 
-export async function decrementProductStock(productId, quantityToSubtract) {
+export async function decrementProductStock(productId, quantityToSubtract, size, color) {
   try {
     const { data: product, error: fetchError } = await supabase
       .from('products')
-      .select('stock')
+      .select('stock, variants')
       .eq('id', productId)
       .single()
 
     if (fetchError) throw fetchError
     if (!product) return
 
+    const updates = {}
     const currentStock = product.stock || 0
-    const newStock = Math.max(0, currentStock - quantityToSubtract)
+    updates.stock = Math.max(0, currentStock - quantityToSubtract)
+
+    if (Array.isArray(product.variants) && product.variants.length > 0 && size && color) {
+      const cleanedColor = color.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim()
+      const updatedVariants = product.variants.map(v => {
+        const cleanedVColor = v.color ? v.color.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim() : ''
+        if (cleanedVColor === cleanedColor && v.size === size) {
+          const vStock = v.stock !== undefined ? v.stock : 0
+          return {
+            ...v,
+            stock: Math.max(0, vStock - quantityToSubtract)
+          }
+        }
+        return v
+      })
+      updates.variants = updatedVariants
+    }
 
     const { error: updateError } = await supabase
       .from('products')
-      .update({ stock: newStock })
+      .update(updates)
       .eq('id', productId)
 
     if (updateError) throw updateError
