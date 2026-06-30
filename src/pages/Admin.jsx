@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getProducts, getOrders, getInquiries, insertProduct, updateProduct, deleteProduct, updateOrderStatus, insertInquiry, getCategories, insertCategory, deleteCategory, getUsers, updateCategory, getAdminCustomDesigns, deleteCustomDesign, getCoupons, insertCoupon, deleteCoupon, getReviews, approveReview, deleteReview, getStoreSettings, saveStoreSettings, deleteInquiry, getCustomizerConfig, getHomepageConfig, saveHomepageConfig, getCustomDesign } from '../lib/supabase'
+import { getProducts, getOrders, getInquiries, insertProduct, updateProduct, deleteProduct, updateOrderStatus, insertInquiry, getCategories, insertCategory, deleteCategory, getUsers, updateCategory, getAdminCustomDesigns, deleteCustomDesign, getCoupons, insertCoupon, deleteCoupon, getReviews, approveReview, deleteReview, getStoreSettings, saveStoreSettings, deleteInquiry, getCustomizerConfig, getHomepageConfig, saveHomepageConfig, getCustomDesign, getBlogs, insertBlog, updateBlog, deleteBlog } from '../lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-hot-toast'
 import ProductFormModal from '../components/ProductFormModal'
@@ -14,11 +14,12 @@ import ContactsTab from '../components/admin/ContactsTab'
 import SettingsTab from '../components/admin/SettingsTab'
 import CustomizerTab from '../components/admin/CustomizerTab'
 import HomepageTab from '../components/admin/HomepageTab'
+import BlogsTab from '../components/admin/BlogsTab'
 import {
   TrendingUp, Package, ShoppingBag, Star, Users, Tag, Mail, Settings, Palette,
   LogOut, Globe, Plus, Trash2, Edit, CreditCard, CheckCircle, Clock,
   XCircle, Search, Percent, ChevronRight, Eye, IndianRupee, Check, X, ShieldAlert, ArrowRight, Layers, Sparkles, Truck, MapPin, Menu,
-  Type, Image as ImageIcon, Download, Printer
+  Type, Image as ImageIcon, Download, Printer, BookOpen
 } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
@@ -59,6 +60,7 @@ export default function Admin() {
   const [coupons, setCoupons] = useState([])
   const [reviews, setReviews] = useState([])
   const [categoriesList, setCategoriesList] = useState([])
+  const [blogs, setBlogs] = useState([])
   const [newCategoryName, setNewCategoryName] = useState('')
   const [newCategoryParent, setNewCategoryParent] = useState('')
   const [newCategoryDescription, setNewCategoryDescription] = useState('')
@@ -224,6 +226,11 @@ export default function Admin() {
         case 'coupons': {
           const dbCoupons = await getCoupons()
           setCoupons(dbCoupons || [])
+          break
+        }
+        case 'blogs': {
+          const dbBlogs = await getBlogs(true)
+          setBlogs(dbBlogs || [])
           break
         }
         case 'contacts': {
@@ -470,6 +477,41 @@ export default function Admin() {
         loadAdminData()
       } catch (err) {
         toast.error("Failed to delete category.")
+      }
+    }
+  }
+
+  // Blogs Handlers
+  const handleInsertBlog = async (blogPayload) => {
+    try {
+      await insertBlog(blogPayload)
+      toast.success(`Published blog post "${blogPayload.title}"`)
+      loadAdminData()
+    } catch (err) {
+      toast.error("Failed to publish blog post.")
+      throw err
+    }
+  }
+
+  const handleUpdateBlog = async (id, blogPayload) => {
+    try {
+      await updateBlog(id, blogPayload)
+      toast.success(`Updated blog post "${blogPayload.title}"`)
+      loadAdminData()
+    } catch (err) {
+      toast.error("Failed to update blog post.")
+      throw err
+    }
+  }
+
+  const handleDeleteBlog = async (id) => {
+    if (confirm("Are you sure you want to delete this blog post?")) {
+      try {
+        await deleteBlog(id)
+        toast.success("Blog post removed successfully.")
+        loadAdminData()
+      } catch (err) {
+        toast.error("Failed to delete blog post.")
       }
     }
   }
@@ -857,6 +899,7 @@ export default function Admin() {
     { id: 'homepage', label: 'Homepage Customizer', icon: Globe },
     { id: 'products', label: 'Products & Stock', icon: Package },
     { id: 'categories', label: 'Categories', icon: Layers },
+    { id: 'blogs', label: 'Blog Posts', icon: BookOpen },
     { id: 'orders', label: 'Orders', icon: ShoppingBag },
     { id: 'reviews', label: 'Reviews', icon: Star },
     { id: 'users', label: 'Accounts', icon: Users },
@@ -1112,6 +1155,15 @@ export default function Admin() {
                   setSelectedCategory={setSelectedCategory}
                   setShowCategoryModal={setShowCategoryModal}
                   handleDeleteCategory={handleDeleteCategory}
+                />
+              )}
+
+              {activeTab === 'blogs' && (
+                <BlogsTab
+                  blogs={blogs}
+                  onInsertBlog={handleInsertBlog}
+                  onUpdateBlog={handleUpdateBlog}
+                  onDeleteBlog={handleDeleteBlog}
                 />
               )}
 

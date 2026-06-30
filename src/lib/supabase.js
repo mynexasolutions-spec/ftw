@@ -769,3 +769,94 @@ export async function saveCustomizerConfig(config) {
     throw err;
   }
 }
+
+// ─── BLOGS API ──────────────────────────────────────────────────────────────
+export async function getBlogs(all = false) {
+  try {
+    let query = supabase
+      .from('blogs')
+      .select('*')
+      .order('created_at', { ascending: false })
+      
+    if (!all) {
+      query = query.eq('published', true)
+    }
+
+    const { data, error } = await query
+    if (error) throw error
+    return data || []
+  } catch (err) {
+    console.error("Supabase blogs fetch failed:", err.message)
+    throw err
+  }
+}
+
+export async function getBlogBySlug(slug) {
+  try {
+    const { data, error } = await supabase
+      .from('blogs')
+      .select('*')
+      .eq('slug', slug)
+      .maybeSingle()
+
+    if (error) throw error
+    return data
+  } catch (err) {
+    console.error(`Supabase blog fetch by slug (${slug}) failed:`, err.message)
+    throw err
+  }
+}
+
+export async function insertBlog(blog) {
+  const newBlog = {
+    ...blog,
+    id: blog.id || `blog-${Date.now()}`,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('blogs')
+      .insert([newBlog])
+      .select()
+    if (error) throw error
+    return data[0]
+  } catch (err) {
+    console.error("Supabase blog insertion failed:", err.message)
+    throw err
+  }
+}
+
+export async function updateBlog(blogId, blog) {
+  const updatedPayload = {
+    ...blog,
+    updated_at: new Date().toISOString()
+  }
+  try {
+    const { data, error } = await supabase
+      .from('blogs')
+      .update(updatedPayload)
+      .eq('id', blogId)
+      .select()
+    if (error) throw error
+    return data[0]
+  } catch (err) {
+    console.error("Supabase blog update failed:", err.message)
+    throw err
+  }
+}
+
+export async function deleteBlog(blogId) {
+  try {
+    const { error } = await supabase
+      .from('blogs')
+      .delete()
+      .eq('id', blogId)
+    if (error) throw error
+    return true
+  } catch (err) {
+    console.error("Supabase blog deletion failed:", err.message)
+    throw err
+  }
+}

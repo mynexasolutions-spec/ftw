@@ -22,6 +22,7 @@ export default function Footer() {
     { label: 'Sale', to: '/shop?tab=Sale' },
     { label: 'Coming Soon', to: '/shop?tab=Coming+Soon' },
     { label: 'DTF Custom', to: '/shop?tab=dtf' },
+    { label: 'Blogs', to: '/blogs' },
     { label: 'About', to: '/about' },
     { label: 'Contact', to: '/helpline' },
     { label: 'My Orders', to: '/my-orders' },

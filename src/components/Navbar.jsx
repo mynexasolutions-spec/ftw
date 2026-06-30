@@ -3,7 +3,7 @@ import { Link, NavLink, useLocation, useNavigate, useSearchParams } from 'react-
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { useWishlist } from '../context/WishlistContext'
-import { ShoppingBag, X, Trash2, User, Menu, Heart, LogOut, Home, ShoppingCart, Info, HelpCircle, Shield, Package, Palette, Minus, Plus, Lock, Search } from 'lucide-react'
+import { ShoppingBag, X, Trash2, User, Menu, Heart, LogOut, Home, ShoppingCart, Info, HelpCircle, Shield, Package, Palette, Minus, Plus, Lock, Search, BookOpen } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { motion } from 'framer-motion'
 import { getStoreSettings } from '../lib/supabase'
@@ -151,6 +151,7 @@ export default function Navbar() {
     { path: '/', label: 'Home' },
     { path: '/shop', label: 'Shop' },
     { path: '/customizer', label: '✦ Custom Tee' },
+    { path: '/blogs', label: 'Blogs' },
     { path: '/about', label: 'About Us' },
     { path: '/helpline', label: 'Helpline' }
   ]
@@ -695,6 +696,7 @@ export default function Navbar() {
                 { path: '/', label: 'Home', icon: Home },
                 { path: '/shop', label: 'Shop', icon: ShoppingBag },
                 { path: '/customizer', label: 'Custom Tee', icon: Palette },
+                { path: '/blogs', label: 'Blogs', icon: BookOpen },
                 { path: '/wishlist', label: `Wishlist ${wishlistCount > 0 ? `(${wishlistCount})` : ''}`, icon: Heart },
               ]
               return mobileNavItems.map((item) => {

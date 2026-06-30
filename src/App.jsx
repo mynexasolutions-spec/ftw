@@ -15,6 +15,8 @@ import Wishlist from './pages/Wishlist'
 import Admin from './pages/Admin'
 import BagAnimationOverlay from './components/BagAnimationOverlay'
 import Customizer from './pages/Customizer'
+import Blogs from './pages/Blogs'
+import BlogDetail from './pages/BlogDetail'
 
 import MyOrders from './pages/MyOrders'
 import ResetPassword from './pages/ResetPassword'
@@ -50,6 +52,8 @@ function App() {
           <Route path="/customizer" element={<Customizer />} />
           <Route path="/my-orders" element={<MyOrders />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/blogs" element={<Blogs />} />
+          <Route path="/blog/:slug" element={<BlogDetail />} />
         </Routes>
       </main>
       {!isCustomizer && !isAdmin && <Footer />}
