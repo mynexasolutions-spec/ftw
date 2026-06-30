@@ -76,7 +76,7 @@ export default function About() {
           <span className="text-[#FF4E20] font-mono uppercase tracking-[0.25em] text-xs font-bold block mb-2">
             FTW BRAND STORY
           </span>
-          <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-black uppercase tracking-tight text-[#161616] leading-none">
+          <h1 className="font-sans text-3xl sm:text-4xl lg:text-5xl font-bold uppercase text-[#161616] leading-tight">
             ABOUT <span className="text-[#FF4E20] italic transform skew-x-3 inline-block">US</span>
           </h1>
         </motion.div>
@@ -90,7 +90,7 @@ export default function About() {
           {/* Left Column */}
           <div className="lg:col-span-7 space-y-6 sm:space-y-8">
             <motion.div variants={fadeUp}>
-              <span className="block font-display text-3xl sm:text-4xl lg:text-5xl font-black uppercase tracking-tight text-[#161616] leading-none mb-1">
+              <span className="block font-sans text-3xl sm:text-4xl lg:text-5xl font-bold uppercase text-[#161616] leading-tight mb-1">
                 FOR THE <span className="text-[#FF4E20] italic transform skew-x-3 inline-block">WIN</span>
               </span>
             </motion.div>
@@ -238,7 +238,7 @@ export default function About() {
             className="mb-12 border-l-4 border-[#161616] pl-5"
           >
             <motion.span variants={fadeUp} className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#FF4E20] font-bold block mb-2">DESIGN PHILOSOPHY</motion.span>
-            <motion.h2 variants={fadeUp} className="font-display text-3xl sm:text-4xl font-black uppercase text-[#161616] leading-none">
+            <motion.h2 variants={fadeUp} className="font-sans text-3xl sm:text-4xl font-bold uppercase text-[#161616] leading-tight">
               DESIGNED WITH INTENTION.
             </motion.h2>
             <motion.p variants={fadeUp} className="text-xs sm:text-sm text-[#161616]/75 mt-4 max-w-2xl leading-relaxed font-sans">
@@ -262,7 +262,7 @@ export default function About() {
                   <div className="w-11 h-11 rounded-xl bg-[#161616] text-[#FF4E20] flex items-center justify-center mb-6 group-hover:bg-[#FF4E20] group-hover:text-white transition-all duration-300 group-hover:scale-105 group-hover:rotate-3 shadow-sm">
                     <Icon className="w-5 h-5 transition-colors" />
                   </div>
-                  <h3 className="font-display text-base sm:text-lg font-black uppercase text-[#161616] mb-2.5 tracking-wide">{title}</h3>
+                  <h3 className="font-sans text-base sm:text-lg font-bold text-[#161616] mb-2">{title}</h3>
                   <p className="text-[11px] sm:text-xs text-[#161616]/60 leading-[1.8] font-sans">{desc}</p>
                 </div>
 
@@ -315,7 +315,7 @@ export default function About() {
             >
               <motion.div variants={fadeUp}>
                 <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#FF4E20] font-bold block mb-2">PRODUCT QUALITY</span>
-                <h2 className="font-display text-3xl sm:text-4xl font-black uppercase text-[#161616] leading-none mb-6">
+                <h2 className="font-sans text-3xl sm:text-4xl font-bold uppercase text-[#161616] leading-tight mb-6">
                   A LUXURY YOU CAN<br />ACTUALLY LIVE IN.
                 </h2>
                 <p className="text-xs sm:text-sm text-[#161616]/70 leading-relaxed font-sans mb-4">
@@ -360,8 +360,8 @@ export default function About() {
           <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8 p-8 sm:p-12 md:p-16">
             <div className="max-w-lg text-center lg:text-left">
               <span className="text-[10px] font-mono font-black uppercase tracking-[0.25em] text-[#FF4E20] block mb-3.5">CUSTOMER CARE HELPLINE</span>
-              <h2 className="font-display text-3xl sm:text-4xl font-black uppercase leading-none text-white tracking-tight">
-                WE ARE HERE <span className="text-[#FF4E20] italic transform skew-x-3 inline-block">FOR YOU.</span>
+              <h2 className="font-sans text-3xl sm:text-4xl font-bold uppercase leading-tight text-white">
+                We are here <span className="text-[#FF4E20] italic transform skew-x-3 inline-block">for you.</span>
               </h2>
               <p className="text-[11px] sm:text-xs text-white/50 mt-4 leading-relaxed max-w-sm mx-auto lg:mx-0 font-sans">
                 Have questions about our drop narrative, order updates, or sizing details? Get in touch with our customer care helpline anytime.

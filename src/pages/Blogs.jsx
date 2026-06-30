@@ -34,7 +34,7 @@ export default function Blogs() {
   }, [])
 
   return (
-    <div className="bg-[#FAF9F6] text-[#161616] font-sans min-h-screen pt-28 pb-20 relative overflow-hidden selection:bg-[#161616] selection:text-white bg-grid-dots bg-grain">
+    <div className="bg-[#FAF9F6] text-[#161616] font-sans min-h-screen pt-16 sm:pt-24 pb-20 relative overflow-hidden selection:bg-[#161616] selection:text-white bg-grid-dots bg-grain">
       {/* Background gradients */}
       <div className="absolute top-0 left-0 w-full h-[500px] bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,rgba(255,78,32,0.05),transparent)] pointer-events-none" />
 
@@ -45,7 +45,7 @@ export default function Blogs() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="mb-12 md:mb-16 border-l-4 border-[#161616] pl-4 sm:pl-6"
+          className="mb-8 md:mb-12 border-l-4 border-[#161616] pl-4 sm:pl-6"
         >
           <span className="text-[#FF4E20] font-mono uppercase tracking-[0.25em] text-xs font-bold block mb-2">
             FTW BLOGS
@@ -53,9 +53,6 @@ export default function Blogs() {
           <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-black uppercase tracking-tight text-[#161616] leading-none">
             THE <span className="text-[#FF4E20] italic transform skew-x-3 inline-block font-sans">FEED</span>
           </h1>
-          <p className="text-xs sm:text-sm text-[#161616]/60 mt-3 font-sans max-w-md leading-relaxed">
-            Developer logs, drop narratives, culture features, and styling guides straight from the FTW street lab.
-          </p>
         </motion.div>
 
         {loading ? (
@@ -118,7 +115,7 @@ export default function Blogs() {
                       </div>
                     </div>
 
-                    <h2 className="font-sans font-black text-[19px] sm:text-[21px] uppercase tracking-tight leading-tight line-clamp-2">
+                    <h2 className="font-sans font-bold text-[22px] sm:text-[25px] leading-snug line-clamp-2">
                       <Link to={`/blog/${blog.slug}`} className="text-[#161616] hover:text-[#FF4E20] transition-colors duration-300 decoration-none block">
                         {blog.title}
                       </Link>
@@ -130,13 +127,13 @@ export default function Blogs() {
                   </div>
                 </div>
 
-                {/* Footer read link */}
+                {/* Footer read button */}
                 <div className="px-6 pb-6 pt-2">
                   <Link 
                     to={`/blog/${blog.slug}`} 
-                    className="inline-flex items-center gap-2 text-[10.5px] font-mono font-black uppercase tracking-widest text-[#161616] hover:text-[#FF4E20] transition-colors duration-300 decoration-none cursor-pointer"
+                    className="inline-flex items-center justify-center px-5 py-2.5 bg-[#161616] hover:bg-[#FF4E20] text-[#FAF9F6] hover:text-white text-[10px] sm:text-[10.5px] font-mono font-black uppercase tracking-widest rounded-xl transition-all duration-300 shadow-xs border border-transparent select-none cursor-pointer decoration-none"
                   >
-                    Read
+                    Read More
                   </Link>
                 </div>
               </motion.article>

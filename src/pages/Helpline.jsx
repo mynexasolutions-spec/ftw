@@ -101,7 +101,7 @@ export default function Helpline() {
           <span className="text-[#FF4E20] font-mono uppercase tracking-[0.25em] text-xs font-bold block mb-2">
             HELP & SUPPORT
           </span>
-          <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-black uppercase tracking-tight text-[#161616] leading-none">
+          <h1 className="font-sans text-3xl sm:text-4xl lg:text-5xl font-bold uppercase text-[#161616] leading-tight">
             SUPPORT <span className="text-[#FF4E20] italic transform skew-x-3 inline-block">HELPLINE</span>
           </h1>
         </motion.div>
@@ -123,7 +123,7 @@ export default function Helpline() {
             
             <div className="mb-8">
               <span className="text-orange-600 font-mono uppercase tracking-widest text-[10px] font-bold block mb-2">CONTACT US</span>
-              <h2 className="font-display text-2xl sm:text-3xl font-black uppercase text-dark tracking-tight">
+              <h2 className="font-sans text-2xl sm:text-3xl font-bold text-dark leading-tight">
                 Send us a message
               </h2>
               <p className="text-xs text-dark/50 mt-1 font-mono">Fill in the form below and we will get back to you soon.</p>
@@ -232,7 +232,7 @@ export default function Helpline() {
               
               <div className="mb-6">
                 <span className="text-[#FF4E20] font-mono uppercase tracking-widest text-[10px] font-bold block mb-2">DIRECT CONTACT</span>
-                <h3 className="font-display text-xl sm:text-2xl font-black uppercase text-dark tracking-tight">Other ways to reach us</h3>
+                <h3 className="font-sans text-xl sm:text-2xl font-bold text-dark leading-tight">Other ways to reach us</h3>
               </div>
 
               <div className="space-y-4">
@@ -342,7 +342,7 @@ export default function Helpline() {
           <div className="mb-8 border-b border-neutral-100 pb-4 flex items-center justify-between gap-4">
             <div>
               <span className="text-[#FF4E20] font-mono uppercase tracking-widest text-[10px] font-bold block mb-2">FAQ</span>
-              <h2 className="font-display text-2xl sm:text-3xl font-black uppercase text-dark tracking-tight">
+              <h2 className="font-sans text-2xl sm:text-3xl font-bold text-dark leading-tight">
                 Frequently Asked Questions
               </h2>
             </div>

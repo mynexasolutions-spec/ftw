@@ -217,7 +217,7 @@ export default function ProductFormModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 font-sans">
-      <div onClick={onClose} className="absolute inset-0 bg-dark/70 backdrop-blur-md" />
+      <div className="absolute inset-0 bg-dark/70 backdrop-blur-md" />
       <motion.div
         initial={{ opacity: 0, y: 30, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}

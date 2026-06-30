@@ -343,7 +343,7 @@ export default function Admin() {
 
   const handleSaveProduct = async (e) => {
     e.preventDefault()
-    
+
     // Filter variants to keep ONLY active colors from the colors list
     const activeColorsCleaned = (productForm.colors || []).map(c => c.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim().toLowerCase());
     const variants = (productForm.variants || []).filter(v => {
