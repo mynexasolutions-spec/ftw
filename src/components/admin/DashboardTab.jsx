@@ -103,7 +103,7 @@ export default function DashboardTab({ orders, totalSalesVal, pendingOrders, avg
         {/* Design Style Ratio Visualizer */}
         <div className="bg-white border border-cream3 p-6 rounded-2xl space-y-4 shadow-xs">
           <div className="flex justify-between items-center border-b border-cream2 pb-2.5">
-            <h4 className="text-xs lg:text-xs font-mono uppercase text-dark/70 font-black flex items-center gap-2">
+            <h4 className="text-xs lg:text-xs font-sans uppercase text-dark/70 font-black flex items-center gap-2">
               <Sparkles className="w-4 h-4 lg:w-4 lg:h-4 text-accent" />
               Order Matrix (Custom vs Catalog)
             </h4>
@@ -124,14 +124,14 @@ export default function DashboardTab({ orders, totalSalesVal, pendingOrders, avg
                   <span className="w-2.5 h-2.5 lg:w-2.5 lg:h-2.5 rounded-sm bg-accent inline-block" />
                   <span className="font-bold text-dark">Custom Prints</span>
                 </div>
-                <p className="text-[10px] lg:text-[11px] text-dark2/60 font-mono">{customOrdersCount} orders ({customRatio}%)</p>
+                <p className="text-[10px] lg:text-[11px] text-dark2/60 font-sans">{customOrdersCount} orders ({customRatio}%)</p>
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2 justify-end">
                   <span className="font-bold text-dark">Standard Catalog</span>
                   <span className="w-2.5 h-2.5 lg:w-2.5 lg:h-2.5 rounded-sm bg-dark/80 inline-block" />
                 </div>
-                <p className="text-[10px] lg:text-[11px] text-dark2/60 font-mono text-right">{catalogOrdersCount} orders ({catalogRatio}%)</p>
+                <p className="text-[10px] lg:text-[11px] text-dark2/60 font-sans text-right">{catalogOrdersCount} orders ({catalogRatio}%)</p>
               </div>
             </div>
           </div>
@@ -140,7 +140,7 @@ export default function DashboardTab({ orders, totalSalesVal, pendingOrders, avg
         {/* Payment Splits Visualizer */}
         <div className="bg-white border border-cream3 p-6 rounded-2xl space-y-4 shadow-xs">
           <div className="flex justify-between items-center border-b border-cream2 pb-2.5">
-            <h4 className="text-xs lg:text-xs font-mono uppercase text-dark/70 font-black flex items-center gap-2">
+            <h4 className="text-xs lg:text-xs font-sans uppercase text-dark/70 font-black flex items-center gap-2">
               <CreditCard className="w-4 h-4 lg:w-4 lg:h-4 text-accent" />
               Payment Splits (Online vs COD)
             </h4>
@@ -161,14 +161,14 @@ export default function DashboardTab({ orders, totalSalesVal, pendingOrders, avg
                   <span className="w-2.5 h-2.5 lg:w-2.5 lg:h-2.5 rounded-sm bg-emerald-500 inline-block" />
                   <span className="font-bold text-dark">Online Prepaid</span>
                 </div>
-                <p className="text-[10px] lg:text-[11px] text-dark2/60 font-mono">{onlineCount} orders ({onlineRatio}%)</p>
+                <p className="text-[10px] lg:text-[11px] text-dark2/60 font-sans">{onlineCount} orders ({onlineRatio}%)</p>
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2 justify-end">
                   <span className="font-bold text-dark">COD (Unpaid)</span>
                   <span className="w-2.5 h-2.5 lg:w-2.5 lg:h-2.5 rounded-sm bg-amber-500 inline-block" />
                 </div>
-                <p className="text-[10px] lg:text-[11px] text-dark2/60 font-mono text-right">{codCount} orders ({codRatio}%)</p>
+                <p className="text-[10px] lg:text-[11px] text-dark2/60 font-sans text-right">{codCount} orders ({codRatio}%)</p>
               </div>
             </div>
           </div>
@@ -212,7 +212,7 @@ export default function DashboardTab({ orders, totalSalesVal, pendingOrders, avg
                               <div className="flex items-center gap-2">
                                 <span className="font-bold text-dark block text-xs lg:text-xs">{o.customer_name}</span>
                                 {isCustom && (
-                                  <span className="bg-orange-50 text-orange-600 border border-orange-100 text-[8px] lg:text-[9px] font-black uppercase px-1.5 py-0.5 rounded tracking-wide shrink-0">
+                                  <span className="bg-purple-50 text-purple-600 border border-purple-100 text-[8px] lg:text-[9px] font-black uppercase px-1.5 py-0.5 rounded tracking-wide shrink-0">
                                     Custom Print
                                   </span>
                                 )}
@@ -221,7 +221,7 @@ export default function DashboardTab({ orders, totalSalesVal, pendingOrders, avg
                             </div>
                           </div>
                         </td>
-                        <td className="p-4 lg:p-4 font-mono text-dark2/50 text-[10px] lg:text-[11px]" title={o.id}>{o.id}</td>
+                        <td className="p-4 lg:p-4 font-sans text-dark2/50 text-[10px] lg:text-[11px]" title={o.id}>{o.id}</td>
                         <td className="p-4 lg:p-4 text-dark2/70 text-xs lg:text-xs">{new Date(o.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
                         <td className="p-4 lg:p-4 font-bold text-dark text-xs lg:text-xs">₹{o.total.toLocaleString('en-IN')}</td>
                         <td className="p-4 lg:p-4">

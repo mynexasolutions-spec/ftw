@@ -52,8 +52,8 @@ export default function CouponsTab({
           className="bg-gradient-to-br from-violet-50/80 to-purple-100/40 border border-purple-100 p-4 sm:p-5 rounded-2xl shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[110px] sm:min-h-[135px] lg:min-h-[140px] group cursor-pointer"
         >
           <div>
-            <span className="text-[9px] sm:text-[10px] lg:text-xs font-mono font-black text-purple-700/80 uppercase tracking-widest block">Active Coupons</span>
-            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-purple-950 mt-1 font-mono">{totalCoupons}</p>
+            <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans font-black text-purple-700/80 uppercase tracking-widest block">Active Coupons</span>
+            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-purple-950 mt-1 font-sans">{totalCoupons}</p>
           </div>
           <div className="flex justify-between items-center mt-2 sm:mt-3">
             <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold text-purple-600 bg-purple-50/90 px-2 py-0.5 rounded border border-purple-150/50">Live Codes</span>
@@ -70,8 +70,8 @@ export default function CouponsTab({
           className="bg-gradient-to-br from-amber-50/80 to-orange-100/40 border border-orange-100 p-4 sm:p-5 rounded-2xl shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[110px] sm:min-h-[135px] lg:min-h-[140px] group cursor-pointer"
         >
           <div>
-            <span className="text-[9px] sm:text-[10px] lg:text-xs font-mono font-black text-amber-700/80 uppercase tracking-widest block">Percent Codes</span>
-            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-amber-955 mt-1 font-mono">{percentCount}</p>
+            <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans font-black text-amber-700/80 uppercase tracking-widest block">Percent Codes</span>
+            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-amber-955 mt-1 font-sans">{percentCount}</p>
           </div>
           <div className="flex justify-between items-center mt-2 sm:mt-3">
             <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold text-amber-600 bg-amber-50/90 px-2 py-0.5 rounded border border-amber-150/50">Percentage Off</span>
@@ -88,8 +88,8 @@ export default function CouponsTab({
           className="bg-gradient-to-br from-blue-50/80 to-indigo-100/40 border border-blue-100 p-4 sm:p-5 rounded-2xl shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[110px] sm:min-h-[135px] lg:min-h-[140px] group cursor-pointer"
         >
           <div>
-            <span className="text-[9px] sm:text-[10px] lg:text-xs font-mono font-black text-blue-700/80 uppercase tracking-widest block">Flat Discount Codes</span>
-            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-blue-955 mt-1 font-mono">{flatCount}</p>
+            <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans font-black text-blue-700/80 uppercase tracking-widest block">Flat Discount Codes</span>
+            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-blue-955 mt-1 font-sans">{flatCount}</p>
           </div>
           <div className="flex justify-between items-center mt-2 sm:mt-3">
             <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold text-blue-600 bg-blue-50/90 px-2 py-0.5 rounded border border-blue-150/50">Cash Off (₹)</span>
@@ -102,7 +102,7 @@ export default function CouponsTab({
 
       {/* Coupon Generator Form */}
       <div className="bg-white border border-cream3 rounded-3xl p-5 sm:p-6 lg:p-7 shadow-sm">
-        <span className="text-[9px] lg:text-xs text-accent font-black uppercase tracking-widest block mb-4 border-b border-cream3 pb-2 font-mono">Coupon Generator</span>
+        <span className="text-[9px] lg:text-xs text-accent font-black uppercase tracking-widest block mb-4 border-b border-cream3 pb-2 font-sans">Coupon Generator</span>
         <form onSubmit={handleAddCoupon} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end text-xs lg:text-sm font-sans">
           <div className="space-y-1.5">
             <label className="text-[10px] lg:text-xs uppercase tracking-wider block font-bold text-dark2/60">Coupon Code *</label>
@@ -187,7 +187,7 @@ export default function CouponsTab({
                 {/* Coupon Details */}
                 <div className="flex justify-between items-start gap-3">
                   <div>
-                    <span className="font-mono font-black text-xs sm:text-sm lg:text-base tracking-widest text-dark bg-cream2 px-3.5 lg:px-4 py-1.5 lg:py-2 rounded-xl border border-cream3 block w-fit shadow-xs">
+                    <span className="font-sans font-black text-xs sm:text-sm lg:text-base tracking-widest text-dark bg-cream2 px-3.5 lg:px-4 py-1.5 lg:py-2 rounded-xl border border-cream3 block w-fit shadow-xs">
                       {c.code}
                     </span>
                     <span className="text-[9px] lg:text-[10px] text-dark2/45 font-black uppercase tracking-widest block mt-2.5 flex items-center gap-1">
@@ -205,11 +205,11 @@ export default function CouponsTab({
 
                 {/* Ticket Footer Action Row */}
                 <div className="flex justify-between items-center border-t border-dashed border-cream3/80 pt-3 mt-4">
-                  <span className="text-[8.5px] lg:text-[9.5px] text-dark2/40 font-mono tracking-widest uppercase font-black">FTW Code Spec</span>
+                  <span className="text-[8.5px] lg:text-[9.5px] text-dark2/40 font-sans tracking-widest uppercase font-black">FTW Code Spec</span>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleCopyCode(c.code)}
-                      className="px-3 lg:px-3.5 py-1 lg:py-1.5 bg-cream hover:bg-dark hover:text-white rounded-xl border border-cream3 text-[9px] lg:text-xs font-mono font-black uppercase tracking-wider transition-all cursor-pointer"
+                      className="px-3 lg:px-3.5 py-1 lg:py-1.5 bg-cream hover:bg-dark hover:text-white rounded-xl border border-cream3 text-[9px] lg:text-xs font-sans font-black uppercase tracking-wider transition-all cursor-pointer"
                       title="Copy Coupon Code"
                     >
                       {copiedCode === c.code ? (

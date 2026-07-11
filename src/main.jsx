@@ -23,28 +23,29 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                   duration: 3000,
                   style: {
                     borderRadius: '12px',
-                    background: '#161616',
-                    color: '#FAF9F6',
-                    border: '1px solid #222222',
+                    background: '#FFFFFF',
+                    color: '#0F172A',
+                    border: '1px solid #C084FC',
                     fontFamily: "'Space Grotesk', sans-serif",
                     fontSize: '0.88rem',
+                    boxShadow: '0 10px 30px rgba(139, 92, 246, 0.08)',
                   },
                   success: {
                     style: {
-                      borderColor: '#E2F952',
+                      borderColor: '#8B5CF6',
                     },
                     iconTheme: {
-                      primary: '#E2F952',
-                      secondary: '#0B0B0B',
+                      primary: '#8B5CF6',
+                      secondary: '#FFFFFF',
                     },
                   },
                   error: {
                     style: {
-                      borderColor: '#FF4E20',
+                      borderColor: '#EF4444',
                     },
                     iconTheme: {
-                      primary: '#FF4E20',
-                      secondary: '#FAF9F6',
+                      primary: '#EF4444',
+                      secondary: '#FFFFFF',
                     },
                   },
                 }}

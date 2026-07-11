@@ -164,7 +164,7 @@ export default function BlogsTab({
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-cream3 pb-5">
             <div>
-              <h2 className="font-display text-2xl lg:text-3xl xl:text-4xl font-black uppercase tracking-tight text-dark flex items-center gap-3">
+              <h2 className="font-sans text-2xl lg:text-3xl xl:text-4xl font-black uppercase tracking-tight text-dark flex items-center gap-3">
                 <div className="p-2 lg:p-2.5 bg-dark text-white rounded-xl shadow-md">
                   <BookOpen className="w-5.5 h-5.5 lg:w-6 lg:h-6 text-accent fill-accent" />
                 </div>
@@ -188,22 +188,22 @@ export default function BlogsTab({
               className="bg-neutral-55/40 border border-neutral-200/60 p-5 rounded-2xl flex flex-col justify-between min-h-[110px]"
             >
               <div>
-                <span className="text-[9px] sm:text-[10px] lg:text-xs xl:text-sm font-mono font-black text-dark2/50 uppercase tracking-widest block">Total Posts</span>
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-dark mt-1 font-mono">{totalPosts}</p>
+                <span className="text-[9px] sm:text-[10px] lg:text-xs xl:text-sm font-sans font-black text-dark2/50 uppercase tracking-widest block">Total Posts</span>
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-dark mt-1 font-sans">{totalPosts}</p>
               </div>
-              <span className="text-[8px] sm:text-[9px] lg:text-[10px] xl:text-xs font-mono text-dark/30 mt-2">All Drop Stories</span>
+              <span className="text-[8px] sm:text-[9px] lg:text-[10px] xl:text-xs font-sans text-dark/30 mt-2">All Drop Stories</span>
             </motion.div>
 
             {/* Published */}
             <motion.div
               whileHover={{ y: -4 }}
-              className="bg-orange-50/50 border border-orange-100 p-5 rounded-2xl flex flex-col justify-between min-h-[110px]"
+              className="bg-purple-50/50 border border-purple-100 p-5 rounded-2xl flex flex-col justify-between min-h-[110px]"
             >
               <div>
-                <span className="text-[9px] sm:text-[10px] lg:text-xs xl:text-sm font-mono font-black text-accent uppercase tracking-widest block">Published</span>
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-dark mt-1 font-mono">{publishedPosts}</p>
+                <span className="text-[9px] sm:text-[10px] lg:text-xs xl:text-sm font-sans font-black text-accent uppercase tracking-widest block">Published</span>
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-dark mt-1 font-sans">{publishedPosts}</p>
               </div>
-              <span className="text-[8px] sm:text-[9px] lg:text-[10px] xl:text-xs font-mono text-[#FF4E20] mt-2">Live on Shop Portal</span>
+              <span className="text-[8px] sm:text-[9px] lg:text-[10px] xl:text-xs font-sans text-purple-600 mt-2">Live on Shop Portal</span>
             </motion.div>
 
             {/* Drafts */}
@@ -212,10 +212,10 @@ export default function BlogsTab({
               className="bg-neutral-55/50 border border-neutral-200/40 p-5 rounded-2xl flex flex-col justify-between min-h-[110px]"
             >
               <div>
-                <span className="text-[9px] sm:text-[10px] lg:text-xs xl:text-sm font-mono font-black text-dark2/40 uppercase tracking-widest block">Drafts</span>
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-dark mt-1 font-mono">{draftPosts}</p>
+                <span className="text-[9px] sm:text-[10px] lg:text-xs xl:text-sm font-sans font-black text-dark2/40 uppercase tracking-widest block">Drafts</span>
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-dark mt-1 font-sans">{draftPosts}</p>
               </div>
-              <span className="text-[8px] sm:text-[9px] lg:text-[10px] xl:text-xs font-mono text-neutral-400 mt-2">Private offline notes</span>
+              <span className="text-[8px] sm:text-[9px] lg:text-[10px] xl:text-xs font-sans text-neutral-400 mt-2">Private offline notes</span>
             </motion.div>
           </div>
 
@@ -238,13 +238,13 @@ export default function BlogsTab({
             <div className="text-center py-16 bg-cream2/20 border border-dashed border-cream3 rounded-[28px] select-none">
               <BookOpen className="w-10 h-10 mx-auto text-dark2/30 mb-3" />
               <p className="text-xs lg:text-sm font-black uppercase text-dark2/60">No articles match your criteria</p>
-              <p className="text-[10px] lg:text-xs text-dark2/40 mt-1 font-mono">Create your first update drop, or clear search queries.</p>
+              <p className="text-[10px] lg:text-xs text-dark2/40 mt-1 font-sans">Create your first update drop, or clear search queries.</p>
             </div>
           ) : (
             <div className="bg-white border border-cream3 rounded-[28px] overflow-hidden shadow-xs">
               <table className="w-full text-left border-collapse text-xs lg:text-[14px] xl:text-[15px]">
                 <thead>
-                  <tr className="bg-cream2/30 border-b border-cream3 select-none text-[10px] lg:text-xs font-mono font-black uppercase tracking-wider text-dark2/50">
+                  <tr className="bg-cream2/30 border-b border-cream3 select-none text-[10px] lg:text-xs font-sans font-black uppercase tracking-wider text-dark2/50">
                     <th className="p-4 lg:p-5">Story Details</th>
                     <th className="hidden md:table-cell p-4 lg:p-5">Author</th>
                     <th className="hidden sm:table-cell p-4 lg:p-5">Tag</th>
@@ -268,12 +268,12 @@ export default function BlogsTab({
                           </div>
                           <div>
                             <span className="font-sans font-semibold text-xs lg:text-[16px] xl:text-[18px] text-dark block leading-snug">{blog.title}</span>
-                            <span className="text-[10px] lg:text-xs text-dark2/45 font-mono hidden sm:block mt-1">{blog.slug}</span>
+                            <span className="text-[10px] lg:text-xs text-dark2/45 font-sans hidden sm:block mt-1">{blog.slug}</span>
                           </div>
                         </div>
                       </td>
                       <td className="hidden md:table-cell p-4 lg:p-5 text-dark2/70 font-sans font-bold">{blog.author}</td>
-                      <td className="hidden sm:table-cell p-4 lg:p-5 font-mono text-[10px]">
+                      <td className="hidden sm:table-cell p-4 lg:p-5 font-sans text-[10px]">
                         {blog.tag ? (
                           <span className="bg-dark text-cream font-black px-2 py-1 rounded-md text-[9px] select-none tracking-widest uppercase">{blog.tag}</span>
                         ) : (
@@ -282,11 +282,11 @@ export default function BlogsTab({
                       </td>
                       <td className="hidden sm:table-cell p-4 lg:p-5">
                         {blog.published ? (
-                          <span className="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-200/50 px-3 py-1 rounded-xl text-[9px] font-mono font-black uppercase tracking-wider select-none">
+                          <span className="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-200/50 px-3 py-1 rounded-xl text-[9px] font-sans font-black uppercase tracking-wider select-none">
                             <Globe className="w-3 h-3" /> Live
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 text-neutral-500 bg-neutral-100 border border-neutral-200/50 px-3 py-1 rounded-xl text-[9px] font-mono font-black uppercase tracking-wider select-none">
+                          <span className="inline-flex items-center gap-1.5 text-neutral-500 bg-neutral-100 border border-neutral-200/50 px-3 py-1 rounded-xl text-[9px] font-sans font-black uppercase tracking-wider select-none">
                             <Eye className="w-3 h-3 text-neutral-450" /> Draft
                           </span>
                         )}
@@ -324,7 +324,7 @@ export default function BlogsTab({
         <div className="bg-[#FAFAF7] border border-cream3 w-full p-3 sm:p-8 lg:p-10 rounded-2xl sm:rounded-[32px] shadow-xs relative text-sm font-sans">
           <div className="flex justify-between items-center border-b border-cream3 pb-5 mb-8 select-none">
             <div>
-              <span className="text-[10px] text-accent font-black uppercase tracking-widest font-mono">Blog Feed Operations</span>
+              <span className="text-[10px] text-accent font-black uppercase tracking-widest font-sans">Blog Feed Operations</span>
               <h3 className="font-display text-2xl lg:text-3xl font-black uppercase text-dark tracking-tight leading-none mt-1.5">
                 {modalMode === 'add' ? 'Publish Blog Story' : 'Modify Blog Story'}
               </h3>
@@ -343,7 +343,7 @@ export default function BlogsTab({
             <div className="bg-white border border-cream3 p-4 sm:p-7 rounded-2xl sm:rounded-[24px] space-y-4 shadow-xs">
               <div className="border-b border-cream2 pb-3">
                 <span className="text-[10px] lg:text-[13px] xl:text-[14px] uppercase font-black text-dark tracking-wider block">Core Story Identity</span>
-                <span className="text-[9px] lg:text-[11px] xl:text-[12px] text-dark2/40 font-mono uppercase block mt-0.5">Configure main headers and web routing path.</span>
+                <span className="text-[9px] lg:text-[11px] xl:text-[12px] text-dark2/40 font-sans uppercase block mt-0.5">Configure main headers and web routing path.</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="space-y-1.5">
@@ -366,7 +366,7 @@ export default function BlogsTab({
                     placeholder="introducing-the-cyber-drop"
                     value={slug}
                     onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
-                    className="w-full px-4 py-3 bg-[#FAF9F6] border border-cream3 rounded-xl focus:outline-none focus:bg-white focus:border-dark text-sm sm:text-base font-bold text-dark transition-all font-mono placeholder:opacity-30"
+                    className="w-full px-4 py-3 bg-[#FAF9F6] border border-cream3 rounded-xl focus:outline-none focus:bg-white focus:border-dark text-sm sm:text-base font-bold text-dark transition-all font-sans placeholder:opacity-30"
                   />
                 </div>
               </div>
@@ -376,7 +376,7 @@ export default function BlogsTab({
             <div className="bg-white border border-cream3 p-4 sm:p-7 rounded-2xl sm:rounded-[24px] space-y-4 shadow-xs">
               <div className="border-b border-cream2 pb-3">
                 <span className="text-[10px] lg:text-[12px] uppercase font-black text-dark tracking-wider block">Media & Catalog Details</span>
-                <span className="text-[9px] lg:text-[10.5px] text-dark2/40 font-mono uppercase block mt-0.5">Upload cover image and customize feed descriptors.</span>
+                <span className="text-[9px] lg:text-[10.5px] text-dark2/40 font-sans uppercase block mt-0.5">Upload cover image and customize feed descriptors.</span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
@@ -400,12 +400,12 @@ export default function BlogsTab({
                         {uploadingImage ? (
                           <div className="flex flex-col items-center gap-2">
                             <span className="animate-spin w-5 h-5 border-2 border-[#161616] border-t-transparent rounded-full" />
-                            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-dark/50">Uploading...</span>
+                            <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-dark/50">Uploading...</span>
                           </div>
                         ) : (
                           <div className="flex flex-col items-center gap-1.5">
                             <Plus className="w-6 h-6 text-dark2/35 group-hover:text-[#FF4E20] transition-colors" />
-                            <span className="text-[10px] font-mono font-black uppercase tracking-widest text-dark2/50 group-hover:text-dark transition-colors">Upload Banner</span>
+                            <span className="text-[10px] font-sans font-black uppercase tracking-widest text-dark2/50 group-hover:text-dark transition-colors">Upload Banner</span>
                           </div>
                         )}
                         <input
@@ -465,9 +465,9 @@ export default function BlogsTab({
               <div className="flex justify-between items-start border-b border-cream2 pb-3">
                 <div>
                   <span className="text-[10px] lg:text-[13px] xl:text-[14px] uppercase font-black text-dark tracking-wider block">Story Content Narrative</span>
-                  <span className="text-[9px] lg:text-[11px] xl:text-[12px] text-dark2/40 font-mono uppercase block mt-0.5">Write your article body using headings, formatting, and inline images.</span>
+                  <span className="text-[9px] lg:text-[11px] xl:text-[12px] text-dark2/40 font-sans uppercase block mt-0.5">Write your article body using headings, formatting, and inline images.</span>
                 </div>
-                <span className="text-[8px] sm:text-[9px] font-mono font-black uppercase tracking-widest text-[#FF4E20] bg-[#FF4E20]/5 px-2.5 py-1 rounded-lg border border-[#FF4E20]/15 select-none shrink-0">
+                <span className="text-[8px] sm:text-[9px] font-sans font-black uppercase tracking-widest text-[#FF4E20] bg-[#FF4E20]/5 px-2.5 py-1 rounded-lg border border-[#FF4E20]/15 select-none shrink-0">
                   Rich Text Editor
                 </span>
               </div>
@@ -479,7 +479,7 @@ export default function BlogsTab({
                 />
                 
                 {/* Real-time stats bar */}
-                <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-cream3/60 text-[9px] sm:text-[10px] font-mono text-dark2/40 uppercase tracking-wider select-none">
+                <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-cream3/60 text-[9px] sm:text-[10px] font-sans text-dark2/40 uppercase tracking-wider select-none">
                   <div className="flex gap-4">
                     <span>Words: <strong className="text-dark font-black">{wordCount}</strong></span>
                     <span>Characters: <strong className="text-dark font-black">{charCount}</strong></span>
@@ -492,7 +492,7 @@ export default function BlogsTab({
             <div className="bg-white border border-cream3 p-4 sm:p-7 rounded-2xl sm:rounded-[24px] space-y-4 shadow-xs">
               <div className="border-b border-[#FAF9F6] pb-3 select-none">
                 <span className="text-[10px] lg:text-[12px] uppercase font-black text-dark tracking-wider block">Search Engine Optimization (SEO)</span>
-                <span className="text-[9px] lg:text-[10.5px] text-dark2/40 font-mono uppercase block mt-0.5">These inputs are hidden from users but help index search rankings.</span>
+                <span className="text-[9px] lg:text-[10.5px] text-dark2/40 font-sans uppercase block mt-0.5">These inputs are hidden from users but help index search rankings.</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">

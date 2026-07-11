@@ -10,17 +10,18 @@
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 
-  /* Display headings — Inter with tighter tracking for impact */
+  /* Display headings — Orbitron/Rajdhani for clean gaming look */
   .font-display {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    letter-spacing: -0.03em;
+    font-family: 'Orbitron', 'Rajdhani', 'Inter', sans-serif;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
 
-  /* Mono labels — Inter still, just styled differently via tracking */
+  /* Mono labels — Rajdhani with wider spacing */
   .font-mono {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Rajdhani', 'Inter', sans-serif;
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
   }
 }
 
@@ -33,6 +34,42 @@
   --cream: #FFFFFF;
   --cream2: #FAF9F6;
   --cream3: #F3F2EE;
+}
+
+.admin-theme {
+  --primary: #8B5CF6;
+  /* Vibrant violet-500 */
+  --accent: #7C3AED;
+  /* Premium purple/violet-600 */
+}
+
+/* Make selected text clearly visible in admin theme */
+.admin-theme ::selection {
+  background-color: #8B5CF6 !important;
+  color: #FFFFFF !important;
+}
+
+.admin-theme *::selection {
+  background-color: #8B5CF6 !important;
+  color: #FFFFFF !important;
+}
+
+/* Custom Scrollbar for Admin dashboard panels */
+.admin-theme .custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.admin-theme .custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-theme .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 10px;
+}
+
+.admin-theme .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
 }
 
 /* ===== Soft Grain Texture Overlay ===== */
@@ -130,28 +167,29 @@
   will-change: transform;
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar - Premium Gaming Light Theme */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(11, 11, 11, 0.2) transparent;
+  scrollbar-color: #CCFF00 #FAF9F6;
 }
 
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #FAF9F6;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(11, 11, 11, 0.2);
+  background: #CCFF00;
   border-radius: 9999px;
+  border: 2px solid #FAF9F6;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(11, 11, 11, 0.5);
+  background: #b8e600;
 }
 
 /* Premium Card hover style swap helper */
@@ -204,4 +242,70 @@ input::-ms-clear {
   /* IE and Edge */
   scrollbar-width: none;
   /* Firefox */
+}
+
+/* Premium Glowing Utilities */
+.neon-glow-primary {
+  text-shadow: 0 0 10px rgba(204, 255, 0, 0.45);
+}
+
+.gaming-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.gaming-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 25%;
+  height: 200%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(30deg);
+  transition: all 0.6s ease;
+  opacity: 0;
+}
+
+.gaming-btn:hover::after {
+  left: 150%;
+  opacity: 1;
+}
+
+.gaming-btn:hover {
+  box-shadow: 0 0 15px rgba(204, 255, 0, 0.45);
+}
+
+/* Custom Purple Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #FAF9F6;
+}
+::-webkit-scrollbar-thumb {
+  background: #C084FC;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8B5CF6;
+}
+
+/* Firefox */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #C084FC #FAF9F6;
+}
+
+/* Global React Hot Toast Purple Theme Overrides */
+.hot-toast-bar,
+div[role="status"] > div {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1px solid #C084FC !important;
+  border-radius: 12px !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.08) !important;
 }

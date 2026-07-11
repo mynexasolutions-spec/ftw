@@ -32,7 +32,7 @@ export default function SettingsTab({
             </div>
             <div>
               <h3 className="text-sm lg:text-base font-black uppercase text-dark tracking-wider">1. Logistics & Shipping</h3>
-              <p className="text-[9px] lg:text-[10px] text-dark2/45 uppercase mt-0.5 font-bold font-mono">Define domestic cargo shipping rates and thresholds</p>
+              <p className="text-[9px] lg:text-[10px] text-dark2/45 mt-0.5 font-bold font-sans">Define domestic cargo shipping rates and thresholds</p>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -45,7 +45,7 @@ export default function SettingsTab({
                 onChange={(e) => setSettings({ ...settings, shipping_threshold: Number(e.target.value) })}
                 className="w-full px-4 py-2.5 lg:py-3 bg-cream/35 border border-cream3 rounded-xl focus:outline-none focus:bg-white focus:border-dark font-sans text-xs lg:text-sm font-bold transition-all"
               />
-              <span className="text-[10px] lg:text-xs text-dark2/45 block">Orders above <span className="font-extrabold text-dark font-mono">₹{(settings.shipping_threshold || 0).toLocaleString('en-IN')}</span> qualify for free delivery.</span>
+              <span className="text-[10px] lg:text-xs text-dark2/45 block">Orders above <span className="font-extrabold text-dark font-sans">₹{(settings.shipping_threshold || 0).toLocaleString('en-IN')}</span> qualify for free delivery.</span>
             </div>
             <div className="space-y-2">
               <label className="text-[10px] lg:text-xs uppercase tracking-wider font-bold block text-dark2/60">Flat Shipping Charge (INR) *</label>
@@ -56,7 +56,7 @@ export default function SettingsTab({
                 onChange={(e) => setSettings({ ...settings, shipping_flat_rate: Number(e.target.value) })}
                 className="w-full px-4 py-2.5 lg:py-3 bg-cream/35 border border-cream3 rounded-xl focus:outline-none focus:bg-white focus:border-dark font-sans text-xs lg:text-sm font-bold transition-all"
               />
-              <span className="text-[10px] lg:text-xs text-dark2/45 block">Standard flat delivery fee of <span className="font-extrabold text-dark font-mono">₹{(settings.shipping_flat_rate || 0).toLocaleString('en-IN')}</span>.</span>
+              <span className="text-[10px] lg:text-xs text-dark2/45 block">Standard flat delivery fee of <span className="font-extrabold text-dark font-sans">₹{(settings.shipping_flat_rate || 0).toLocaleString('en-IN')}</span>.</span>
             </div>
           </div>
         </div>
@@ -69,7 +69,7 @@ export default function SettingsTab({
             </div>
             <div>
               <h3 className="text-sm lg:text-base font-black uppercase text-dark tracking-wider">2. Payment Gateways</h3>
-              <p className="text-[9px] lg:text-[10px] text-dark2/45 uppercase mt-0.5 font-bold font-mono">Toggle active transaction rails for checkout drop purchases</p>
+              <p className="text-[9px] lg:text-[10px] text-dark2/45 mt-0.5 font-bold font-sans">Toggle active transaction rails for checkout drop purchases</p>
             </div>
           </div>
           <div className="space-y-4">
@@ -144,7 +144,7 @@ export default function SettingsTab({
             </div>
             <div>
               <h3 className="text-sm lg:text-base font-black uppercase text-dark tracking-wider">3. Warehouse Location</h3>
-              <p className="text-[9px] lg:text-[10px] text-dark2/45 uppercase mt-0.5 font-bold font-mono">Origin point for return shipments and dispatch logistics</p>
+              <p className="text-[9px] lg:text-[10px] text-dark2/45 mt-0.5 font-bold font-sans">Origin point for return shipments and dispatch logistics</p>
             </div>
           </div>
           <div className="space-y-2">
@@ -157,6 +157,70 @@ export default function SettingsTab({
               className="w-full px-4 py-2.5 lg:py-3 bg-cream/35 border border-cream3 rounded-xl focus:outline-none focus:bg-white focus:border-dark font-sans text-xs lg:text-sm font-bold transition-all"
             />
             <span className="text-[10px] lg:text-xs text-dark2/45 block">This physical address will be printed on outbound shipping labels.</span>
+          </div>
+        </div>
+        {/* Section 4: Support & Contact Details */}
+        <div className="bg-white border border-cream3 p-5 sm:p-6 lg:p-7 rounded-3xl space-y-6 hover:border-dark/25 hover:shadow-md transition-all duration-300 shadow-sm">
+          <div className="flex items-center gap-3.5 border-b border-cream3 pb-3.5">
+            <div className="p-2.5 lg:p-3 bg-dark/5 text-dark rounded-xl">
+              <ShieldCheck className="w-5 h-5 lg:w-6 lg:h-6 text-accent" />
+            </div>
+            <div>
+              <h3 className="text-sm lg:text-base font-black uppercase text-dark tracking-wider">4. Support & Contact Details</h3>
+              <p className="text-[9px] lg:text-[10px] text-dark2/45 mt-0.5 font-bold font-sans">Configure details visible on the Helpline page and footer</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-[10px] lg:text-xs uppercase tracking-wider font-bold block text-dark2/60">Support Email *</label>
+              <input
+                type="email" 
+                required 
+                value={settings.support_email || ''} 
+                onChange={(e) => setSettings({ ...settings, support_email: e.target.value })}
+                className="w-full px-4 py-2.5 lg:py-3 bg-cream/35 border border-cream3 rounded-xl focus:outline-none focus:bg-white focus:border-dark font-sans text-xs lg:text-sm font-bold transition-all"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] lg:text-xs uppercase tracking-wider font-bold block text-dark2/60">WhatsApp Number *</label>
+              <input
+                type="text" 
+                required 
+                value={settings.support_whatsapp || ''} 
+                onChange={(e) => setSettings({ ...settings, support_whatsapp: e.target.value })}
+                className="w-full px-4 py-2.5 lg:py-3 bg-cream/35 border border-cream3 rounded-xl focus:outline-none focus:bg-white focus:border-dark font-sans text-xs lg:text-sm font-bold transition-all"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] lg:text-xs uppercase tracking-wider font-bold block text-dark2/60">Instagram Handle (no @) *</label>
+              <input
+                type="text" 
+                required 
+                value={settings.support_instagram || ''} 
+                onChange={(e) => setSettings({ ...settings, support_instagram: e.target.value })}
+                className="w-full px-4 py-2.5 lg:py-3 bg-cream/35 border border-cream3 rounded-xl focus:outline-none focus:bg-white focus:border-dark font-sans text-xs lg:text-sm font-bold transition-all"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] lg:text-xs uppercase tracking-wider font-bold block text-dark2/60">Facebook Page URL *</label>
+              <input
+                type="url" 
+                required 
+                value={settings.facebook_link || ''} 
+                onChange={(e) => setSettings({ ...settings, facebook_link: e.target.value })}
+                className="w-full px-4 py-2.5 lg:py-3 bg-cream/35 border border-cream3 rounded-xl focus:outline-none focus:bg-white focus:border-dark font-sans text-xs lg:text-sm font-bold transition-all"
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-[10px] lg:text-xs uppercase tracking-wider font-bold block text-dark2/60">Support Hours *</label>
+              <input
+                type="text" 
+                required 
+                value={settings.support_hours || ''} 
+                onChange={(e) => setSettings({ ...settings, support_hours: e.target.value })}
+                className="w-full px-4 py-2.5 lg:py-3 bg-cream/35 border border-cream3 rounded-xl focus:outline-none focus:bg-white focus:border-dark font-sans text-xs lg:text-sm font-bold transition-all"
+              />
+            </div>
           </div>
         </div>
 

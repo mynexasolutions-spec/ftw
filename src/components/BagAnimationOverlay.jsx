@@ -232,7 +232,7 @@ export default function BagAnimationOverlay() {
             <motion.h3 
               initial={{ opacity: 0 }}
               animate={stage !== 'flying' ? { opacity: 1 } : {}}
-              className="font-display text-lg font-black uppercase tracking-tight text-dark line-clamp-1 max-w-[260px]"
+              className="font-display text-lg font-black uppercase tracking-tight text-dark px-4"
             >
               {animatingProduct.name}
             </motion.h3>

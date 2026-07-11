@@ -144,9 +144,9 @@ export default function Customizer() {
           setBlankPrice(Number(p.customizer_blank_price))
         }
         setZonePrices({
-          front:        p.customizer_print_cost_front        !== undefined ? Number(p.customizer_print_cost_front)        : 99,
-          back:         p.customizer_print_cost_back         !== undefined ? Number(p.customizer_print_cost_back)         : 99,
-          left_sleeve:  p.customizer_print_cost_left_sleeve  !== undefined ? Number(p.customizer_print_cost_left_sleeve)  : 99,
+          front: p.customizer_print_cost_front !== undefined ? Number(p.customizer_print_cost_front) : 99,
+          back: p.customizer_print_cost_back !== undefined ? Number(p.customizer_print_cost_back) : 99,
+          left_sleeve: p.customizer_print_cost_left_sleeve !== undefined ? Number(p.customizer_print_cost_left_sleeve) : 99,
           right_sleeve: p.customizer_print_cost_right_sleeve !== undefined ? Number(p.customizer_print_cost_right_sleeve) : 99,
         })
         // Load size chart from store_settings
@@ -293,7 +293,7 @@ export default function Customizer() {
         setTextBold(activeElement.bold || false)
         setTextItalic(activeElement.italic || false)
         setTextUnderline(activeElement.underline || false)
-        
+
         // Auto-switch tabs to expose text controls (font, style, size)
         setDesktopTab('text')
         setMobileDrawer('text')
@@ -343,8 +343,8 @@ export default function Customizer() {
   const addElement = (el) => {
     // Calculate print zone dimensions based on activeZone
     const zoneWidth = (activeZone === 'left_sleeve' || activeZone === 'right_sleeve') ? 420 * 0.22 : 420 * 0.45;
-    const zoneHeight = (activeZone === 'left_sleeve' || activeZone === 'right_sleeve') 
-      ? 500 * 0.16 
+    const zoneHeight = (activeZone === 'left_sleeve' || activeZone === 'right_sleeve')
+      ? 500 * 0.16
       : (activeZone === 'front' ? 500 * 0.52 : 500 * 0.62);
 
     // Approximate size of new element to center it accurately
@@ -609,11 +609,11 @@ export default function Customizer() {
           }))
         }}
         style={{ x: el.x, y: el.y, rotate: el.rotation, scale: el.scale, position: 'absolute', zIndex: elementZIndex }}
-        className={`cursor-move flex items-center justify-center p-1.5 ${isSel ? 'outline-dashed outline-2 outline-orange-400 rounded-sm' : ''}`}
+        className={`cursor-move flex items-center justify-center p-1.5 ${isSel ? 'outline-dashed outline-2 outline-purple-600 rounded-sm' : ''}`}
       >
         {isSel && (
           <motion.div
-            className="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-orange-500 rounded-full border border-white cursor-se-resize z-[60] shadow-sm"
+            className="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-purple-600 rounded-full border border-white cursor-se-resize z-[60] shadow-sm"
             onMouseDown={(e) => handleResizeStart(e, el)}
             onTouchStart={(e) => handleResizeStart(e, el)}
             onClick={e => e.stopPropagation()}
@@ -821,7 +821,7 @@ export default function Customizer() {
               updateElement({ size: val })
             }
           }}
-            className="w-full h-1.5 rounded-full appearance-none bg-cream3 accent-accent cursor-pointer" />
+            className="w-full h-1.5 rounded-full appearance-none bg-cream3 accent-purple-600 cursor-pointer" />
         </div>
       </div>
 
@@ -838,7 +838,7 @@ export default function Customizer() {
                 }
               }}
                 className={`w-8 h-8 rounded-full shrink-0 cursor-pointer border border-neutral-200/50 flex items-center justify-center transition-all duration-200 ${isSel
-                  ? 'ring-2 ring-offset-2 ring-accent scale-110 shadow-sm'
+                  ? 'ring-2 ring-offset-2 ring-purple-600 scale-110 shadow-sm'
                   : 'hover:scale-105 hover:shadow-xs'
                   }`}
                 style={{ backgroundColor: c }}
@@ -864,7 +864,7 @@ export default function Customizer() {
       )}
 
       <button onClick={handleAddText}
-        className="w-full py-4 rounded-xl font-bold text-xs uppercase tracking-widest border-none cursor-pointer transition-all duration-300 flex items-center justify-center gap-2 bg-accent text-white hover:bg-dark hover:shadow-glow shadow-md hover:scale-[1.01] active:scale-[0.99]"
+        className="w-full py-4 rounded-xl font-bold text-xs uppercase tracking-widest border-none cursor-pointer transition-all duration-300 flex items-center justify-center gap-2 bg-purple-600 text-white hover:bg-purple-700 hover:shadow-glow shadow-md hover:scale-[1.01] active:scale-[0.99]"
       >
         <span>Add Text to Canvas</span>
       </button>
@@ -931,11 +931,10 @@ export default function Customizer() {
                 {uploadedImages.map((img, i) => (
                   <div
                     key={i}
-                    className={`relative aspect-square border border-cream3 rounded-xl overflow-hidden transition-all duration-300 p-1 bg-cream2 group/img ${
-                      isReadOnly
+                    className={`relative aspect-square border border-cream3 rounded-xl overflow-hidden transition-all duration-300 p-1 bg-cream2 group/img ${isReadOnly
                         ? 'cursor-default hover:border-accent/40'
                         : 'hover:border-accent cursor-pointer hover:scale-105 hover:shadow-md'
-                    }`}
+                      }`}
                     onClick={!isReadOnly ? () => addElement({ type: 'image', url: img, name: `gallery-${i}` }) : undefined}
                   >
                     <img src={img} alt={`Design image ${i + 1}`} className="w-full h-full object-contain" />
@@ -1108,7 +1107,7 @@ export default function Customizer() {
             key={el.id}
             onClick={() => setSelectedElementId(el.id)}
             className={`flex items-center justify-between px-3 py-2.5 rounded-xl border-2 cursor-pointer transition-all ${selectedElementId === el.id
-              ? 'border-orange-400 bg-orange-50'
+              ? 'border-purple-600 bg-purple-50'
               : 'border-neutral-200 bg-white hover:border-neutral-300'
               }`}
           >
@@ -1137,13 +1136,13 @@ export default function Customizer() {
             <div className="flex justify-between text-[9px] font-mono text-dark/50 mb-1"><span>Scale</span><span>{activeElement.scale.toFixed(2)}x</span></div>
             <input type="range" min="0.2" max="2.5" step="0.05" value={activeElement.scale}
               onChange={e => updateElement({ scale: +e.target.value })}
-              className="w-full accent-orange-500 cursor-pointer" />
+              className="w-full accent-purple-600 cursor-pointer" />
           </div>
           <div>
             <div className="flex justify-between text-[9px] font-mono text-dark/50 mb-1"><span>Rotation</span><span>{activeElement.rotation}°</span></div>
             <input type="range" min="0" max="359" step="5" value={activeElement.rotation}
               onChange={e => updateElement({ rotation: +e.target.value })}
-              className="w-full accent-orange-500 cursor-pointer" />
+              className="w-full accent-purple-600 cursor-pointer" />
           </div>
           {activeElement.type === 'text' && (
             <div className="space-y-2">
@@ -1340,18 +1339,77 @@ export default function Customizer() {
 
   /* ─────────────────────── JSX ─────────────────────── */
   return (
-    <div className="fixed inset-0 bg-[#EFEFEF] flex flex-col font-sans overflow-hidden" style={{ zIndex: 9999 }}>
+    <div className="fixed inset-0 bg-[#FAF9F6] text-[#161616] flex flex-col font-sans overflow-hidden bg-grain" style={{ zIndex: 9999 }}>
+
+      {/* Gaming UI grid lines and glowing effects in light theme */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .bg-grain {
+            background-image: 
+              radial-gradient(rgba(139, 92, 246, 0.08) 1.2px, transparent 1.2px),
+              radial-gradient(circle at 10% 10%, rgba(139, 92, 246, 0.04) 0%, transparent 40%),
+              radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.04) 0%, transparent 40%);
+            background-size: 20px 20px, 100% 100%, 100% 100%;
+          }
+
+          /* Full subtle scanline overlay */
+          .customizer-scanlines {
+            position: absolute; inset: 0; z-index: 1; pointer-events: none;
+            background: repeating-linear-gradient(
+              0deg,
+              transparent,
+              transparent 2px,
+              rgba(139,92,246,0.015) 2px,
+              rgba(139,92,246,0.015) 4px
+            );
+          }
+
+          /* Outer border wrapper for customizer console panels */
+          .hud-card-border {
+            background: linear-gradient(135deg, rgba(168,85,247,0.7), rgba(99,58,214,0.5), rgba(37,99,235,0.5));
+            clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px);
+            padding: 1.5px;
+            position: relative;
+            transition: all 0.3s ease;
+          }
+
+          /* HUD Console inside container */
+          .hud-customizer-card {
+            background: #FFFFFF;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px);
+          }
+
+          /* Corner ticks */
+          .hud-corner { position: absolute; width: 8px; height: 8px; border-color: rgba(139,92,246,0.38); border-style: solid; z-index: 10; }
+          .hud-tl { top: 4px; left: 4px; border-width: 2px 0 0 2px; }
+          .hud-tr { top: 4px; right: 4px; border-width: 2px 2px 0 0; }
+          .hud-bl { bottom: 4px; left: 4px; border-width: 0 0 2px 2px; }
+          .hud-br { bottom: 4px; right: 4px; border-width: 0 2px 2px 0; }
+
+          .hud-hex { font-family: monospace; font-size: 7px; color: rgba(139,92,246,0.5); letter-spacing: 0.05em; font-weight: bold; }
+        `
+      }} />
+
+      <div className="customizer-scanlines" />
+
+      {/* Decorative margin decals */}
+      <div className="absolute left-6 top-[38%] rotate-[-90deg] origin-left text-[8px] font-mono text-gray-400 tracking-[0.3em] uppercase select-none pointer-events-none z-10 hidden xl:block">
+        FTW // GRAPHIC_DESIGN // STUDIO_V2.0
+      </div>
 
       {/* ────────── SHARED TOPBAR ────────── */}
-      <div className="shrink-0 flex items-center justify-between px-4 py-3 bg-white border-b border-neutral-200 shadow-xs">
+      <div className="shrink-0 flex items-center justify-between px-6 py-4 bg-white/70 backdrop-blur-xl border-b border-[#E8E5DC] shadow-sm relative z-10">
         {/* Left */}
         <div className="flex items-center gap-2">
           <button onClick={() => navigate(-1)}
             className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-neutral-100 transition-colors border-none bg-transparent cursor-pointer"
           ><ArrowLeft className="w-5 h-5 text-dark" /></button>
           <div className="hidden sm:block">
-            <h1 className="text-sm font-black uppercase tracking-tight text-dark leading-none">Studio Customizer</h1>
-            <span className="text-[9px] font-mono text-dark/40 uppercase tracking-widest">FOR THE WIN • DTF Studio</span>
+            <h1 className="text-[16px] font-black uppercase tracking-tight text-dark leading-none font-sans">Studio Customizer</h1>
+            <span className="text-[11px] font-mono text-purple-600 uppercase tracking-widest font-black block mt-1">FOR THE WIN • DTF Studio</span>
           </div>
         </div>
 
@@ -1365,19 +1423,19 @@ export default function Customizer() {
           ><Redo2 className="w-4 h-4" /></button>
           <div className="w-px h-5 bg-neutral-200 mx-1" />
           <button onClick={() => setGridOn(v => !v)}
-            className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors border-none cursor-pointer ${gridOn ? 'bg-orange-100 text-orange-500' : 'hover:bg-neutral-100 text-dark bg-transparent'}`}
+            className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors border-none cursor-pointer ${gridOn ? 'bg-purple-100 text-purple-600' : 'hover:bg-neutral-100 text-dark bg-transparent'}`}
           ><Grid3X3 className="w-4 h-4" /></button>
         </div>
 
         {/* Right: price + Add-to-bag (desktop only) */}
         <div className="flex items-center gap-3">
           <div className="hidden lg:block text-right">
-            <span className="text-[9px] font-mono uppercase text-dark/40 block">Estimated Total</span>
+            <span className="text-[9px] font-mono uppercase text-dark/50 block font-bold">Estimated Total</span>
             <span className="text-base font-black font-mono text-dark">₹{totalPrice}</span>
           </div>
           {(!isReadOnly || isOwner) && (
             <button onClick={handleSaveAndContinue}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 sm:gap-2 sm:px-4 sm:py-2 bg-[#161616] hover:bg-neutral-800 text-white rounded-xl text-[10px] sm:text-xs font-bold cursor-pointer border-none transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 sm:gap-2 sm:px-5 sm:py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-[10px] sm:text-xs font-mono font-black uppercase tracking-wider cursor-pointer border-none transition-all shadow-md animate-pulse"
             >
               <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span>Save & Continue</span>
@@ -1438,7 +1496,7 @@ export default function Customizer() {
                     </div>
                     <span className="whitespace-nowrap font-sans font-bold uppercase tracking-wider text-[9px]">{zone.name}</span>
                     {cnt > 0 && (
-                      <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-black flex items-center justify-center min-w-[14px] h-3.5 transition-all duration-300 ${isA ? 'bg-orange-500 text-white shadow-[0_0_10px_rgba(249,115,22,0.5)]' : 'bg-neutral-900 text-white'
+                      <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-black flex items-center justify-center min-w-[14px] h-3.5 transition-all duration-300 ${isA ? 'bg-purple-600 text-white shadow-[0_0_10px_rgba(139,92,246,0.5)]' : 'bg-neutral-900 text-white'
                         }`}>
                         {cnt}
                       </span>
@@ -1494,9 +1552,9 @@ export default function Customizer() {
             ].map(item => (
               <button key={item.key}
                 onClick={() => setMobileDrawer(d => d === item.key ? null : item.key)}
-                className={`flex flex-col items-center gap-0.5 relative border-none bg-transparent cursor-pointer px-3 py-1 rounded-xl transition-colors ${mobileDrawer === item.key ? 'text-orange-500' : 'text-dark/60 hover:text-dark'}`}
+                className={`flex flex-col items-center gap-0.5 relative border-none bg-transparent cursor-pointer px-3 py-1 rounded-xl transition-colors ${mobileDrawer === item.key ? 'text-purple-600' : 'text-dark/60 hover:text-dark'}`}
               >
-                {item.badge && <span className="absolute -top-0.5 right-2 w-2.5 h-2.5 bg-orange-400 rounded-full" />}
+                {item.badge && <span className="absolute -top-0.5 right-2 w-2.5 h-2.5 bg-purple-600 rounded-full" />}
                 {item.icon}
                 <span className="text-[9px] font-medium">{item.label}</span>
               </button>
@@ -1524,13 +1582,18 @@ export default function Customizer() {
           </div>
 
           {/* Canvas */}
-          <div style={{ transform: `scale(${zoom})`, transformOrigin: 'center', transition: 'transform 0.2s ease' }}>
+          <div style={{ transform: `scale(${zoom})`, transformOrigin: 'center', transition: 'transform 0.2s ease' }} className="hud-card-border shadow-2xl">
             <div
               ref={canvasRef}
               onClick={() => setSelectedElementId(null)}
-              className="relative rounded-2xl overflow-hidden bg-white shadow-2xl"
+              className="hud-checkout-card"
               style={{ width: 420, height: 500 }}
             >
+              <div className="hud-corner hud-tl" />
+              <div className="hud-corner hud-tr" />
+              <div className="hud-corner hud-bl" />
+              <div className="hud-corner hud-br" />
+
               <div className="absolute inset-0 z-0 transition-colors duration-300" style={{ backgroundColor: selectedColor?.mockups ? '#FFFFFF' : selectedColor.hex }} />
               <img src={mockupSrc} alt="T-shirt" className={`absolute inset-0 z-10 w-full h-full object-contain select-none pointer-events-none ${selectedColor?.mockups ? '' : 'mix-blend-multiply'}`} draggable={false} />
               {gridOn && (
@@ -1582,7 +1645,7 @@ export default function Customizer() {
                     </div>
                     <span className="whitespace-nowrap font-sans font-bold uppercase tracking-wider text-[10px]">{zone.name}</span>
                     {cnt > 0 && (
-                      <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black flex items-center justify-center min-w-[16px] h-4 transition-all duration-300 ${isA ? 'bg-orange-500 text-white shadow-[0_0_10px_rgba(249,115,22,0.5)]' : 'bg-neutral-900 text-white'
+                      <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black flex items-center justify-center min-w-[16px] h-4 transition-all duration-300 ${isA ? 'bg-purple-600 text-white shadow-[0_0_10px_rgba(139,92,246,0.5)]' : 'bg-neutral-900 text-white'
                         }`}>
                         {cnt}
                       </span>
@@ -1595,29 +1658,29 @@ export default function Customizer() {
         </div>
 
         {/* RIGHT: Control panel */}
-        <div className="w-[360px] xl:w-[400px] bg-white border-l border-neutral-200 flex flex-col shadow-xl">
+        <div className="w-[360px] xl:w-[400px] bg-white border-l border-[#E8E5DC] flex flex-col shadow-xl relative z-10">
           {/* Tab strip */}
-          <div className="shrink-0 flex border-b border-cream3/80 bg-cream2 p-1.5 gap-1">
+          <div className="shrink-0 flex border-b border-[#E8E5DC]/80 bg-neutral-50 p-1.5 gap-1">
             {DESKTOP_TABS.map(tab => {
               const isA = desktopTab === tab.key
               return (
                 <button key={tab.key}
                   onClick={() => setDesktopTab(tab.key)}
                   title={tab.label}
-                  className={`flex-1 flex flex-col items-center gap-1.5 py-2.5 rounded-xl border-none cursor-pointer transition-all duration-200 relative text-xs font-semibold ${isA
-                    ? 'text-dark bg-white shadow-sm font-bold scale-[1.02]'
+                  className={`flex-1 flex flex-col items-center gap-1.5 py-2.5 rounded-xl border-none cursor-pointer transition-all duration-200 relative text-xs font-bold ${isA
+                    ? 'text-dark bg-white shadow-sm font-black scale-[1.02]'
                     : 'text-dark/40 bg-transparent hover:text-dark hover:bg-white/40'
                     }`}
                 >
                   {tab.badge && (
-                    <span className="absolute top-1.5 right-2 w-2.5 h-2.5 rounded-full bg-accent animate-pulse shadow-[0_0_6px_#FF4E20]" />
+                    <span className="absolute top-1.5 right-2 w-2.5 h-2.5 rounded-full bg-purple-600 animate-pulse shadow-[0_0_6px_#8B5CF6]" />
                   )}
-                  <div className={`transition-colors duration-200 ${isA ? 'text-accent' : 'text-current'}`}>
+                  <div className={`transition-colors duration-200 ${isA ? 'text-purple-600' : 'text-current'}`}>
                     {tab.icon}
                   </div>
-                  <span className="text-[9.5px] tracking-wider uppercase font-mono font-bold">{tab.label}</span>
+                  <span className="text-[9.5px] tracking-wider uppercase font-mono font-black">{tab.label}</span>
                   {isA && (
-                    <div className="absolute bottom-0 left-1/3 right-1/3 h-[2.5px] bg-accent rounded-full" />
+                    <div className="absolute bottom-0 left-1/3 right-1/3 h-[2.5px] bg-purple-600 rounded-full" />
                   )}
                 </button>
               )
@@ -1707,12 +1770,12 @@ export default function Customizer() {
               </div>
               <div className="flex items-center justify-between px-5 pb-3 border-b border-neutral-100 shrink-0">
                 <h3 className="font-bold text-base text-dark flex items-center gap-2">
-                  {mobileDrawer === 'color' && <><Palette className="w-4 h-4 text-accent" /> <span>Color & Style</span></>}
-                  {mobileDrawer === 'text' && <><Type className="w-4 h-4 text-accent" /> <span>Add Text</span></>}
-                  {mobileDrawer === 'image' && <><ImageIcon className="w-4 h-4 text-accent" /> <span>Upload Image</span></>}
-                  {mobileDrawer === 'presets' && <><Sparkles className="w-4 h-4 text-accent" /> <span>Ready Designs</span></>}
-                  {mobileDrawer === 'layers' && <><Layers className="w-4 h-4 text-accent" /> <span>Layers</span></>}
-                  {mobileDrawer === 'designs' && <><Sparkles className="w-4 h-4 text-accent" /> <span>My Designs</span></>}
+                  {mobileDrawer === 'color' && <><Palette className="w-4 h-4 text-purple-600" /> <span>Color & Style</span></>}
+                  {mobileDrawer === 'text' && <><Type className="w-4 h-4 text-purple-600" /> <span>Add Text</span></>}
+                  {mobileDrawer === 'image' && <><ImageIcon className="w-4 h-4 text-purple-600" /> <span>Upload Image</span></>}
+                  {mobileDrawer === 'presets' && <><Sparkles className="w-4 h-4 text-purple-600" /> <span>Ready Designs</span></>}
+                  {mobileDrawer === 'layers' && <><Layers className="w-4 h-4 text-purple-600" /> <span>Layers</span></>}
+                  {mobileDrawer === 'designs' && <><Sparkles className="w-4 h-4 text-purple-600" /> <span>My Designs</span></>}
                 </h3>
                 <button onClick={() => setMobileDrawer(null)}
                   className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-neutral-100 border-none bg-transparent cursor-pointer"

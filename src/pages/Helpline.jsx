@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { Mail, Phone, MessageCircle, Instagram, Clock, HelpCircle, ShieldCheck, Send, ChevronDown, Compass, Sparkles } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Mail, Phone, MessageCircle, Instagram, Clock, HelpCircle, ShieldCheck, Send, ChevronDown, Compass, Sparkles, User, FileText, HelpCircle as HelpIcon, ArrowRight, Zap, Gamepad2 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { motion, AnimatePresence } from 'framer-motion'
-import { insertInquiry } from '../lib/supabase'
+import { insertInquiry, getStoreSettings } from '../lib/supabase'
 
 export default function Helpline() {
   const [formData, setFormData] = useState({
@@ -14,18 +14,39 @@ export default function Helpline() {
   })
   const [loading, setLoading] = useState(false)
   const [openFaqIndex, setOpenFaqIndex] = useState(null)
+  const [settings, setSettings] = useState({
+    support_email: 'forthewinmail8@gmail.com',
+    support_whatsapp: '+91 XXXXX XXXXX',
+    support_instagram: 'ftw_streetwear',
+    support_hours: 'MON – SAT: 10:00 AM – 7:00 PM IST',
+    facebook_link: 'https://facebook.com'
+  })
+
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const dbSettings = await getStoreSettings()
+        if (dbSettings) {
+          setSettings(dbSettings)
+        }
+      } catch (err) {
+        console.error("Failed to load helpline settings:", err)
+      }
+    }
+    loadSettings()
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
-    
+
     try {
       await insertInquiry(formData)
-      toast.success("Message sent! We will get back to you soon.", {
-        style: { 
-          background: '#161616', 
-          color: '#FAF9F6', 
-          border: '1px solid #222222',
+      toast.success("Message dispatched! Telemetry confirmed.", {
+        style: {
+          background: '#161616',
+          color: '#FAF9F6',
+          border: '1.5px solid #8B5CF6',
           fontFamily: "'Space Grotesk', sans-serif"
         }
       })
@@ -37,26 +58,9 @@ export default function Helpline() {
         message: ''
       })
     } catch (err) {
-      toast.error("Failed to send message. Please try again.")
+      toast.error("Failed to transmit telemetry. Please try again.")
     } finally {
       setLoading(false)
-    }
-  }
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { staggerChildren: 0.15 }
-    }
-  }
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { type: "spring", stiffness: 100, damping: 15 } 
     }
   }
 
@@ -80,102 +84,274 @@ export default function Helpline() {
   ]
 
   return (
-    <div className="bg-[#FAF9F6] text-[#161616] font-sans min-h-screen relative overflow-hidden selection:bg-[#161616] selection:text-white bg-grid-dots bg-grain">
-      {/* Visual background accents */}
-      <div className="absolute top-0 left-0 w-full h-[500px] bg-[radial-gradient(ellipse_60%_60%_at_50%_-10%,rgba(255,78,32,0.06),transparent)] pointer-events-none" />
-      <div className="absolute top-1/3 left-10 w-96 h-96 bg-purple-500/3 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-[450px] h-[450px] bg-orange-500/2 blur-[150px] rounded-full pointer-events-none" />
+    <div className="bg-[#FAF9F6] text-dark min-h-screen relative overflow-hidden bg-grain pb-20">
+      {/* Inline styles to match the precise HUD screenshot layout with purple accents */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .bg-grain {
+            background-image: 
+              radial-gradient(rgba(139, 92, 246, 0.08) 1.2px, transparent 1.2px),
+              radial-gradient(circle at 10% 10%, rgba(139, 92, 246, 0.04) 0%, transparent 40%),
+              radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.04) 0%, transparent 40%);
+            background-size: 20px 20px, 100% 100%, 100% 100%;
+          }
 
-      {/* Grid overlay for streetwear structure */}
-      <div className="absolute inset-0 bg-grid-black/[0.012] pointer-events-none" />
+          /* Main Heading FTW decal styling */
+          .hud-helpline-title {
+            font-family: 'Orbitron', 'Space Grotesk', sans-serif;
+            font-weight: 1000;
+            font-size: clamp(34px, 5.5vw, 64px);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            line-height: 1.1;
+            color: #161616;
+            margin-top: 10px;
+          }
+          .hud-helpline-title span {
+            background: linear-gradient(90deg, #8B5CF6 0%, #6366F1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-style: italic;
+          }
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-10 sm:pt-16 pb-16 sm:pb-20 relative z-10">
-        
-        {/* Title Header */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="mb-10 sm:mb-16 border-l-4 border-[#161616] pl-4 sm:pl-6"
-        >
-          <span className="text-[#FF4E20] font-mono uppercase tracking-[0.25em] text-xs font-bold block mb-2">
-            HELP & SUPPORT
-          </span>
-          <h1 className="font-sans text-3xl sm:text-4xl lg:text-5xl font-bold uppercase text-[#161616] leading-tight">
-            SUPPORT <span className="text-[#FF4E20] italic transform skew-x-3 inline-block">HELPLINE</span>
+          /* Outer border wrapper for helpline card — darker gaming border */
+          .hud-card-border {
+            background: linear-gradient(135deg, rgba(168,85,247,0.9), rgba(99,58,214,0.9), rgba(37,99,235,0.9));
+            clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px), 0 18px);
+            padding: 1.5px;
+            position: relative;
+            transition: all 0.3s ease;
+          }
+
+          /* HUD Card layout matching screenshot */
+          .hud-helpline-card {
+            background: #FFFFFF;
+            padding: 32px;
+            position: relative;
+            clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px), 0 18px);
+          }
+          /* Keep content forward */
+          .hud-helpline-card > form,
+          .hud-helpline-card > div,
+          .hud-helpline-card > span,
+          .hud-helpline-card > h2,
+          .hud-helpline-card > h3,
+          .hud-helpline-card > p,
+          .hud-helpline-card > a {
+            position: relative;
+            z-index: 10;
+          }
+
+          /* Tech Input Controls */
+          .hud-field-wrap {
+            position: relative;
+          }
+          .hud-field-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #A855F7;
+            width: 16px;
+            height: 16px;
+            z-index: 10;
+          }
+          .hud-input-ctl {
+            width: 100%;
+            padding: 14px 14px 14px 44px;
+            background: rgba(245,240,255,0.45);
+            border: 1.5px solid rgba(139,92,246,0.22);
+            border-radius: 12px;
+            color: #161616;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+          }
+          @media (min-width: 1024px) {
+            .hud-input-ctl {
+              font-size: 16px;
+              padding: 16px 16px 16px 50px;
+            }
+          }
+          .hud-input-ctl:focus {
+            border-color: #8B5CF6;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.12);
+            background: #FFFFFF;
+          }
+
+          /* Tech submit button styled exact */
+          .hud-submit-action {
+            background: #161616;
+            color: #D6FF40;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 900;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 36px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          }
+          @media (min-width: 1024px) {
+            .hud-submit-action {
+              font-size: 14px;
+              padding: 18px 48px;
+            }
+          }
+          .hud-submit-action:hover {
+            background: #8B5CF6;
+            color: #FFFFFF;
+            box-shadow: 0 0 22px rgba(139, 92, 246, 0.4);
+          }
+
+          /* Direct Contact box item */
+          .hud-contact-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border: 1px solid #E8E5DC;
+            border-radius: 12px;
+            background: #FFFFFF;
+            transition: all 0.3s ease;
+            text-decoration: none;
+          }
+          .hud-contact-row:hover {
+            border-color: #8B5CF6;
+            background: #FAF8FE;
+          }
+
+          .hud-contact-iconbox {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border: 1.5px solid #8B5CF6;
+            background: rgba(139, 92, 246, 0.06);
+            color: #8B5CF6;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.1);
+          }
+        `
+      }} />
+
+      {/* Decorative vertical texts & decals */}
+      <div className="absolute left-6 top-[25%] rotate-[-90deg] origin-left text-[9px] font-mono text-gray-400 tracking-[0.3em] uppercase select-none pointer-events-none">
+        FTW // STREETWEAR // SYSTEMS
+      </div>
+
+      <div className="absolute right-6 top-[25%] text-gray-400 font-mono text-[10px] select-none pointer-events-none text-right">
+        X X X X X<br />
+        SYSTEM_UP
+      </div>
+
+      {/* Large Decorative Console Gamepad Backdrop Icons */}
+      <div className="absolute right-[2%] top-[10%] opacity-[0.15] text-purple-500/40 pointer-events-none z-0">
+        <Gamepad2 className="w-[180px] h-[180px] rotate-[15deg]" />
+      </div>
+      <div className="absolute left-[2%] top-[42%] opacity-[0.12] text-indigo-500/40 pointer-events-none z-0">
+        <Gamepad2 className="w-[160px] h-[160px] rotate-[-20deg]" />
+      </div>
+      <div className="absolute right-[2%] top-[68%] opacity-[0.14] text-purple-500/40 pointer-events-none z-0">
+        <Gamepad2 className="w-[170px] h-[170px] rotate-[35deg]" />
+      </div>
+      <div className="absolute left-[2%] bottom-[2%] opacity-[0.10] text-indigo-500/40 pointer-events-none z-0">
+        <Gamepad2 className="w-[150px] h-[150px] rotate-[-10deg]" />
+      </div>
+
+      <main className="max-w-7xl mx-auto px-6 pt-16 pb-12 relative z-10">
+
+        {/* Header Layout */}
+        <div className="mb-14 text-left border-b border-[#E8E5DC] pb-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/10 border border-purple-500/25 text-purple-600 font-mono uppercase tracking-[0.25em] text-[10px] font-black rounded mb-4">
+            <Zap className="w-3.5 h-3.5 fill-purple-600 text-purple-600 animate-pulse" /> HELP & SUPPORT
+          </div>
+          <h1 className="hud-helpline-title">
+            SUPPORT <span>HELPLINE</span>
           </h1>
-        </motion.div>
+          <p className="text-dark2/50 font-mono text-[11px] md:text-sm uppercase tracking-wider mt-2">
+            WE'VE GOT YOUR BACK. LET'S GET YOU BACK IN THE GAME.
+          </p>
+        </div>
 
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start"
-        >
-          
-          {/* LEFT: Inquiry Form Card */}
-          <motion.div 
-            variants={cardVariants}
-            className="lg:col-span-7 bg-white border border-neutral-200/80 p-5 sm:p-10 rounded-2xl sm:rounded-[32px] shadow-[0_8px_30px_rgba(0,0,0,0.02)] relative overflow-hidden group hover:border-[#161616]/30 transition-all duration-500"
-          >
-            {/* Glowing Accent Top Border */}
-            <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-[#FF4E20] to-transparent opacity-80" />
-            
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+          {/* LEFT: Contact Inquiry Form (60% width) */}
+          <div className="lg:col-span-7 hud-helpline-card">
             <div className="mb-8">
-              <span className="text-orange-600 font-mono uppercase tracking-widest text-[10px] font-bold block mb-2">CONTACT US</span>
-              <h2 className="font-sans text-2xl sm:text-3xl font-bold text-dark leading-tight">
-                Send us a message
-              </h2>
-              <p className="text-xs text-dark/50 mt-1 font-mono">Fill in the form below and we will get back to you soon.</p>
+              <span className="text-purple-600 font-mono uppercase tracking-widest text-[10px] md:text-xs font-black block mb-1.5">/// CONTACT US</span>
+              <h2 className="text-2xl md:text-3xl font-black text-[#161616] tracking-tight leading-none uppercase font-display">Send us a message</h2>
+              <p className="text-xs md:text-sm text-dark2/50 mt-1 font-sans">Fill in the form below and we will get back to you soon.</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6 font-sans">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Name */}
                 <div className="space-y-2">
-                  <label className="block text-[10px] font-mono uppercase text-[#161616]/60 font-bold">Your Name *</label>
-                  <input 
-                    type="text" 
-                    required 
-                    placeholder="Enter your name" 
-                    value={formData.name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-4 py-3.5 rounded-xl border border-neutral-200 bg-[#FAF9F6] text-[#161616] focus:outline-none focus:border-[#161616] focus:bg-white transition-all text-xs font-semibold placeholder:text-neutral-400"
-                  />
+                  <label className="block text-[11px] md:text-xs font-mono uppercase text-[#161616] font-black">Your Name *</label>
+                  <div className="hud-field-wrap">
+                    <User className="hud-field-icon" />
+                    <input
+                      type="text"
+                      required
+                      placeholder="Enter your name"
+                      value={formData.name}
+                      onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                      className="hud-input-ctl"
+                    />
+                  </div>
                 </div>
+
                 {/* Email */}
                 <div className="space-y-2">
-                  <label className="block text-[10px] font-mono uppercase text-[#161616]/60 font-bold">Email Address *</label>
-                  <input 
-                    type="email" 
-                    required 
-                    placeholder="e.g. name@domain.com" 
-                    value={formData.email}
-                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                    className="w-full px-4 py-3.5 rounded-xl border border-neutral-200 bg-[#FAF9F6] text-[#161616] focus:outline-none focus:border-[#161616] focus:bg-white transition-all text-xs font-semibold placeholder:text-neutral-400"
-                  />
+                  <label className="block text-[11px] md:text-xs font-mono uppercase text-[#161616] font-black">Email Address *</label>
+                  <div className="hud-field-wrap">
+                    <Mail className="hud-field-icon" />
+                    <input
+                      type="email"
+                      required
+                      placeholder="e.g. name@domain.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                      className="hud-input-ctl"
+                    />
+                  </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Order Number */}
+                {/* Order ID */}
                 <div className="space-y-2">
-                  <label className="block text-[10px] font-mono uppercase text-[#161616]/60 font-bold">Order ID (Optional)</label>
-                  <input 
-                    type="text" 
-                    placeholder="e.g. #FTW-10928" 
-                    value={formData.orderNumber}
-                    onChange={(e) => setFormData(prev => ({ ...prev, orderNumber: e.target.value }))}
-                    className="w-full px-4 py-3.5 rounded-xl border border-neutral-200 bg-[#FAF9F6] text-[#161616] focus:outline-none focus:border-[#161616] focus:bg-white transition-all text-xs font-semibold placeholder:text-neutral-400"
-                  />
+                  <label className="block text-[11px] md:text-xs font-mono uppercase text-[#161616] font-black">Order ID (Optional)</label>
+                  <div className="hud-field-wrap">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-400 font-mono font-bold text-sm z-10">#</span>
+                    <input
+                      type="text"
+                      placeholder="e.g. #FTW-10928"
+                      value={formData.orderNumber}
+                      onChange={(e) => setFormData(prev => ({ ...prev, orderNumber: e.target.value }))}
+                      className="hud-input-ctl animate-none"
+                    />
+                  </div>
                 </div>
+
                 {/* Subject */}
                 <div className="space-y-2">
-                  <label className="block text-[10px] font-mono uppercase text-[#161616]/60 font-bold">Subject *</label>
-                  <select 
+                  <label className="block text-[11px] md:text-xs font-mono uppercase text-[#161616] font-black">Subject *</label>
+                  <select
                     value={formData.subject}
                     onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
-                    className="w-full px-4 py-3.5 rounded-xl border border-neutral-200 bg-[#FAF9F6] text-[#161616] focus:outline-none focus:border-[#161616] focus:bg-white transition-all text-xs font-semibold cursor-pointer"
+                    className="hud-input-ctl cursor-pointer py-4"
                   >
                     <option>General Inquiry</option>
                     <option>Order Status & Tracking</option>
@@ -188,224 +364,110 @@ export default function Helpline() {
 
               {/* Message */}
               <div className="space-y-2">
-                <label className="block text-[10px] font-mono uppercase text-[#161616]/60 font-bold">Message Details *</label>
-                <textarea 
-                  required 
-                  rows="5"
-                  placeholder="Tell us how we can help you..." 
-                  value={formData.message}
-                  onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                  className="w-full px-4 py-3.5 rounded-xl border border-neutral-200 bg-[#FAF9F6] text-[#161616] focus:outline-none focus:border-[#161616] focus:bg-white transition-all text-xs font-semibold resize-none placeholder:text-neutral-400"
-                />
+                <label className="block text-[11px] md:text-xs font-mono uppercase text-[#161616] font-black">Message Details *</label>
+                <div className="hud-field-wrap">
+                  <FileText className="absolute left-4 top-5 text-purple-400 w-4 h-4 z-10" />
+                  <textarea
+                    required
+                    rows="5"
+                    placeholder="Tell us how we can help you..."
+                    value={formData.message}
+                    onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+                    className="hud-input-ctl resize-none pl-11 pt-4"
+                  />
+                </div>
               </div>
 
-              <motion.button
-                whileTap={{ scale: 0.98 }}
+              <button
                 type="submit"
                 disabled={loading}
-                className="w-full sm:w-fit px-8 py-4 bg-[#161616] text-white hover:bg-[#FF4E20] transition-all duration-300 font-mono font-black text-xs uppercase tracking-widest rounded-xl flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed shadow-md border-none"
+                className="hud-submit-action"
               >
-                {loading ? (
-                  <>
-                    <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                    <span>Sending...</span>
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-3.5 h-3.5" />
-                    <span>Submit</span>
-                  </>
-                )}
-              </motion.button>
+                <Send className="w-4 h-4" />
+                <span>{loading ? 'Sending...' : 'Submit Message'}</span>
+              </button>
             </form>
-          </motion.div>
+          </div>
 
-          {/* RIGHT: Contact Channels & Meta Cards */}
-          <div className="lg:col-span-5 space-y-8">
-            
-            {/* Direct Channels */}
-            <motion.div 
-              variants={cardVariants}
-              className="bg-white border border-neutral-200/80 p-5 sm:p-8 rounded-2xl sm:rounded-[32px] shadow-[0_8px_30px_rgba(0,0,0,0.02)] relative overflow-hidden group hover:border-[#FF4E20]/25 transition-all duration-500"
-            >
-              <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-[#FF4E20] to-transparent opacity-80" />
-              
+          {/* RIGHT: Direct Contacts (40% width) */}
+          <div className="lg:col-span-5 space-y-6">
+            <div className="hud-helpline-card">
               <div className="mb-6">
-                <span className="text-[#FF4E20] font-mono uppercase tracking-widest text-[10px] font-bold block mb-2">DIRECT CONTACT</span>
-                <h3 className="font-sans text-xl sm:text-2xl font-bold text-dark leading-tight">Other ways to reach us</h3>
+                <span className="text-purple-600 font-mono uppercase tracking-widest text-[10px] md:text-xs font-black block mb-1.5">/// DIRECT CONTACT</span>
+                <h3 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight leading-none uppercase font-display">Other ways to reach us</h3>
               </div>
 
               <div className="space-y-4">
-                {/* Email Support */}
-                <a 
-                  href="mailto:forthewinmail8@gmail.com" 
-                  className="flex items-center gap-4 p-4 border border-neutral-100 hover:border-[#161616] hover:bg-[#FAF9F6] rounded-2xl transition-all duration-300 group/item decoration-none"
-                >
-                  <div className="p-3 bg-[#FAF9F6] text-[#FF4E20] rounded-xl group-hover/item:bg-[#FF4E20] group-hover/item:text-white transition-colors duration-300">
-                    <Mail className="w-5 h-5" />
+                {/* Email support */}
+                <a href={`mailto:${settings.support_email}`} className="hud-contact-row">
+                  <div className="flex items-center gap-4">
+                    <div className="hud-contact-iconbox">
+                      <Mail className="w-5 h-5" />
+                    </div>
+                    <div className="text-left">
+                      <span className="text-[10px] md:text-[11px] text-gray-400 uppercase font-mono font-bold block mb-0.5">Email Support</span>
+                      <span className="text-xs md:text-sm text-slate-800 font-mono font-bold break-all">{settings.support_email}</span>
+                    </div>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <span className="text-[9px] text-[#161616]/40 uppercase font-mono font-bold block mb-0.5">Email Support</span>
-                    <span className="text-xs text-dark font-mono font-bold break-all block">forthewinmail8@gmail.com</span>
-                  </div>
+                  <ArrowRight className="w-4 h-4 text-purple-600" />
                 </a>
 
-                {/* WhatsApp Support */}
-                <a 
-                  href="https://wa.me/91XXXXXXXXXX" 
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-4 p-4 border border-neutral-100 hover:border-[#161616] hover:bg-[#FAF9F6] rounded-2xl transition-all duration-300 group/item decoration-none"
-                >
-                  <div className="p-3 bg-[#FAF9F6] text-[#161616] rounded-xl group-hover/item:bg-[#161616] group-hover/item:text-white transition-colors duration-300">
-                    <MessageCircle className="w-5 h-5" />
+                {/* WhatsApp support */}
+                <a href={`https://wa.me/${(settings.support_whatsapp || '').replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="hud-contact-row">
+                  <div className="flex items-center gap-4">
+                    <div className="hud-contact-iconbox">
+                      <MessageCircle className="w-5 h-5" />
+                    </div>
+                    <div className="text-left">
+                      <span className="text-[10px] md:text-[11px] text-gray-400 uppercase font-mono font-bold block mb-0.5">WhatsApp Support</span>
+                      <span className="text-xs md:text-sm text-slate-800 font-mono font-bold">{settings.support_whatsapp}</span>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-[9px] text-[#161616]/40 uppercase font-mono font-bold block mb-0.5">WhatsApp Support</span>
-                    <span className="text-xs text-dark font-mono font-bold block">+91 XXXXX XXXXX</span>
-                  </div>
-                </a>
-
-                {/* Phone support */}
-                <a 
-                  href="tel:+91XXXXXXXXXX" 
-                  className="flex items-center gap-4 p-4 border border-neutral-100 hover:border-[#161616] hover:bg-[#FAF9F6] rounded-2xl transition-all duration-300 group/item decoration-none"
-                >
-                  <div className="p-3 bg-[#FAF9F6] text-[#FF4E20] rounded-xl group-hover/item:bg-[#FF4E20] group-hover/item:text-white transition-colors duration-300">
-                    <Phone className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <span className="text-[9px] text-[#161616]/40 uppercase font-mono font-bold block mb-0.5">Call Us</span>
-                    <span className="text-xs text-dark font-mono font-bold block">+91 XXXXX XXXXX</span>
-                  </div>
+                  <ArrowRight className="w-4 h-4 text-purple-600" />
                 </a>
 
                 {/* Instagram support */}
-                <a 
-                  href="https://instagram.com" 
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-4 p-4 border border-neutral-100 hover:border-[#161616] hover:bg-[#FAF9F6] rounded-2xl transition-all duration-300 group/item decoration-none"
-                >
-                  <div className="p-3 bg-[#FAF9F6] text-[#161616] rounded-xl group-hover/item:bg-[#161616] group-hover/item:text-white transition-colors duration-300">
-                    <Instagram className="w-5 h-5" />
+                <a href={`https://instagram.com/${settings.support_instagram}`} target="_blank" rel="noopener noreferrer" className="hud-contact-row">
+                  <div className="flex items-center gap-4">
+                    <div className="hud-contact-iconbox">
+                      <Instagram className="w-5 h-5" />
+                    </div>
+                    <div className="text-left">
+                      <span className="text-[10px] md:text-[11px] text-gray-400 uppercase font-mono font-bold block mb-0.5">Instagram DM</span>
+                      <span className="text-xs md:text-sm text-slate-800 font-mono font-bold">@{settings.support_instagram}</span>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-[9px] text-[#161616]/40 uppercase font-mono font-bold block mb-0.5">Instagram DM</span>
-                    <span className="text-xs text-dark font-mono font-bold block">@ftw_streetwear</span>
-                  </div>
+                  <ArrowRight className="w-4 h-4 text-purple-600" />
                 </a>
               </div>
-            </motion.div>
-
-            {/* Support Meta info */}
-            <motion.div 
-              variants={cardVariants}
-              className="bg-white border border-neutral-200/80 p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.01)] space-y-5"
-            >
-              <div className="flex gap-4 items-start">
-                <div className="p-2.5 bg-[#FAF9F6] text-[#FF4E20] rounded-lg border border-neutral-100">
-                  <Clock className="w-4 h-4" />
-                </div>
-                <div>
-                  <h4 className="text-xs uppercase font-mono font-bold text-dark mb-1">Our Hours</h4>
-                  <p className="text-[10px] text-dark/50 font-mono uppercase">Mon – Sat: 10:00 AM – 7:00 PM IST</p>
-                </div>
-              </div>
-
-              <div className="flex gap-4 items-start">
-                <div className="p-2.5 bg-[#FAF9F6] text-dark rounded-lg border border-neutral-100">
-                  <ShieldCheck className="w-4 h-4" />
-                </div>
-                <div>
-                  <h4 className="text-xs uppercase font-mono font-bold text-dark mb-1">Returns & Exchanges</h4>
-                  <p className="text-[10px] text-dark/50 leading-relaxed font-mono uppercase">Our items are highly limited. Sizing and exchanges depend on what we have in stock.</p>
-                </div>
-              </div>
-            </motion.div>
-
-          </div>
-
-        </motion.div>
-      </main>
-
-      {/* FAQ Accordion Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-16 sm:pb-20">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="bg-white border border-neutral-200/80 p-5 sm:p-10 rounded-2xl sm:rounded-[32px] shadow-[0_8px_30px_rgba(0,0,0,0.02)] relative overflow-hidden"
-        >
-          <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-[#FF4E20] to-transparent opacity-80" />
-          
-          <div className="mb-8 border-b border-neutral-100 pb-4 flex items-center justify-between gap-4">
-            <div>
-              <span className="text-[#FF4E20] font-mono uppercase tracking-widest text-[10px] font-bold block mb-2">FAQ</span>
-              <h2 className="font-sans text-2xl sm:text-3xl font-bold text-dark leading-tight">
-                Frequently Asked Questions
-              </h2>
             </div>
-            <HelpCircle className="w-7 h-7 text-[#FF4E20] animate-pulse shrink-0" />
-          </div>
 
-          <div className="space-y-4">
-            {faqData.map((faq, idx) => {
-              const isOpen = openFaqIndex === idx
-              return (
-                <div key={idx} className="border-b border-neutral-100 last:border-0 pb-4">
-                  <button
-                    onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
-                    className="w-full flex justify-between items-center py-3 text-left font-bold uppercase tracking-tight text-[#161616] hover:text-[#FF4E20] transition-colors font-sans text-xs sm:text-sm cursor-pointer border-none bg-transparent"
-                  >
-                    <span>{faq.q}</span>
-                    <span className="text-base font-mono shrink-0 ml-4">
-                      <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isOpen ? 'rotate-180 text-[#FF4E20]' : 'text-neutral-400'}`} />
-                    </span>
-                  </button>
-                  <AnimatePresence initial={false}>
-                    {isOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.25, ease: 'easeInOut' }}
-                        className="overflow-hidden"
-                      >
-                        <div className="text-dark/60 font-sans leading-relaxed text-xs pl-1 mt-2 pr-6 uppercase tracking-wider font-mono text-[10px]">
-                          {faq.a}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              )
-            })}
-          </div>
-        </motion.div>
-      </section>
+            {/* Support Hours */}
+            <div className="hud-helpline-card flex items-center gap-4 p-5">
+              <div className="hud-contact-iconbox shrink-0">
+                <Clock className="w-5 h-5" />
+              </div>
+              <div className="text-left">
+                <span className="text-[10px] md:text-[11px] text-gray-400 uppercase font-mono font-bold block mb-0.5">Our Hours</span>
+                <span className="text-xs md:text-sm text-slate-800 font-mono font-bold">{settings.support_hours}</span>
+              </div>
+            </div>
 
-      {/* Streetwear quote banner */}
-      <section className="pb-20 sm:pb-24 px-4 sm:px-6 max-w-7xl mx-auto text-center">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.98 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="bg-[#161616] text-[#FAF9F6] p-6 sm:p-16 rounded-2xl sm:rounded-[32px] relative overflow-hidden border border-neutral-900 shadow-2xl"
-        >
-          <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
-            <Compass className="w-48 h-48 animate-spin-slow text-white" />
+            {/* Returns & Exchanges */}
+            <div className="hud-helpline-card flex items-start gap-4 p-5">
+              <div className="hud-contact-iconbox shrink-0">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div className="text-left">
+                <span className="text-[10px] text-gray-400 uppercase font-mono font-bold block mb-0.5">Returns & Exchanges</span>
+                <span className="text-xs md:text-sm text-slate-800 font-sans font-bold leading-normal block max-w-sm">
+                  Our items are highly limited. Sizing and exchanges depend on what we have in stock.
+                </span>
+              </div>
+            </div>
           </div>
-          <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#FF4E20] font-black mb-4 block">ABOUT US</span>
-          <blockquote className="font-display text-lg sm:text-3xl font-black uppercase leading-tight tracking-tight max-w-3xl mx-auto mb-6 text-white">
-            "We make clothes that help you express yourself and your unique style."
-          </blockquote>
-          <span className="text-[10px] text-white/50 uppercase font-mono tracking-widest flex items-center justify-center gap-1">
-            <Sparkles className="w-3.5 h-3.5 text-orange-500" /> FOR THE WIN • TOKYO - SEOUL - MUMBAI
-          </span>
-        </motion.div>
-      </section>
+        </div>
+      </main>
     </div>
   )
 }

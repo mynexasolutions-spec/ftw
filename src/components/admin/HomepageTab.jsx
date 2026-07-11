@@ -39,7 +39,8 @@ export default function HomepageTab({
       { url: '', label: '' },
       { url: '', label: '' }
     ],
-    hero_bg_banner: homepageConfig?.hero_bg_banner || ''
+    hero_bg_banner: homepageConfig?.hero_bg_banner || '',
+    hero_bg_banner_mobile: homepageConfig?.hero_bg_banner_mobile || ''
   })
 
   React.useEffect(() => {
@@ -57,7 +58,8 @@ export default function HomepageTab({
           { url: '', label: '' },
           { url: '', label: '' }
         ],
-        hero_bg_banner: homepageConfig.hero_bg_banner || ''
+        hero_bg_banner: homepageConfig.hero_bg_banner || '',
+        hero_bg_banner_mobile: homepageConfig.hero_bg_banner_mobile || ''
       })
     }
   }, [homepageConfig])
@@ -68,6 +70,7 @@ export default function HomepageTab({
 
   const [uploading, setUploading] = useState(false)
   const [uploadingBg, setUploadingBg] = useState(false)
+  const [uploadingBgMobile, setUploadingBgMobile] = useState(false)
   const [uploadingTeasers, setUploadingTeasers] = useState([false, false, false])
 
   const uploadFile = (file) => {
@@ -188,7 +191,7 @@ export default function HomepageTab({
             </div>
             <div>
               <h3 className="text-sm lg:text-base font-black uppercase text-dark tracking-wider">1. Hero Section Slider</h3>
-              <p className="text-[9px] lg:text-xs text-dark2/45 uppercase mt-0.5 font-bold font-mono">Manage carousel photos rotating on the landing slide banner (Max 5 images)</p>
+              <p className="text-[9px] lg:text-xs text-dark2/45 uppercase mt-0.5 font-bold font-sans">Manage carousel photos rotating on the landing slide banner (Max 5 images)</p>
             </div>
           </div>
 
@@ -217,12 +220,12 @@ export default function HomepageTab({
                         Banner #{idx + 1}
                       </div>
                       <div>
-                        <label className="text-[8px] uppercase font-mono font-black text-dark2/45 block mb-1">Target Product</label>
+                        <label className="text-[8px] uppercase font-sans font-black text-dark2/45 block mb-1">Target Product</label>
                         {matchedProduct ? (
                           <div className="bg-cream2/70 border border-cream3/80 rounded-xl p-1.5 flex items-center justify-between gap-1.5">
                             <div className="min-w-0 flex-1">
                               <span className="font-bold text-[9.5px] text-dark block truncate">{matchedProduct.name}</span>
-                              <span className="text-[8px] font-mono text-dark2/50 block">₹{matchedProduct.price}</span>
+                              <span className="text-[8px] font-sans text-dark2/50 block">₹{matchedProduct.price}</span>
                             </div>
                             <button
                               type="button"
@@ -231,7 +234,7 @@ export default function HomepageTab({
                                 setPickerSearchQuery('');
                                 setPickerModalOpen(true);
                               }}
-                              className="p-1.5 text-white bg-orange-500 hover:bg-orange-600 rounded-lg cursor-pointer shrink-0 border-none transition-all active:scale-95 shadow-xs flex items-center justify-center"
+                              className="p-1.5 text-white bg-purple-600 hover:bg-purple-700 rounded-lg cursor-pointer shrink-0 border-none transition-all active:scale-95 shadow-xs flex items-center justify-center"
                               title="Change linked product"
                             >
                               <Pencil className="w-3.5 h-3.5 text-white" />
@@ -257,7 +260,7 @@ export default function HomepageTab({
                 )
               })}
               {config.hero_images.length === 0 && (
-                <div className="col-span-full py-8 text-center text-dark/40 font-mono text-[10px]">
+                <div className="col-span-full py-8 text-center text-dark/40 font-sans text-[10px]">
                   No slider banners added. Please add image URLs.
                 </div>
               )}
@@ -270,7 +273,7 @@ export default function HomepageTab({
                 </div>
                 <div className="text-center">
                   <span className="text-xs font-bold text-dark block">{uploading ? 'Uploading image...' : `Upload New Hero Banner (${config.hero_images.length}/5)`}</span>
-                  <span className="text-[9px] text-dark/40 font-mono uppercase tracking-wider block mt-0.5">JPEG, PNG, WEBP files</span>
+                  <span className="text-[9px] text-dark/40 font-sans uppercase tracking-wider block mt-0.5">JPEG, PNG, WEBP files</span>
                 </div>
                 <input
                   type="file"
@@ -301,7 +304,7 @@ export default function HomepageTab({
                 />
               </label>
             ) : (
-              <div className="border border-cream3 bg-cream/10 rounded-2xl p-6 text-center text-dark2/50 font-mono text-[10px] uppercase font-bold">
+              <div className="border border-cream3 bg-cream/10 rounded-2xl p-6 text-center text-dark2/50 font-sans text-[10px] uppercase font-bold">
                 🔒 Maximum of 5 hero slider images uploaded. Delete some images to upload more.
               </div>
             )}
@@ -325,7 +328,7 @@ export default function HomepageTab({
                     </button>
                   </>
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-dark/30 font-mono text-[9px] uppercase">Default Background Banner</div>
+                  <div className="w-full h-full flex items-center justify-center text-dark/30 font-sans text-[9px] uppercase">Default Background Banner</div>
                 )}
               </div>
 
@@ -361,6 +364,60 @@ export default function HomepageTab({
             </div>
           </div>
 
+          {/* Hero Mobile Banner Upload */}
+          <div className="border-t border-cream3 pt-5 space-y-3">
+            <h4 className="text-[10px] uppercase tracking-wider font-bold block text-dark2/60">Hero Mobile Banner Image (Optional)</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+              <div className="aspect-[3/4] max-w-[250px] w-full mx-auto bg-cream3 relative overflow-hidden rounded-xl border border-cream3">
+                {config.hero_bg_banner_mobile ? (
+                  <>
+                    <img src={config.hero_bg_banner_mobile} alt="Mobile Banner" className="w-full h-full object-cover" onError={(e) => { e.target.src = '/images/banner.webp' }} />
+                    <button
+                      type="button"
+                      onClick={() => setConfig(prev => ({ ...prev, hero_bg_banner_mobile: '' }))}
+                      className="absolute top-2 right-2 p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow cursor-pointer transition-colors z-10"
+                      title="Remove image"
+                    >
+                      <Trash className="w-3.5 h-3.5" />
+                    </button>
+                  </>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-dark/30 font-sans text-[9px] uppercase text-center p-4">No Mobile Banner</div>
+                )}
+              </div>
+
+              <div className="space-y-2.5">
+                <p className="text-[10px] text-dark2/50 leading-relaxed font-sans">
+                  Upload a mobile banner image designed for the 62vh layout (e.g. 1080x1440 or 3:4 aspect ratio). If empty, it will fall back to the desktop banner.
+                </p>
+                <label className="w-fit px-4 py-2 bg-dark hover:bg-accent hover:text-dark text-white transition-colors font-bold uppercase rounded-lg cursor-pointer text-[9px] flex items-center gap-1.5 select-none shadow-sm border-none">
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>{uploadingBgMobile ? 'Uploading...' : 'Upload Mobile Banner'}</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    disabled={uploadingBgMobile}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0]
+                      if (!file) return
+                      setUploadingBgMobile(true)
+                      try {
+                        const url = await uploadFile(file)
+                        setConfig(prev => ({ ...prev, hero_bg_banner_mobile: url }))
+                        toast.success('Mobile banner uploaded successfully!')
+                      } catch (err) {
+                        toast.error(`Upload failed: ${err.message}`)
+                      } finally {
+                        setUploadingBgMobile(false)
+                      }
+                    }}
+                  />
+                </label>
+              </div>
+            </div>
+          </div>
+
           <div className="flex justify-end pt-3 border-t border-cream3 mt-4">
             <button
               type="submit"
@@ -379,7 +436,7 @@ export default function HomepageTab({
             </div>
             <div>
               <h3 className="text-sm lg:text-base font-black uppercase text-dark tracking-wider">2. Featured Collection Products</h3>
-              <p className="text-[9px] lg:text-xs text-dark2/45 uppercase mt-0.5 font-bold font-mono">Select products to render in the CATALOG SERIES 01 catalog grid</p>
+              <p className="text-[9px] lg:text-xs text-dark2/45 uppercase mt-0.5 font-bold font-sans">Select products to render in the CATALOG SERIES 01 catalog grid</p>
             </div>
           </div>
 
@@ -399,7 +456,7 @@ export default function HomepageTab({
                   </div>
                   <div className="min-w-0 flex-grow">
                     <span className="font-bold text-dark text-xs block truncate uppercase">{prod.name}</span>
-                    <span className="text-[9px] lg:text-[10px] text-dark/50 block font-mono">₹{prod.price} • ID: {prod.id}</span>
+                    <span className="text-[9px] lg:text-[10px] text-dark/50 block font-sans">₹{prod.price} • ID: {prod.id}</span>
                   </div>
                   <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${checked ? 'bg-accent border-accent text-white' : 'border-cream3'
                     }`}>
@@ -409,7 +466,7 @@ export default function HomepageTab({
               )
             })}
             {products.length === 0 && (
-              <div className="col-span-full py-8 text-center text-dark/40 font-mono text-[10px]">
+              <div className="col-span-full py-8 text-center text-dark/40 font-sans text-[10px]">
                 No inventory products found. Add products first.
               </div>
             )}
@@ -432,7 +489,7 @@ export default function HomepageTab({
             </div>
             <div>
               <h3 className="text-sm lg:text-base font-black uppercase text-dark tracking-wider">3. Sale Archive Products</h3>
-              <p className="text-[9px] lg:text-xs text-dark2/45 uppercase mt-0.5 font-bold font-mono">Select products to show inside the exclusive SALE ARCHIVE grid</p>
+              <p className="text-[9px] lg:text-xs text-dark2/45 uppercase mt-0.5 font-bold font-sans">Select products to show inside the exclusive SALE ARCHIVE grid</p>
             </div>
           </div>
 
@@ -452,7 +509,7 @@ export default function HomepageTab({
                   </div>
                   <div className="min-w-0 flex-grow">
                     <span className="font-bold text-dark text-xs block truncate uppercase">{prod.name}</span>
-                    <span className="text-[9px] lg:text-[10px] text-dark/50 block font-mono">₹{prod.price} {prod.originalPrice ? `(Was: ₹${prod.originalPrice})` : ''}</span>
+                    <span className="text-[9px] lg:text-[10px] text-dark/50 block font-sans">₹{prod.price} {prod.originalPrice ? `(Was: ₹${prod.originalPrice})` : ''}</span>
                   </div>
                   <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${checked ? 'bg-accent border-accent text-white' : 'border-cream3'
                     }`}>
@@ -480,7 +537,7 @@ export default function HomepageTab({
             </div>
             <div>
               <h3 className="text-sm lg:text-base font-black uppercase text-dark tracking-wider">4. Next Drop Teaser & Countdown</h3>
-              <p className="text-[9px] lg:text-xs text-dark2/45 uppercase mt-0.5 font-bold font-mono">Update the next drop name, description, date countdown, and teaser images</p>
+              <p className="text-[9px] lg:text-xs text-dark2/45 uppercase mt-0.5 font-bold font-sans">Update the next drop name, description, date countdown, and teaser images</p>
             </div>
           </div>
 
@@ -552,13 +609,13 @@ export default function HomepageTab({
                           </button>
                         </>
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-dark/30 font-mono text-[9px] lg:text-xs uppercase">No Image</div>
+                        <div className="w-full h-full flex items-center justify-center text-dark/30 font-sans text-[9px] lg:text-xs uppercase">No Image</div>
                       )}
                     </div>
 
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <span className="font-mono text-[8px] lg:text-[10px] text-accent uppercase font-black">Teaser #{idx + 1}</span>
+                        <span className="font-sans text-[8px] lg:text-[10px] text-accent uppercase font-black">Teaser #{idx + 1}</span>
                       </div>
                       <input
                         type="text"
@@ -624,7 +681,7 @@ export default function HomepageTab({
             <div className="flex justify-between items-center border-b border-cream3 pb-3">
               <div>
                 <h3 className="font-sans text-sm font-black uppercase text-dark">Select Target Product</h3>
-                <p className="text-[9px] text-dark2/50 font-mono">Attach a product for Banner #{pickerBannerIdx !== null ? pickerBannerIdx + 1 : 1}</p>
+                <p className="text-[9px] text-dark2/50 font-sans">Attach a product for Banner #{pickerBannerIdx !== null ? pickerBannerIdx + 1 : 1}</p>
               </div>
               <button
                 type="button"
@@ -680,7 +737,7 @@ export default function HomepageTab({
                       <img src={p.images?.[0] || p.image} alt="" className="w-8 h-10 object-cover rounded-lg bg-cream3 shrink-0" onError={(e) => { e.target.src = '/images/Regular-T.png' }} />
                       <div className="min-w-0">
                         <span className="font-bold text-xs text-dark block truncate">{p.name}</span>
-                        <span className="text-[9px] font-mono text-dark2/50 block">₹{p.price} • ID: {p.id}</span>
+                        <span className="text-[9px] font-sans text-dark2/50 block">₹{p.price} • ID: {p.id}</span>
                       </div>
                     </div>
                     {isSelected && <Check className="w-4 h-4 text-dark shrink-0 ml-2" />}

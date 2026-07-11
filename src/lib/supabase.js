@@ -486,7 +486,12 @@ export async function getStoreSettings() {
     shipping_flat_rate: 99,
     enable_razorpay: true,
     enable_cod: true,
-    store_address: 'FTW Streetwear Lab, Mumbai, IN'
+    store_address: 'FTW Streetwear Lab, Mumbai, IN',
+    support_email: 'forthewinmail8@gmail.com',
+    support_whatsapp: '+91 XXXXX XXXXX',
+    support_instagram: 'ftw_streetwear',
+    support_hours: 'MON – SAT: 10:00 AM – 7:00 PM IST',
+    facebook_link: 'https://facebook.com'
   };
 
   try {
@@ -496,7 +501,13 @@ export async function getStoreSettings() {
       .eq('key', 'global_settings')
       .maybeSingle();
     if (error) throw error;
-    return data?.value || defaultSettings;
+    
+    // Ensure all default properties are merged in case some keys are missing from existing DB JSON
+    const dbValue = data?.value || {};
+    return {
+      ...defaultSettings,
+      ...dbValue
+    };
   } catch (err) {
     console.error("Supabase getStoreSettings error:", err.message);
     return defaultSettings;
@@ -533,7 +544,8 @@ export async function getHomepageConfig() {
     coming_soon_description: '',
     coming_soon_countdown: null,
     coming_soon_images: [],
-    hero_bg_banner: '/images/banner.webp'
+    hero_bg_banner: '/images/banner.webp',
+    hero_bg_banner_mobile: '/images/mobilebanner.webp'
   };
 
   try {
@@ -553,7 +565,8 @@ export async function getHomepageConfig() {
       coming_soon_description: data.coming_soon_description || defaultHomepage.coming_soon_description,
       coming_soon_countdown: data.coming_soon_countdown || defaultHomepage.coming_soon_countdown,
       coming_soon_images: Array.isArray(data.coming_soon_images) ? data.coming_soon_images : defaultHomepage.coming_soon_images,
-      hero_bg_banner: data.hero_bg_banner || defaultHomepage.hero_bg_banner
+      hero_bg_banner: data.hero_bg_banner || defaultHomepage.hero_bg_banner,
+      hero_bg_banner_mobile: data.hero_bg_banner_mobile || defaultHomepage.hero_bg_banner_mobile
     };
   } catch (err) {
     console.error("Supabase getHomepageConfig error:", err.message);
@@ -574,6 +587,7 @@ export async function saveHomepageConfig(config) {
       coming_soon_countdown: config.coming_soon_countdown,
       coming_soon_images: config.coming_soon_images,
       hero_bg_banner: config.hero_bg_banner,
+      hero_bg_banner_mobile: config.hero_bg_banner_mobile,
       updated_at: new Date().toISOString()
     };
 

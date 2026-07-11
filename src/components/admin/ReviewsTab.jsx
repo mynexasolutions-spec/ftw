@@ -55,8 +55,8 @@ export default function ReviewsTab({
           className="bg-gradient-to-br from-violet-50/80 to-purple-100/40 border border-purple-100 p-4 sm:p-5 rounded-2xl shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[110px] sm:min-h-[135px] lg:min-h-[140px] group cursor-pointer"
         >
           <div>
-            <span className="text-[9px] sm:text-[10px] lg:text-xs font-mono font-black text-purple-700/80 uppercase tracking-widest block">Total Reviews</span>
-            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-purple-950 mt-1 font-mono">{totalReviews}</p>
+            <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans font-black text-purple-700/80 uppercase tracking-widest block">Total Reviews</span>
+            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-purple-950 mt-1 font-sans">{totalReviews}</p>
           </div>
           <div className="flex justify-between items-center mt-2 sm:mt-3">
             <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold text-purple-600 bg-purple-50/90 px-2 py-0.5 rounded border border-purple-150/50">All time</span>
@@ -73,8 +73,8 @@ export default function ReviewsTab({
           className="bg-gradient-to-br from-amber-50/80 to-orange-100/40 border border-orange-100 p-4 sm:p-5 rounded-2xl shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[110px] sm:min-h-[135px] lg:min-h-[140px] group cursor-pointer"
         >
           <div>
-            <span className="text-[9px] sm:text-[10px] lg:text-xs font-mono font-black text-amber-700/80 uppercase tracking-widest block">Pending Approval</span>
-            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-amber-955 mt-1 font-mono">{pendingReviews}</p>
+            <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans font-black text-amber-700/80 uppercase tracking-widest block">Pending Approval</span>
+            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-amber-955 mt-1 font-sans">{pendingReviews}</p>
           </div>
           <div className="flex justify-between items-center mt-2 sm:mt-3">
             <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold text-amber-600 bg-amber-50/90 px-2 py-0.5 rounded border border-amber-150/50 animate-pulse">Needs Review</span>
@@ -91,8 +91,8 @@ export default function ReviewsTab({
           className="bg-gradient-to-br from-emerald-550/10 to-teal-100/40 border border-teal-100 p-4 sm:p-5 rounded-2xl shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[110px] sm:min-h-[135px] lg:min-h-[140px] group cursor-pointer"
         >
           <div>
-            <span className="text-[9px] sm:text-[10px] lg:text-xs font-mono font-black text-emerald-700/80 uppercase tracking-widest block">Approved</span>
-            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-emerald-950 mt-1 font-mono">{approvedReviews}</p>
+            <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans font-black text-emerald-700/80 uppercase tracking-widest block">Approved</span>
+            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-emerald-950 mt-1 font-sans">{approvedReviews}</p>
           </div>
           <div className="flex justify-between items-center mt-2 sm:mt-3">
             <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold text-emerald-600 bg-emerald-550/10 px-2 py-0.5 rounded border border-teal-150/50">Live on Store</span>
@@ -109,8 +109,8 @@ export default function ReviewsTab({
           className="bg-gradient-to-br from-rose-50 to-rose-100/40 border border-rose-100 p-4 sm:p-5 rounded-2xl shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[110px] sm:min-h-[135px] lg:min-h-[140px] group cursor-pointer"
         >
           <div>
-            <span className="text-[9px] sm:text-[10px] lg:text-xs font-mono font-black text-rose-700/80 uppercase tracking-widest block">Average Rating</span>
-            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-rose-955 mt-1 font-mono">{avgRating} <span className="text-xs sm:text-sm lg:text-base text-rose-700/60 font-sans">/ 5.0</span></p>
+            <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans font-black text-rose-700/80 uppercase tracking-widest block">Average Rating</span>
+            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-rose-955 mt-1 font-sans">{avgRating} <span className="text-xs sm:text-sm lg:text-base text-rose-700/60 font-sans">/ 5.0</span></p>
           </div>
           <div className="flex justify-between items-center mt-2 sm:mt-3">
             <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold text-rose-600 bg-rose-50/90 px-2 py-0.5 rounded border border-rose-150/50">Quality Score</span>
@@ -171,7 +171,7 @@ export default function ReviewsTab({
                                 {rev.product_name}
                               </p>
                               {matchedProduct && (
-                                <p className="text-[9px] lg:text-[10px] font-mono text-dark2/45 mt-0.5">
+                                <p className="text-[9px] lg:text-[10px] font-sans text-dark2/45 mt-0.5">
                                   {matchedProduct.sku ? `SKU: ${matchedProduct.sku}` : `₹${matchedProduct.price.toLocaleString('en-IN')}`}
                                 </p>
                               )}
@@ -182,7 +182,7 @@ export default function ReviewsTab({
                         {/* Customer */}
                         <td className="p-4 lg:p-4.5">
                           <span className="font-bold text-dark uppercase block text-xs lg:text-sm">{rev.name}</span>
-                          {rev.email && <span className="text-[9px] lg:text-[10.5px] text-dark2/45 block mt-0.5 font-mono">{rev.email}</span>}
+                          {rev.email && <span className="text-[9px] lg:text-[10.5px] text-dark2/45 block mt-0.5 font-sans">{rev.email}</span>}
                         </td>
 
                         {/* Rating Stars */}
@@ -206,7 +206,7 @@ export default function ReviewsTab({
                             {rev.comment && rev.comment.length > 40 && (
                               <button 
                                 onClick={() => setActiveReviewModal(rev)}
-                                className="text-[9px] lg:text-[10px] font-mono font-black uppercase text-accent hover:underline cursor-pointer border-none bg-transparent p-0"
+                                className="text-[9px] lg:text-[10px] font-sans font-black uppercase text-accent hover:underline cursor-pointer border-none bg-transparent p-0"
                               >
                                 See Full Review
                               </button>
@@ -215,7 +215,7 @@ export default function ReviewsTab({
                         </td>
 
                         {/* Created Date */}
-                        <td className="p-4 lg:p-4.5 text-dark2/50 font-mono text-[10px] lg:text-xs">{formatReviewDate(rev.created_at)}</td>
+                        <td className="p-4 lg:p-4.5 text-dark2/50 font-sans text-[10px] lg:text-xs">{formatReviewDate(rev.created_at)}</td>
 
                         {/* Status Badge */}
                         <td className="p-4 lg:p-4.5">
@@ -234,7 +234,7 @@ export default function ReviewsTab({
                             {!rev.approved && (
                               <button 
                                 onClick={() => handleApproveReview(rev.id)} 
-                                className="px-3 py-1.5 bg-dark text-primary hover:bg-accent hover:text-dark text-[9px] lg:text-xs font-mono font-black uppercase tracking-wider rounded-lg cursor-pointer transition-colors border-none"
+                                className="px-3 py-1.5 bg-dark text-primary hover:bg-accent hover:text-dark text-[9px] lg:text-xs font-sans font-black uppercase tracking-wider rounded-lg cursor-pointer transition-colors border-none"
                               >
                                 Approve
                               </button>
@@ -268,7 +268,7 @@ export default function ReviewsTab({
                     <div className="flex justify-between items-start gap-4">
                       <div>
                         <span className="font-extrabold text-dark text-xs uppercase block">{rev.name}</span>
-                        <div className="flex items-center gap-1 text-dark2/40 text-[9px] font-mono mt-0.5">
+                        <div className="flex items-center gap-1 text-dark2/40 text-[9px] font-sans mt-0.5">
                           <Calendar className="w-3 h-3" />
                           <span>{formatReviewDate(rev.created_at)}</span>
                         </div>
@@ -299,7 +299,7 @@ export default function ReviewsTab({
                       <div className="min-w-0">
                         <span className="font-extrabold text-dark uppercase block leading-none truncate">{rev.product_name}</span>
                         {matchedProduct && (
-                          <span className="text-[9px] text-dark2/45 block mt-1 font-mono">
+                          <span className="text-[9px] text-dark2/45 block mt-1 font-sans">
                             {matchedProduct.sku && `SKU: ${matchedProduct.sku}`}
                           </span>
                         )}
@@ -314,7 +314,7 @@ export default function ReviewsTab({
                       {rev.comment && rev.comment.length > 80 && (
                         <button 
                           onClick={() => setActiveReviewModal(rev)}
-                          className="text-[9px] font-mono font-black uppercase text-accent hover:underline cursor-pointer border-none bg-transparent p-0 pl-1"
+                          className="text-[9px] font-sans font-black uppercase text-accent hover:underline cursor-pointer border-none bg-transparent p-0 pl-1"
                         >
                           See Full Review
                         </button>
@@ -335,7 +335,7 @@ export default function ReviewsTab({
                         {!rev.approved && (
                           <button 
                             onClick={() => handleApproveReview(rev.id)} 
-                            className="px-3.5 py-1.5 bg-dark text-primary hover:bg-accent hover:text-dark text-[9px] font-mono font-black uppercase tracking-wider rounded-xl cursor-pointer transition-colors border-none"
+                            className="px-3.5 py-1.5 bg-dark text-primary hover:bg-accent hover:text-dark text-[9px] font-sans font-black uppercase tracking-wider rounded-xl cursor-pointer transition-colors border-none"
                           >
                             Approve
                           </button>
@@ -390,7 +390,7 @@ export default function ReviewsTab({
 
                 {/* Modal Header */}
                 <div className="border-b border-cream3 pb-4 mb-5 pr-10">
-                  <span className="text-[9px] lg:text-xs font-mono text-dark2/45 uppercase tracking-widest font-black block mb-1">FEEDBACK DETAILS</span>
+                  <span className="text-[9px] lg:text-[10px] font-sans text-dark2/45 uppercase tracking-widest font-black block mb-1">FEEDBACK DETAILS</span>
                   <h3 className="font-sans text-xl lg:text-2xl font-black uppercase text-dark">Customer Review</h3>
                   <div className="flex flex-wrap items-center gap-2 mt-2">
                     <span className={`px-2.5 py-0.5 rounded-full text-[9.5px] lg:text-xs font-black uppercase border ${

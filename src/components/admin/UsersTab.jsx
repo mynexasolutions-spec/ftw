@@ -43,7 +43,7 @@ export default function UsersTab({
           </h2>
           <p className="text-xs lg:text-sm text-dark2/50 mt-1 font-medium">Manage user profiles, permissions, tracking roles, and user details.</p>
         </div>
-        <span className="text-[10px] lg:text-xs bg-dark text-cream font-mono font-bold px-3 lg:px-4 py-1.5 lg:py-2 rounded-xl uppercase tracking-wider shadow-xs">
+        <span className="text-[10px] lg:text-xs bg-dark text-cream font-sans font-bold px-3 lg:px-4 py-1.5 lg:py-2 rounded-xl uppercase tracking-wider shadow-xs">
           {filteredUsers.length === usersList.length
             ? `${usersList.length} Accounts`
             : `Found ${filteredUsers.length} of ${usersList.length}`}
@@ -59,8 +59,8 @@ export default function UsersTab({
           className="bg-gradient-to-br from-violet-50/80 to-purple-100/40 border border-purple-100 p-4 sm:p-5 rounded-2xl shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[110px] sm:min-h-[135px] lg:min-h-[140px] group cursor-pointer"
         >
           <div>
-            <span className="text-[9px] sm:text-[10px] lg:text-xs font-mono font-black text-purple-700/80 uppercase tracking-widest block">Total Accounts</span>
-            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-purple-950 mt-1 font-mono">{totalUsers}</p>
+            <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans font-black text-purple-700/80 uppercase tracking-widest block">Total Accounts</span>
+            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-purple-950 mt-1 font-sans">{totalUsers}</p>
           </div>
           <div className="flex justify-between items-center mt-2 sm:mt-3">
             <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold text-purple-600 bg-purple-50/90 px-2 py-0.5 rounded border border-purple-150/50">Registered</span>
@@ -77,8 +77,8 @@ export default function UsersTab({
           className="bg-gradient-to-br from-amber-50/80 to-orange-100/40 border border-orange-100 p-4 sm:p-5 rounded-2xl shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[110px] sm:min-h-[135px] lg:min-h-[140px] group cursor-pointer"
         >
           <div>
-            <span className="text-[9px] sm:text-[10px] lg:text-xs font-mono font-black text-amber-700/80 uppercase tracking-widest block">Administrators</span>
-            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-amber-955 mt-1 font-mono">{adminCount}</p>
+            <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans font-black text-amber-700/80 uppercase tracking-widest block">Administrators</span>
+            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-amber-955 mt-1 font-sans">{adminCount}</p>
           </div>
           <div className="flex justify-between items-center mt-2 sm:mt-3">
             <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold text-amber-600 bg-amber-50/90 px-2 py-0.5 rounded border border-amber-150/50">Staff access</span>
@@ -95,8 +95,8 @@ export default function UsersTab({
           className="bg-gradient-to-br from-blue-50/80 to-indigo-100/40 border border-blue-100 p-4 sm:p-5 rounded-2xl shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[110px] sm:min-h-[135px] lg:min-h-[140px] group cursor-pointer"
         >
           <div>
-            <span className="text-[9px] sm:text-[10px] lg:text-xs font-mono font-black text-blue-700/80 uppercase tracking-widest block">Clients</span>
-            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-blue-950 mt-1 font-mono">{customerCount}</p>
+            <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans font-black text-blue-700/80 uppercase tracking-widest block">Clients</span>
+            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-blue-955 mt-1 font-sans">{customerCount}</p>
           </div>
           <div className="flex justify-between items-center mt-2 sm:mt-3">
             <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold text-blue-600 bg-blue-50/90 px-2 py-0.5 rounded border border-blue-150/50">Shop Buyers</span>
@@ -113,8 +113,8 @@ export default function UsersTab({
           className="bg-gradient-to-br from-emerald-550/10 to-teal-100/40 border border-teal-100 p-4 sm:p-5 rounded-2xl shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[110px] sm:min-h-[135px] lg:min-h-[140px] group cursor-pointer"
         >
           <div>
-            <span className="text-[9px] sm:text-[10px] lg:text-xs font-mono font-black text-emerald-700/80 uppercase tracking-widest block">Active Shoppers</span>
-            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-emerald-950 mt-1 font-mono">{activeShoppersCount}</p>
+            <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans font-black text-emerald-700/80 uppercase tracking-widest block">Active Shoppers</span>
+            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-emerald-955 mt-1 font-sans">{activeShoppersCount}</p>
           </div>
           <div className="flex justify-between items-center mt-2 sm:mt-3">
             <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold text-emerald-600 bg-emerald-550/10 px-2 py-0.5 rounded border border-teal-150/50">With Orders</span>
@@ -183,14 +183,14 @@ export default function UsersTab({
                             </div>
                             <div>
                               <span className="font-bold text-dark block text-xs lg:text-sm uppercase">{userObj.name || 'Anonymous User'}</span>
-                              <span className="text-[10px] lg:text-[11px] text-dark2/45 font-mono block mt-0.5">{userObj.email}</span>
+                              <span className="text-[10px] lg:text-[11px] text-dark2/45 font-sans block mt-0.5">{userObj.email}</span>
                             </div>
                           </div>
                         </td>
 
                         {/* User UUID */}
                         <td className="p-4 lg:p-4.5">
-                          <div className="flex items-center gap-1.5 font-mono text-[10px] lg:text-xs text-dark2/40">
+                          <div className="flex items-center gap-1.5 font-sans text-[10px] lg:text-xs text-dark2/40">
                             <span className="truncate max-w-[120px] lg:max-w-[140px]" title={userObj.id}>{userObj.id}</span>
                             <button 
                               onClick={() => handleCopyUid(userObj.id)}
@@ -209,7 +209,7 @@ export default function UsersTab({
                               <ShoppingBag className="w-3 h-3 lg:w-3.5 lg:h-3.5" /> {orderCount} Order{orderCount > 1 ? 's' : ''}
                             </span>
                           ) : (
-                            <span className="text-dark2/35 text-[9px] lg:text-xs font-mono">No purchases</span>
+                            <span className="text-dark2/35 text-[9px] lg:text-xs font-sans">No purchases</span>
                           )}
                         </td>
 
@@ -229,7 +229,7 @@ export default function UsersTab({
                           <div className="flex items-center justify-end gap-2">
                             <a
                               href={`mailto:${userObj.email}?subject=For%20The%20Win%20Support`}
-                              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-dark text-cream hover:bg-accent hover:text-dark rounded-xl text-[9px] lg:text-xs font-mono font-black uppercase tracking-wider transition-colors shadow-xs border-none"
+                              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-dark text-cream hover:bg-accent hover:text-dark rounded-xl text-[9px] lg:text-xs font-sans font-black uppercase tracking-wider transition-colors shadow-xs border-none"
                               title="Mail Customer"
                             >
                               <Mail className="w-3 h-3 lg:w-3.5 lg:h-3.5" /> Email
@@ -269,7 +269,7 @@ export default function UsersTab({
                         </div>
                         <div className="min-w-0 flex-1">
                           <span className="font-extrabold text-dark text-xs uppercase block" title={userObj.name}>{userObj.name || 'Anonymous User'}</span>
-                          <span className="text-[9.5px] text-dark2/45 font-mono block truncate" title={userObj.email}>{userObj.email}</span>
+                          <span className="text-[9.5px] text-dark2/45 font-sans block truncate" title={userObj.email}>{userObj.email}</span>
                         </div>
                       </div>
                       <span className={`px-2 py-0.5 rounded-full text-[8.5px] font-black uppercase border tracking-wider shrink-0 ${
@@ -285,7 +285,7 @@ export default function UsersTab({
                     <div className="grid grid-cols-2 gap-3 bg-white border border-cream3 p-3 rounded-xl shadow-xs text-[10px]">
                       <div>
                         <span className="text-[8px] uppercase font-black text-dark2/45 block mb-0.5">UUID Reference</span>
-                        <div className="flex items-center gap-1 font-mono text-[9px] text-dark2/60">
+                        <div className="flex items-center gap-1 font-sans text-[9px] text-dark2/60">
                           <span className="truncate max-w-[80px]" title={userObj.id}>{userObj.id}</span>
                           <button 
                             onClick={() => handleCopyUid(userObj.id)}
@@ -300,7 +300,7 @@ export default function UsersTab({
                         {orderCount > 0 ? (
                           <span className="font-bold text-blue-700">{orderCount} Order{orderCount > 1 ? 's' : ''}</span>
                         ) : (
-                          <span className="text-dark2/40 font-mono">None</span>
+                          <span className="text-dark2/40 font-sans">None</span>
                         )}
                       </div>
                     </div>
@@ -309,7 +309,7 @@ export default function UsersTab({
                     <div className="flex justify-end pt-1">
                       <a
                         href={`mailto:${userObj.email}?subject=For%20The%20Win%20Support`}
-                        className="py-2 px-4 bg-dark text-cream hover:bg-accent hover:text-dark rounded-xl text-[10px] font-mono font-black uppercase tracking-widest transition-all flex items-center justify-center gap-1.5 shadow-xs border-none cursor-pointer"
+                        className="py-2 px-4 bg-dark text-cream hover:bg-accent hover:text-dark rounded-xl text-[10px] font-sans font-black uppercase tracking-widest transition-all flex items-center justify-center gap-1.5 shadow-xs border-none cursor-pointer"
                         title="Mail Customer"
                       >
                         <Mail className="w-3.5 h-3.5" />

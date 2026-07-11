@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Calendar, User, ArrowLeft, ArrowRight, Share2, BookOpen } from 'lucide-react'
+import { Calendar, User, ArrowLeft, ArrowRight, Share2, BookOpen, Zap } from 'lucide-react'
 import { getBlogBySlug } from '../lib/supabase'
 import { toast } from 'react-hot-toast'
 
@@ -85,9 +85,9 @@ export default function BlogDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FAFAF7] flex flex-col items-center justify-center font-sans text-[#161616]/60 text-sm">
-        <span className="animate-spin w-6 h-6 border-2 border-[#161616] border-t-transparent rounded-full inline-block mb-3" />
-        Opening narrative dossier...
+      <div className="min-h-screen bg-[#FAF9F6] flex flex-col items-center justify-center font-sans text-dark2/50 text-xs">
+        <span className="animate-spin w-6 h-6 border-2 border-purple-600 border-t-transparent rounded-full inline-block mb-3" />
+        <span className="font-mono uppercase tracking-widest text-[10px]">Opening narrative dossier...</span>
       </div>
     )
   }
@@ -95,10 +95,110 @@ export default function BlogDetail() {
   if (!blog) return null
 
   return (
-    <div className="bg-[#FAFAF7] text-[#161616] font-sans min-h-screen pt-16 sm:pt-24 pb-20 relative selection:bg-[#0B0B0B] selection:text-[#CCFF00] bg-grid-dots bg-grain">
+    <div className="bg-[#FAF9F6] text-[#161616] font-sans min-h-screen pt-16 sm:pt-24 pb-20 relative selection:bg-dark selection:text-[#D6FF40] bg-grain">
+
+      {/* Gaming UI grid lines and glowing effects in light theme */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .bg-grain {
+            background-image: 
+              radial-gradient(rgba(139, 92, 246, 0.08) 1.2px, transparent 1.2px),
+              radial-gradient(circle at 10% 10%, rgba(139, 92, 246, 0.04) 0%, transparent 40%),
+              radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.04) 0%, transparent 40%);
+            background-size: 20px 20px, 100% 100%, 100% 100%;
+          }
+
+          /* Full subtle scanline overlay */
+          .blog-detail-scanlines {
+            position: absolute; inset: 0; z-index: 1; pointer-events: none;
+            background: repeating-linear-gradient(
+              0deg,
+              transparent,
+              transparent 2px,
+              rgba(139,92,246,0.02) 2px,
+              rgba(139,92,246,0.02) 4px
+            );
+          }
+
+          .hud-detail-title {
+            font-family: 'Orbitron', 'Space Grotesk', sans-serif;
+            font-weight: 1000;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            line-height: 1.1;
+            color: #161616;
+          }
+
+          /* Outer border wrapper for helpline card — darker gaming border */
+          .hud-card-border {
+            background: linear-gradient(135deg, rgba(168,85,247,0.8), rgba(99,58,214,0.6), rgba(37,99,235,0.6));
+            clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px), 0 18px);
+            padding: 1.5px;
+            position: relative;
+            transition: all 0.3s ease;
+          }
+
+          /* HUD Card layout matching screenshot */
+          .hud-detail-card {
+            background: #FFFFFF;
+            position: relative;
+            width: 100%;
+            clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 17.5px), 0 18px);
+          }
+          .hud-detail-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 2.5px;
+            background: linear-gradient(90deg, transparent, #8B5CF6 20%, #C084FC 50%, #6D28D9 80%, transparent);
+            z-index: 5;
+          }
+          
+          /* HUD corner ticks */
+          .hud-corner { position: absolute; width: 14px; height: 14px; border-color: rgba(139,92,246,0.5); border-style: solid; z-index: 10; }
+          .hud-tl { top: 8px; left: 8px; border-width: 2px 0 0 2px; }
+          .hud-tr { top: 8px; right: 8px; border-width: 2px 2px 0 0; }
+          .hud-bl { bottom: 8px; left: 8px; border-width: 0 0 2px 2px; }
+          .hud-br { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }
+
+          /* Hex values for tech gaming vibe */
+          .hud-hex { position: absolute; font-size: 7.5px; font-family: monospace; color: rgba(139,92,246,0.45); letter-spacing: 0.05em; font-weight: bold; z-index: 10; }
+          .hud-hex-tl { top: 4px; left: 24px; }
+          .hud-hex-tr { top: 4px; right: 24px; }
+
+          .hud-detail-btn {
+            background: linear-gradient(90deg, #7C3AED 0%, #9333EA 50%, #6D28D9 100%);
+            color: #FFFFFF;
+            font-family: 'Orbitron', 'Space Grotesk', sans-serif;
+            font-weight: 900;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            font-size: 11px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 32px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
+            box-shadow: 0 6px 20px rgba(124,58,237,0.3);
+            text-decoration: none;
+          }
+          .hud-detail-btn:hover {
+            box-shadow: 0 10px 28px rgba(124,58,237,0.45);
+          }
+        `
+      }} />
+
+      <div className="blog-detail-scanlines" />
 
       {/* Background accents */}
-      <div className="absolute top-0 left-0 w-full h-[500px] bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,rgba(255,78,32,0.05),transparent)] pointer-events-none" />
+      <div className="absolute top-0 left-0 w-full h-[500px] bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,rgba(139,92,246,0.06),transparent)] pointer-events-none" />
+
+      {/* Decorative vertical text */}
+      <div className="absolute left-6 top-[25%] rotate-[-90deg] origin-left text-[9px] font-mono text-gray-400 tracking-[0.3em] uppercase select-none pointer-events-none">
+        FTW // DOSSIER // LOG
+      </div>
 
       <motion.div
         variants={stagger}
@@ -107,28 +207,44 @@ export default function BlogDetail() {
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10"
       >
 
+        {/* Back navigation */}
+        <div className="mb-8 flex justify-between items-center">
+          <Link
+            to="/blogs"
+            className="inline-flex items-center gap-2 text-[13.5px] font-mono font-black uppercase tracking-widest text-dark hover:text-purple-600 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" /> Back to Blogs
+          </Link>
+          <button
+            onClick={handleShare}
+            className="p-2.5 rounded-xl bg-white border border-[#E8E5DC] text-dark hover:text-purple-600 hover:border-purple-600/30 transition-all cursor-pointer flex items-center justify-center"
+            title="Share article"
+          >
+            <Share2 className="w-4.5 h-4.5" />
+          </button>
+        </div>
 
         {/* Article Layout */}
         <article className="space-y-10">
 
           {/* Header metadata */}
-          <motion.div variants={fadeInUp} className="space-y-4 text-left">
+          <motion.div variants={fadeInUp} className="space-y-4 text-left border-b border-[#E8E5DC] pb-8">
             {blog.tag && (
-              <span className="text-[9px] font-mono font-black uppercase tracking-widest text-[#FF4E20] bg-[#FF4E20]/5 px-3 py-1.5 rounded-lg border border-[#FF4E20]/15 inline-block">
+              <span className="text-[10px] font-mono font-black uppercase tracking-widest text-purple-600 bg-purple-500/10 px-4 py-1.5 rounded-lg border border-purple-500/25 inline-block">
                 {blog.tag}
               </span>
             )}
-            <h1 className="font-sans text-2xl sm:text-3xl md:text-4xl lg:text-[45px] font-black text-dark tracking-tight leading-none lg:leading-[1.1]">
+            <h1 className="hud-detail-title text-3xl sm:text-4xl md:text-5xl lg:text-[46px] leading-[1.1] font-black text-gray-900">
               {blog.title}
             </h1>
 
-            <div className="flex flex-wrap items-center gap-6 pt-3 text-[10.5px] font-mono text-[#161616]/50 uppercase tracking-widest border-t border-neutral-200/40">
+            <div className="flex flex-wrap items-center gap-6 pt-3 text-[11px] font-mono font-bold text-dark2/50 uppercase tracking-widest">
               <div className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-neutral-400" />
+                <Calendar className="w-4 h-4 text-purple-400" />
                 <span>{new Date(blog.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <User className="w-4 h-4 text-neutral-400" />
+                <User className="w-4 h-4 text-purple-400" />
                 <span>By {blog.author}</span>
               </div>
             </div>
@@ -137,17 +253,25 @@ export default function BlogDetail() {
           {/* Left image, right content side-by-side on lg: screens */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-            {/* Left side: Cover Image banner */}
+            {/* Left side: Cover Image banner wrapped in HUD border */}
             {blog.image && (
               <motion.div
                 variants={fadeInUp}
-                className="lg:col-span-6 rounded-[32px] overflow-hidden border border-neutral-200/70 shadow-lg bg-white lg:sticky lg:top-28"
+                className="lg:col-span-6 hud-card-border lg:sticky lg:top-28"
               >
-                <img
-                  src={blog.image}
-                  alt={blog.title}
-                  className="w-full h-auto block"
-                />
+                <div className="hud-detail-card overflow-hidden">
+                  <div className="hud-corner hud-tl" />
+                  <div className="hud-corner hud-tr" />
+                  <div className="hud-corner hud-bl" />
+                  <div className="hud-corner hud-br" />
+                  <span className="hud-hex hud-hex-tl">COVER_BANNER</span>
+                  <span className="hud-hex hud-hex-tr">0x1A2F</span>
+                  <img
+                    src={blog.image}
+                    alt={blog.title}
+                    className="w-full h-auto block object-cover"
+                  />
+                </div>
               </motion.div>
             )}
 
@@ -157,74 +281,95 @@ export default function BlogDetail() {
               {blog.excerpt && (
                 <motion.div
                   variants={fadeInUp}
-                  className="border-l-4 border-[#FF4E20] pl-6 py-2 italic text-[15px] sm:text-[17px] md:text-[19px] text-[#161616]/80 leading-relaxed font-sans font-semibold tracking-wide"
+                  className="border-l-4 border-purple-600 pl-6 py-2 italic text-[16px] sm:text-[18px] md:text-[20px] text-[#161616]/80 leading-relaxed font-sans font-semibold tracking-wide"
                 >
                   "{blog.excerpt}"
                 </motion.div>
               )}
 
-              {/* Main text content body */}
+              {/* Main text content body wrapped in HUD border */}
               <motion.div
                 variants={fadeInUp}
-                className="font-sans text-[14px] sm:text-base lg:text-[15.5px] text-[#161616]/80 leading-[1.85] space-y-6 text-left bg-white border border-neutral-200/50 rounded-[32px] p-5 sm:p-8 md:p-12 shadow-xs ql-editor-content"
+                className="hud-card-border"
               >
-                <style>{`
-                  .ql-editor-content p { margin-bottom: 1.25rem !important; line-height: 1.85 !important; color: rgba(22, 22, 22, 0.8) !important; text-align: left !important; font-weight: normal !important; }
-                  .ql-editor-content ul { list-style-type: disc !important; padding-left: 1.5rem !important; margin-bottom: 1.5rem !important; }
-                  .ql-editor-content ol { list-style-type: decimal !important; padding-left: 1.5rem !important; margin-bottom: 1.5rem !important; }
-                  .ql-editor-content li { margin-bottom: 0.5rem !important; line-height: 1.7 !important; color: rgba(22, 22, 22, 0.8) !important; font-weight: normal !important; }
-                  .ql-editor-content a { color: #0066cc !important; text-decoration: underline !important; transition: color 0.2s ease; }
-                  .ql-editor-content a:hover { color: #161616 !important; }
-                  .ql-editor-content strong, .ql-editor-content b { font-weight: bold !important; }
-                  .ql-editor-content h1 { font-size: 1.8em; font-weight: inherit !important; margin-top: 1.75rem; margin-bottom: 0.75rem; color: #161616 !important; line-height: 1.25 !important; text-align: left !important; padding-left: 0 !important; margin-left: 0 !important; }
-                  .ql-editor-content h2 { font-size: 1.5em; font-weight: inherit !important; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #161616 !important; line-height: 1.25 !important; text-align: left !important; padding-left: 0 !important; margin-left: 0 !important; }
-                  .ql-editor-content h3 { font-size: 1.2em; font-weight: inherit !important; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #161616 !important; line-height: 1.25 !important; text-align: left !important; padding-left: 0 !important; margin-left: 0 !important; }
-                  .ql-editor-content blockquote {
-                    border-left: 4px solid #FF4E20 !important;
-                    padding-left: 1.25rem !important;
-                    font-style: italic !important;
-                    margin: 1.75rem 0 !important;
-                    color: rgba(22, 22, 22, 0.65) !important;
-                  }
-                  .ql-editor-content img {
-                    max-width: 450px !important;
-                    width: 100% !important;
-                    height: auto !important;
-                    display: block !important;
-                    margin: 2rem auto !important;
-                    border-radius: 24px !important;
-                    border: 1px solid rgba(22, 22, 22, 0.08) !important;
-                    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08) !important;
-                  }
-                `}</style>
-                <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+                <div className="hud-detail-card p-5 sm:p-8 md:p-12 ql-editor-content">
+                  <div className="hud-corner hud-tl" />
+                  <div className="hud-corner hud-tr" />
+                  <div className="hud-corner hud-bl" />
+                  <div className="hud-corner hud-br" />
+                  <span className="hud-hex hud-hex-tl">CONTENT_STREAM</span>
+                  <span className="hud-hex hud-hex-tr">0x3C8D</span>
+
+                  <style>{`
+                    .ql-editor-content p { margin-bottom: 1.25rem !important; line-height: 1.85 !important; color: rgba(22, 22, 22, 0.8) !important; text-align: left !important; font-weight: normal !important; font-size: 15px; }
+                    @media (min-width: 640px) {
+                      .ql-editor-content p { font-size: 17px; }
+                    }
+                    .ql-editor-content ul { list-style-type: disc !important; padding-left: 1.5rem !important; margin-bottom: 1.5rem !important; }
+                    .ql-editor-content ol { list-style-type: decimal !important; padding-left: 1.5rem !important; margin-bottom: 1.5rem !important; }
+                    .ql-editor-content li { margin-bottom: 0.5rem !important; line-height: 1.7 !important; color: rgba(22, 22, 22, 0.8) !important; font-weight: normal !important; }
+                    .ql-editor-content a { color: #8B5CF6 !important; text-decoration: underline !important; transition: color 0.2s ease; }
+                    .ql-editor-content a:hover { color: #161616 !important; }
+                    .ql-editor-content strong, .ql-editor-content b { font-weight: bold !important; }
+                    .ql-editor-content h1 { font-size: 1.8em; font-weight: inherit !important; margin-top: 1.75rem; margin-bottom: 0.75rem; color: #161616 !important; line-height: 1.25 !important; text-align: left !important; padding-left: 0 !important; margin-left: 0 !important; }
+                    .ql-editor-content h2 { font-size: 1.5em; font-weight: inherit !important; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #161616 !important; line-height: 1.25 !important; text-align: left !important; padding-left: 0 !important; margin-left: 0 !important; }
+                    .ql-editor-content h3 { font-size: 1.2em; font-weight: inherit !important; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #161616 !important; line-height: 1.25 !important; text-align: left !important; padding-left: 0 !important; margin-left: 0 !important; }
+                    .ql-editor-content blockquote {
+                      border-left: 4px solid #8B5CF6 !important;
+                      padding-left: 1.25rem !important;
+                      font-style: italic !important;
+                      margin: 1.75rem 0 !important;
+                      color: rgba(22, 22, 22, 0.65) !important;
+                    }
+                    .ql-editor-content img {
+                      max-width: 450px !important;
+                      width: 100% !important;
+                      height: auto !important;
+                      display: block !important;
+                      margin: 2rem auto !important;
+                      border-radius: 24px !important;
+                      border: 1px solid rgba(22, 22, 22, 0.08) !important;
+                      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08) !important;
+                    }
+                  `}</style>
+                  <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+                </div>
               </motion.div>
             </div>
 
           </div>
 
-          {/* Release card CTA */}
+          {/* Release card CTA wrapped in HUD border */}
           <motion.div
             variants={fadeInUp}
-            className="bg-[#161616] rounded-[28px] p-8 sm:p-10 text-white flex flex-col md:flex-row items-center justify-between gap-6 border border-neutral-900 shadow-xl relative overflow-hidden"
+            className="hud-card-border"
           >
-            <div className="absolute right-0 top-0 w-48 h-48 bg-[#FF4E20]/10 rounded-full blur-[80px] pointer-events-none" />
-            <div className="max-w-md text-center md:text-left">
-              <span className="text-[9px] font-mono font-black uppercase tracking-[0.25em] text-[#FF4E20] block mb-2">EXPERIENCE THE CRAFT</span>
-              <h3 className="font-display text-xl sm:text-2xl font-black uppercase tracking-tight text-white leading-none">UPGRADE YOUR STREETWEAR SILHOUETTES</h3>
-              <p className="text-[11px] text-white/50 mt-3 font-sans leading-relaxed">
-                Our drops feature heavy pre-shrunk fabrics, double-stitched ribbings, and state-of-the-art prints. Experience luxury you can actually live in.
-              </p>
+            <div className="hud-detail-card p-8 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="hud-corner hud-tl" />
+              <div className="hud-corner hud-tr" />
+              <div className="hud-corner hud-bl" />
+              <div className="hud-corner hud-br" />
+              <span className="hud-hex hud-hex-tl">SYSTEM_UPGRADE_PROMPT</span>
+              <span className="hud-hex hud-hex-tr">0x7D9E</span>
+
+              <div className="max-w-md text-center md:text-left">
+                <span className="text-[10px] font-mono font-black uppercase tracking-[0.25em] text-[#8B5CF6] block mb-2">EXPERIENCE THE CRAFT</span>
+                <h3 className="font-display text-2xl sm:text-3xl font-black uppercase tracking-tight text-gray-900 leading-none">UPGRADE YOUR STREETWEAR SILHOUETTES</h3>
+                <p className="text-[12.5px] text-gray-500 mt-3 font-sans leading-relaxed">
+                  Our drops feature heavy pre-shrunk fabrics, double-stitched ribbings, and state-of-the-art prints. Experience luxury you can actually live in.
+                </p>
+              </div>
+              <Link
+                to="/shop"
+                className="hud-detail-btn shrink-0"
+              >
+                Explore Drop <ArrowRight className="w-4 h-4 text-white" />
+              </Link>
             </div>
-            <Link
-              to="/shop"
-              className="inline-flex items-center gap-2 bg-[#FF4E20] hover:bg-white text-white hover:text-[#161616] text-[10px] font-mono font-black uppercase tracking-widest px-6 py-4 rounded-xl transition-all duration-300 shadow-md border-none cursor-pointer decoration-none shrink-0"
-            >
-              Explore Drops <ArrowRight className="w-4 h-4" />
-            </Link>
           </motion.div>
 
         </article>
+
       </motion.div>
     </div>
   )

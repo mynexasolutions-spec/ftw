@@ -79,39 +79,39 @@ export default function ProductsTab({
       {/* Inventory Dashboard Banner */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 bg-cream2/60 border border-cream3 rounded-2xl p-3 sm:p-4 shadow-inner">
         <div className="p-3 sm:p-4 bg-white rounded-xl border border-cream3/60 shadow-xs flex flex-col justify-between">
-          <span className="text-[9px] sm:text-[10px] lg:text-xs font-mono text-dark2/45 uppercase tracking-widest font-black block">Catalog Size</span>
+          <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans text-dark2/45 uppercase tracking-widest font-black block">Catalog Size</span>
           <div className="mt-2 flex items-baseline justify-between">
             <span className="text-lg sm:text-xl lg:text-2xl font-sans font-black text-dark">{totalProducts}</span>
-            <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-mono font-bold text-dark2/50">Items</span>
+            <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-sans font-bold text-dark2/50">Items</span>
           </div>
         </div>
 
         <div className="p-3 sm:p-4 bg-white rounded-xl border border-cream3/60 shadow-xs flex flex-col justify-between">
-          <span className="text-[9px] sm:text-[10px] lg:text-xs font-mono text-dark2/45 uppercase tracking-widest font-black block">Out of Stock</span>
+          <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans text-dark2/45 uppercase tracking-widest font-black block">Out of Stock</span>
           <div className="mt-2 flex items-baseline justify-between">
-            <span className="text-lg sm:text-xl lg:text-2xl font-sans font-black text-red-650">{outOfStock.length}</span>
+            <span className="text-lg sm:text-xl lg:text-2xl font-sans font-black text-red-655">{outOfStock.length}</span>
             {outOfStock.length > 0 ? (
-              <span className="text-[8px] sm:text-[9px] lg:text-[10px] bg-red-50 text-red-600 border border-red-100 px-1.5 py-0.5 rounded font-black font-mono animate-pulse">Alert</span>
+              <span className="text-[8px] sm:text-[9px] lg:text-[10px] bg-red-50 text-red-600 border border-red-100 px-1.5 py-0.5 rounded font-black font-sans animate-pulse">Alert</span>
             ) : (
-              <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-mono font-bold text-dark2/40">Clean</span>
+              <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-sans font-bold text-dark2/40">Clean</span>
             )}
           </div>
         </div>
 
         <div className="p-3 sm:p-4 bg-white rounded-xl border border-cream3/60 shadow-xs flex flex-col justify-between">
-          <span className="text-[9px] sm:text-[10px] lg:text-xs font-mono text-dark2/45 uppercase tracking-widest font-black block">Low Stock Warn</span>
+          <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans text-dark2/45 uppercase tracking-widest font-black block">Low Stock Warn</span>
           <div className="mt-2 flex items-baseline justify-between">
             <span className="text-lg sm:text-xl lg:text-2xl font-sans font-black text-amber-600">{lowStock.length}</span>
             {lowStock.length > 0 ? (
-              <span className="text-[8px] sm:text-[9px] lg:text-[10px] bg-amber-50 text-amber-700 border border-amber-100 px-1.5 py-0.5 rounded font-black font-mono">Restock</span>
+              <span className="text-[8px] sm:text-[9px] lg:text-[10px] bg-amber-50 text-amber-700 border border-amber-100 px-1.5 py-0.5 rounded font-black font-sans">Restock</span>
             ) : (
-              <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-mono font-bold text-dark2/40">Healthy</span>
+              <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-sans font-bold text-dark2/40">Healthy</span>
             )}
           </div>
         </div>
 
         <div className="p-3 sm:p-4 bg-white rounded-xl border border-cream3/60 shadow-xs flex flex-col justify-between">
-          <span className="text-[9px] sm:text-[10px] lg:text-xs font-mono text-dark2/45 uppercase tracking-widest font-black block">Stock Valuation</span>
+          <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans text-dark2/45 uppercase tracking-widest font-black block">Stock Valuation</span>
           <div className="mt-2 flex items-baseline justify-between">
             <span className="text-base sm:text-lg lg:text-xl font-sans font-black text-emerald-600">₹{totalStockValue.toLocaleString('en-IN')}</span>
             <Coins className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-emerald-500 shrink-0" />
@@ -178,7 +178,7 @@ export default function ProductsTab({
                               <span className="font-bold text-dark block text-xs lg:text-sm truncate max-w-[180px] lg:max-w-[220px]" title={prod.name}>
                                 {prod.name}
                               </span>
-                              <span className="text-[9px] lg:text-[10px] text-dark2/45 font-mono block">ID: {prod.id}</span>
+                              <span className="text-[9px] lg:text-[10px] text-dark2/45 font-sans block">ID: {prod.id}</span>
                             </div>
                           </div>
                         </td>
@@ -191,7 +191,7 @@ export default function ProductsTab({
                         </td>
 
                         {/* SKU */}
-                        <td className="p-4 lg:p-4.5 font-mono text-dark2/50 text-[10px] lg:text-xs uppercase font-bold">
+                        <td className="p-4 lg:p-4.5 font-sans text-dark2/50 text-[10px] lg:text-xs uppercase font-bold">
                           {prod.sku || '—'}
                         </td>
 
@@ -234,7 +234,7 @@ export default function ProductsTab({
                             {variantItems.length > 0 && (
                               <div className="flex flex-wrap items-center gap-1.5 max-w-[220px] lg:max-w-[260px]">
                                 {variantItems.slice(0, 2).map((item, idx) => (
-                                  <span key={idx} className="inline-flex items-center gap-1 text-[8.5px] lg:text-[9.5px] font-mono font-bold px-2 py-0.5 rounded-md bg-cream2 text-dark2/70 border border-cream3/80 shadow-2xs">
+                                  <span key={idx} className="inline-flex items-center gap-1 text-[8.5px] lg:text-[9.5px] font-sans font-bold px-2 py-0.5 rounded-md bg-cream2 text-dark2/70 border border-cream3/80 shadow-2xs">
                                     <span className="w-1.5 h-1.5 rounded-full bg-dark/40 shrink-0" />
                                     <span>{item.color}:</span>
                                     <span className="font-black text-dark">{item.qty}</span>
@@ -242,7 +242,7 @@ export default function ProductsTab({
                                 ))}
                                 {variantItems.length > 2 && (
                                   <span 
-                                    className="inline-flex items-center text-[8.5px] lg:text-[9.5px] font-mono font-bold px-2 py-0.5 rounded-md bg-dark text-white shadow-2xs cursor-help"
+                                    className="inline-flex items-center text-[8.5px] lg:text-[9.5px] font-sans font-bold px-2 py-0.5 rounded-md bg-dark text-white shadow-2xs cursor-help"
                                     title={variantItems.map(i => `${i.color}: ${i.qty}`).join('\n')}
                                   >
                                     +{variantItems.length - 2} more
@@ -310,7 +310,7 @@ export default function ProductsTab({
                          <span className="font-bold text-dark block text-xs truncate" title={prod.name}>
                            {prod.name}
                          </span>
-                         <span className="text-[9px] text-dark2/45 font-mono block mt-0.5">ID: {prod.id}</span>
+                         <span className="text-[9px] text-dark2/45 font-sans block mt-0.5">ID: {prod.id}</span>
                          <span className="inline-block text-[9px] bg-cream text-dark2/75 px-1.5 py-0.5 rounded font-black uppercase tracking-wider border border-cream3/60 mt-1">
                            {prod.category}
                          </span>
@@ -345,7 +345,7 @@ export default function ProductsTab({
                        {variantItems.length > 0 && (
                          <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-cream3/50">
                            {variantItems.slice(0, 2).map((item, idx) => (
-                             <span key={idx} className="inline-flex items-center gap-1 text-[8px] font-mono font-bold px-2 py-0.5 rounded bg-cream2 text-dark2/70 border border-cream3/80">
+                             <span key={idx} className="inline-flex items-center gap-1 text-[8px] font-sans font-bold px-2 py-0.5 rounded bg-cream2 text-dark2/70 border border-cream3/80">
                                <span className="w-1.5 h-1.5 rounded-full bg-dark/40 shrink-0" />
                                <span>{item.color}:</span>
                                <span className="font-black text-dark">{item.qty}</span>
@@ -353,7 +353,7 @@ export default function ProductsTab({
                            ))}
                            {variantItems.length > 2 && (
                              <span 
-                               className="inline-flex items-center text-[8px] font-mono font-bold px-2 py-0.5 rounded bg-dark text-white shadow-2xs"
+                               className="inline-flex items-center text-[8px] font-sans font-bold px-2 py-0.5 rounded bg-dark text-white shadow-2xs"
                                title={variantItems.map(i => `${i.color}: ${i.qty}`).join('\n')}
                              >
                                +{variantItems.length - 2} more

@@ -552,19 +552,71 @@ export default function MyOrders() {
 
   return (
     <div className="bg-[#FAF9F6] text-[#161616] min-h-screen relative overflow-hidden font-sans bg-grid-dots bg-grain">
-      <div className="min-h-screen pt-16 pb-24 px-6 md:px-12 max-w-5xl mx-auto text-dark relative selection:bg-accent selection:text-cream">
+
+      {/* Styled styles for My Orders page gaming theme details */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          /* Full subtle scanline overlay */
+          .orders-scanlines {
+            position: absolute; inset: 0; z-index: 1; pointer-events: none;
+            background: repeating-linear-gradient(
+              0deg,
+              transparent,
+              transparent 2px,
+              rgba(139,92,246,0.015) 2px,
+              rgba(139,92,246,0.015) 4px
+            );
+          }
+
+          /* HUD Card outer boundary */
+          .hud-card-border {
+            background: linear-gradient(135deg, rgba(168,85,247,0.7), rgba(99,58,214,0.5), rgba(37,99,235,0.5));
+            clip-path: polygon(16px 0, calc(100% - 16px) 0, 100% 16px, 100% calc(100% - 16px), calc(100% - 16px) 100%, 16px 100%, 0 calc(100% - 16px), 0 16px);
+            padding: 1.5px;
+            position: relative;
+            transition: all 0.3s ease;
+          }
+
+          /* HUD inner card layout */
+          .hud-orders-card {
+            background: #FFFFFF;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            clip-path: polygon(16px 0, calc(100% - 16px) 0, 100% 16px, 100% calc(100% - 16px), calc(100% - 16px) 100%, 16px 100%, 0 calc(100% - 16px), 0 16px);
+          }
+
+          /* Corner ticks */
+          .hud-corner { position: absolute; width: 10px; height: 10px; border-color: rgba(139,92,246,0.4); border-style: solid; z-index: 10; }
+          .hud-tl { top: 6px; left: 6px; border-width: 2px 0 0 2px; }
+          .hud-tr { top: 6px; right: 6px; border-width: 2px 2px 0 0; }
+          .hud-bl { bottom: 6px; left: 6px; border-width: 0 0 2px 2px; }
+          .hud-br { bottom: 6px; right: 6px; border-width: 0 2px 2px 0; }
+
+          .hud-hex { font-family: monospace; font-size: 7px; color: rgba(139,92,246,0.5); letter-spacing: 0.05em; font-weight: bold; }
+        `
+      }} />
+
+      <div className="orders-scanlines" />
+
+      {/* Decorative vertical decors */}
+      <div className="absolute left-6 top-[35%] rotate-[-90deg] origin-left text-[9px] font-mono text-gray-400 tracking-[0.25em] uppercase select-none pointer-events-none hidden xl:block">
+        FTW // CUSTOMER_PORTAL // DATABASE_SECURE
+      </div>
+
+      <div className="min-h-screen pt-16 pb-24 px-6 md:px-12 max-w-5xl mx-auto text-dark relative selection:bg-purple-600 selection:text-white">
         {/* Title Header: Matches Shop/Helpline/About page titles */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="mb-10 sm:mb-16 border-l-4 border-[#161616] pl-4 sm:pl-6"
+          className="mb-10 sm:mb-16 border-l-4 border-purple-600 pl-4 sm:pl-6"
         >
-          <span className="text-[#FF4E20] font-mono uppercase tracking-[0.25em] text-xs font-bold block mb-2">
+          <span className="text-purple-600 font-mono uppercase tracking-[0.25em] text-[13.5px] font-black block mb-2">
             CUSTOMER SPACE
           </span>
-          <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-black uppercase tracking-tight text-[#161616] leading-none">
-            MY <span className="text-[#FF4E20] italic transform skew-x-3 inline-block">ORDERS</span>
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight text-[#161616] leading-none">
+            MY <span className="text-purple-600 italic transform skew-x-3 inline-block">ORDERS</span>
           </h1>
         </motion.div>
 
@@ -578,7 +630,7 @@ export default function MyOrders() {
               placeholder="Search by Order ID or Item Name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-3 border border-cream3 rounded-2xl bg-white text-xs font-sans focus:outline-none focus:border-dark transition-colors placeholder:text-dark2/30"
+              className="w-full px-4 py-3.5 border border-cream3 rounded-2xl bg-white text-xs font-sans focus:outline-none focus:border-purple-600 transition-colors placeholder:text-dark2/30 font-bold uppercase tracking-wider"
             />
           </div>
 
@@ -588,9 +640,9 @@ export default function MyOrders() {
               <button
                 key={status}
                 onClick={() => setSelectedStatus(status)}
-                className={`px-4 py-2 text-[10px] font-mono font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer border ${selectedStatus === status
-                    ? 'bg-dark border-dark text-primary shadow-sm'
-                    : 'bg-white border-cream3 text-dark2/70 hover:border-dark/30'
+                className={`px-4 py-2.5 text-[11px] font-mono font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer border ${selectedStatus === status
+                    ? 'bg-purple-600 border-purple-600 text-white shadow-sm'
+                    : 'bg-white border-cream3 text-dark2/70 hover:border-purple-600/35'
                   }`}
               >
                 {status}
@@ -651,8 +703,15 @@ export default function MyOrders() {
                 <motion.div
                   key={order.id}
                   layout="position"
-                  className="bg-white border border-cream3 rounded-3xl overflow-hidden shadow-sm hover:border-dark/25 transition-all duration-300"
+                  className="relative bg-white border border-purple-200 rounded-3xl overflow-hidden shadow-sm hover:border-purple-400/50 hover:shadow-[0_4px_20px_rgba(139,92,246,0.08)] transition-all duration-300"
                 >
+                  {/* HUD top accent line */}
+                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-60" />
+                  {/* HUD corner ticks */}
+                  <div className="hud-corner hud-tl" />
+                  <div className="hud-corner hud-tr" />
+                  <div className="hud-corner hud-bl" />
+                  <div className="hud-corner hud-br" />
                   {/* Collapsed Header Info / Card Trigger */}
                   <div
                     onClick={() => toggleExpand(order.id)}
@@ -662,24 +721,24 @@ export default function MyOrders() {
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 flex-grow">
                         <div>
-                          <span className="text-[9px] font-mono text-dark2/45 uppercase font-black block">Order ID</span>
-                          <span className="font-mono text-xs font-black text-dark block mt-1">{order.id}</span>
+                          <span className="text-[10px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Order ID</span>
+                          <span className="font-mono text-[13px] font-black text-dark block mt-1">{order.id}</span>
                         </div>
                         <div>
-                          <span className="text-[9px] font-mono text-dark2/45 uppercase font-black block">Placed On</span>
-                          <span className="text-xs font-bold text-dark block mt-1">{formatOrderDate(order.created_at)}</span>
+                          <span className="text-[10px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Placed On</span>
+                          <span className="text-[13px] font-bold text-dark block mt-1">{formatOrderDate(order.created_at)}</span>
                         </div>
                         <div>
-                          <span className="text-[9px] font-mono text-dark2/45 uppercase font-black block">Grand Total</span>
-                          <span className="text-xs font-black font-mono text-dark block mt-1">₹{order.total.toLocaleString('en-IN')}</span>
+                          <span className="text-[10px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Grand Total</span>
+                          <span className="text-[15px] font-black font-mono text-dark block mt-1">₹{order.total.toLocaleString('en-IN')}</span>
                         </div>
                         <div>
-                          <span className="text-[9px] font-mono text-dark2/45 uppercase font-black block">Status</span>
-                          <span className={`inline-block px-2.5 py-0.5 rounded-lg text-[9px] font-black uppercase mt-1 border ${isDelivered ? 'bg-green-50 text-green-700 border-green-150' :
-                              isShipped ? 'bg-blue-50 text-blue-700 border-blue-150' :
-                                isProcessing ? 'bg-purple-50 text-purple-700 border-purple-150' :
-                                  isCancelled ? 'bg-red-50 text-red-700 border-red-150' :
-                                    'bg-yellow-50 text-yellow-700 border-yellow-150'
+                          <span className="text-[10px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Status</span>
+                          <span className={`inline-block px-3 py-1 rounded-lg text-[11px] font-black uppercase mt-1 border tracking-wider ${isDelivered ? 'bg-green-50 text-green-700 border-green-200' :
+                              isShipped ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                                isProcessing ? 'bg-purple-50 text-purple-700 border-purple-200' :
+                                  isCancelled ? 'bg-red-50 text-red-700 border-red-200' :
+                                    'bg-yellow-50 text-yellow-700 border-yellow-200'
                             }`}>
                             {order.status || 'Pending'}
                           </span>
@@ -687,8 +746,8 @@ export default function MyOrders() {
                       </div>
 
                       <div className="flex items-center justify-end gap-3 shrink-0">
-                        <span className="text-[10px] font-mono text-dark2/45 font-bold md:hidden">TAP TO VIEW DETAILS</span>
-                        <button className="p-2 rounded-full bg-cream3/60 text-dark2/75 hover:bg-dark hover:text-cream transition-all border-none cursor-pointer">
+                        <span className="text-[11px] font-mono text-dark2/45 font-bold md:hidden uppercase tracking-widest">Tap to View</span>
+                        <button className="p-2 rounded-full bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white transition-all border border-purple-200 cursor-pointer">
                           {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                         </button>
                       </div>
@@ -716,11 +775,11 @@ export default function MyOrders() {
                                   </div>
                                 )}
                                 <div className="min-w-0">
-                                  <p className="text-[10px] font-extrabold uppercase text-dark leading-tight group-hover:text-accent transition-colors">{item.name}</p>
-                                  <p className="text-[9px] font-mono text-accent font-black uppercase mt-0.5">
+                                  <p className="text-[12px] font-extrabold uppercase text-dark leading-tight group-hover:text-purple-600 transition-colors">{item.name}</p>
+                                  <p className="text-[11px] font-mono text-purple-600 font-black uppercase mt-0.5">
                                     {item.size && `Sz ${item.size}`}{item.qty > 1 ? ` × ${item.qty}` : ''}
                                   </p>
-                                  <p className="text-[9px] font-mono text-dark2/50 mt-0.5">₹{((item.price || 0) * (item.qty || 1)).toLocaleString('en-IN')}</p>
+                                  <p className="text-[11px] font-mono text-dark2/60 mt-0.5">₹{((item.price || 0) * (item.qty || 1)).toLocaleString('en-IN')}</p>
                                 </div>
                               </>
                             )
@@ -751,22 +810,22 @@ export default function MyOrders() {
                         <div className="flex flex-col gap-3 md:items-end justify-center shrink-0 mt-2 md:mt-0">
                           {/* Info pills */}
                           <div className="flex flex-wrap gap-2 md:justify-end">
-                            <div className="flex items-center gap-1.5 bg-cream/70 border border-cream3 rounded-xl px-3 py-1.5">
-                              <ShoppingBag className="w-3 h-3 text-dark2/45 shrink-0" />
-                              <span className="text-[10px] font-bold text-dark font-mono whitespace-nowrap">
+                            <div className="flex items-center gap-1.5 bg-purple-50 border border-purple-100 rounded-xl px-3 py-1.5">
+                              <ShoppingBag className="w-3 h-3 text-purple-500 shrink-0" />
+                              <span className="text-[11px] font-black text-dark font-mono whitespace-nowrap">
                                 {order.items.reduce((s, i) => s + (i.qty || 1), 0)} item{order.items.reduce((s, i) => s + (i.qty || 1), 0) > 1 ? 's' : ''}
                               </span>
                             </div>
                             {order.payment_method && (
-                              <div className="flex items-center gap-1.5 bg-cream/70 border border-cream3 rounded-xl px-3 py-1.5">
-                                <CreditCard className="w-3 h-3 text-dark2/45 shrink-0" />
-                                <span className="text-[10px] font-bold text-dark font-mono whitespace-nowrap uppercase">{order.payment_method}</span>
+                              <div className="flex items-center gap-1.5 bg-purple-50 border border-purple-100 rounded-xl px-3 py-1.5">
+                                <CreditCard className="w-3 h-3 text-purple-500 shrink-0" />
+                                <span className="text-[11px] font-black text-dark font-mono whitespace-nowrap uppercase">{order.payment_method}</span>
                               </div>
                             )}
                             {order.address && (
-                              <div className="flex items-center gap-1.5 bg-cream/70 border border-cream3 rounded-xl px-3 py-1.5">
-                                <MapPin className="w-3 h-3 text-dark2/45 shrink-0" />
-                                <span className="text-[10px] font-bold text-dark font-mono whitespace-nowrap">
+                              <div className="flex items-center gap-1.5 bg-purple-50 border border-purple-100 rounded-xl px-3 py-1.5">
+                                <MapPin className="w-3 h-3 text-purple-500 shrink-0" />
+                                <span className="text-[11px] font-black text-dark font-mono whitespace-nowrap">
                                   {order.address.split(',').slice(-2, -1)[0]?.trim() || order.address.substring(0, 18)}
                                 </span>
                               </div>
@@ -778,25 +837,25 @@ export default function MyOrders() {
                             <div className="flex items-center gap-2">
                               <button
                                 onClick={(e) => { e.stopPropagation(); generateInvoice(order) }}
-                                className="flex items-center gap-1.5 px-3 py-1.5 bg-dark text-primary text-[9px] font-mono font-black uppercase tracking-widest rounded-xl hover:bg-accent hover:text-dark transition-colors duration-200 border-none cursor-pointer whitespace-nowrap"
+                                className="flex items-center gap-1.5 px-4 py-2 bg-purple-600 text-white text-[11px] font-mono font-black uppercase tracking-widest rounded-xl hover:bg-purple-700 transition-colors duration-200 border-none cursor-pointer whitespace-nowrap shadow-sm"
                               >
-                                <Download className="w-3 h-3" /> Invoice
+                                <Download className="w-3.5 h-3.5" /> Invoice
                               </button>
                               {order.items && (
                                 <button
                                   onClick={(e) => { e.stopPropagation(); setRatingModal({ order, itemIdx: 0 }) }}
-                                  className={`flex items-center gap-1.5 px-3 py-1.5 border text-[9px] font-mono font-black uppercase tracking-widest rounded-xl transition-colors duration-200 cursor-pointer whitespace-nowrap ${order.items.every(item => userReviews.some(ur => ur.product_name === item.name))
-                                      ? 'bg-cream border-cream3 text-dark2/50 hover:text-accent hover:border-accent'
-                                      : 'bg-cream2 border-cream3 text-dark hover:border-accent hover:text-accent'
+                                  className={`flex items-center gap-1.5 px-4 py-2 border text-[11px] font-mono font-black uppercase tracking-widest rounded-xl transition-colors duration-200 cursor-pointer whitespace-nowrap ${order.items.every(item => userReviews.some(ur => ur.product_name === item.name))
+                                      ? 'bg-cream border-cream3 text-dark2/50 hover:text-purple-600 hover:border-purple-400'
+                                      : 'bg-cream2 border-cream3 text-dark hover:border-purple-600 hover:text-purple-600'
                                     }`}
                                 >
                                   {order.items.every(item => userReviews.some(ur => ur.product_name === item.name)) ? (
                                     <>
-                                      <Eye className="w-3 h-3" /> Rated
+                                      <Eye className="w-3.5 h-3.5" /> Rated
                                     </>
                                   ) : (
                                     <>
-                                      <Star className="w-3 h-3" /> Rate
+                                      <Star className="w-3.5 h-3.5" /> Rate
                                     </>
                                   )}
                                 </button>
@@ -820,14 +879,14 @@ export default function MyOrders() {
                       >
                         {/* Customer, Address & Payment Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-dark font-sans">
-                          <div className="bg-white border border-cream3 rounded-2xl p-5 space-y-2">
-                            <span className="text-[9px] font-mono text-dark2/45 uppercase font-black block">Delivery Details</span>
-                            <p className="font-semibold leading-relaxed whitespace-pre-line text-dark2/80">{order.address}</p>
+                          <div className="bg-white border border-purple-100 rounded-2xl p-5 space-y-2">
+                            <span className="text-[11px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Delivery Details</span>
+                            <p className="text-[13px] font-semibold leading-relaxed whitespace-pre-line text-dark2/80">{order.address}</p>
                           </div>
-                          <div className="bg-white border border-cream3 rounded-2xl p-5 space-y-2">
-                            <span className="text-[9px] font-mono text-dark2/45 uppercase font-black block">Payment Information</span>
-                            <p className="font-semibold text-dark uppercase"><span className="text-dark2/45 font-normal">Method:</span> {order.payment_method}</p>
-                            <p className="font-semibold text-dark uppercase"><span className="text-dark2/45 font-normal">Status:</span> {statusText}</p>
+                          <div className="bg-white border border-purple-100 rounded-2xl p-5 space-y-2">
+                            <span className="text-[11px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Payment Information</span>
+                            <p className="text-[13px] font-semibold text-dark uppercase"><span className="text-dark2/45 font-normal">Method:</span> {order.payment_method}</p>
+                            <p className="text-[13px] font-semibold text-dark uppercase"><span className="text-dark2/45 font-normal">Status:</span> {statusText}</p>
                             {rzpOrderId && (
                               <p className="font-mono text-[9px] text-dark/70 break-all leading-tight mt-1 bg-cream3/30 p-2 rounded-lg border border-cream3"><span className="font-sans text-dark2/45 font-black uppercase text-[8px] block mb-0.5">Razorpay Order ID</span>{rzpOrderId}</p>
                             )}
@@ -835,8 +894,8 @@ export default function MyOrders() {
                         </div>
 
                         {/* 3. Items Purchased Table */}
-                        <div className="bg-white border border-cream3 rounded-2xl p-5 space-y-3">
-                          <span className="text-[9px] text-dark2/40 uppercase font-black tracking-widest block border-b border-cream3 pb-2">Purchased Items ({order.items?.length || 0})</span>
+                        <div className="bg-white border border-purple-100 rounded-2xl p-5 space-y-3">
+                          <span className="text-[11px] text-purple-600/70 uppercase font-black tracking-widest block border-b border-purple-100 pb-2">Purchased Items ({order.items?.length || 0})</span>
                           <div className="space-y-4">
                             {order.items?.map((item, idx) => {
                               const standardProductId = item.id && item.id.startsWith('ftw-') ? (item.id.split('-').length >= 4 ? item.id.split('-').slice(0, -2).join('-') : item.id) : null
@@ -850,7 +909,7 @@ export default function MyOrders() {
                               )
 
                               const titleEl = (
-                                <h4 className="font-extrabold uppercase text-dark truncate leading-tight group-hover:text-accent transition-colors">{item.name}</h4>
+                                <h4 className="text-[13px] font-extrabold uppercase text-dark truncate leading-tight group-hover:text-purple-600 transition-colors">{item.name}</h4>
                               )
 
                               return (
@@ -870,7 +929,7 @@ export default function MyOrders() {
                                     ) : (
                                       titleEl
                                     )}
-                                    <span className="text-[9px] text-accent font-mono font-black uppercase tracking-wider block mt-1">
+                                    <span className="text-[12px] text-purple-600 font-mono font-black uppercase tracking-wider block mt-1">
                                       Size {item.size} <span className="text-dark/45">x</span> {item.qty || 1}
                                     </span>
                                     {(item.designId || item.customDesign) && (
@@ -883,8 +942,8 @@ export default function MyOrders() {
                                     )}
                                   </div>
                                   <div className="text-right shrink-0">
-                                    <span className="text-[10px] text-dark2/45 block font-mono">₹{(item.price || 0).toLocaleString('en-IN')}</span>
-                                    <span className="font-mono font-bold block"> = ₹{((item.price || 0) * (item.qty || 1)).toLocaleString('en-IN')}</span>
+                                    <span className="text-[11px] text-dark2/45 block font-mono">₹{(item.price || 0).toLocaleString('en-IN')}</span>
+                                    <span className="text-[13px] font-mono font-black block text-dark"> = ₹{((item.price || 0) * (item.qty || 1)).toLocaleString('en-IN')}</span>
                                   </div>
                                 </div>
                               )
@@ -893,19 +952,19 @@ export default function MyOrders() {
                         </div>
 
                         {/* 4. Amount Summary Box */}
-                        <div className="bg-cream2 border border-cream3 rounded-2xl p-5 space-y-2 font-mono text-xs text-dark">
-                          <span className="text-[9px] text-dark2/40 uppercase font-black tracking-widest block border-b border-cream3 pb-2 mb-1">Amount Breakdown</span>
-                          <div className="flex justify-between text-dark/70">
+                        <div className="bg-purple-50/60 border border-purple-100 rounded-2xl p-5 space-y-2.5 font-mono text-dark">
+                          <span className="text-[11px] text-purple-600/70 uppercase font-black tracking-widest block border-b border-purple-100 pb-2 mb-1">Amount Breakdown</span>
+                          <div className="flex justify-between text-[13px] text-dark/70">
                             <span>Subtotal</span>
                             <span>₹{itemsSubtotal.toLocaleString('en-IN')}</span>
                           </div>
                           {discount > 0 && (
-                            <div className="flex justify-between text-accent">
+                            <div className="flex justify-between text-[13px] text-purple-600 font-bold">
                               <span>Discount</span>
                               <span>-₹{discount.toLocaleString('en-IN')}</span>
                             </div>
                           )}
-                          <div className="flex justify-between text-dark/70">
+                          <div className="flex justify-between text-[13px] text-dark/70">
                             <span>Delivery</span>
                             {shippingFee === 0 ? (
                               <span className="text-green-700 font-bold uppercase">FREE</span>
@@ -913,27 +972,27 @@ export default function MyOrders() {
                               <span>₹{shippingFee.toLocaleString('en-IN')}</span>
                             )}
                           </div>
-                          <div className="flex justify-between border-t border-cream3 pt-3 font-bold text-sm text-dark">
+                          <div className="flex justify-between border-t border-purple-200 pt-3 font-bold text-[15px] text-dark">
                             <span>Grand Total</span>
-                            <span className="font-black font-mono">₹{order.total.toLocaleString('en-IN')}</span>
+                            <span className="font-black font-mono text-purple-700">₹{order.total.toLocaleString('en-IN')}</span>
                           </div>
                         </div>
 
                         {/* Delivered: action row inside expanded */}
                         {isDelivered && (
                           <div className="flex flex-wrap gap-3 pt-2 border-t border-cream3">
-                            <span className="text-[9px] font-mono font-black uppercase tracking-widest text-dark2/35 self-center">Order Complete —</span>
+                            <span className="text-[11px] font-mono font-black uppercase tracking-widest text-purple-600/50 self-center">Order Complete —</span>
                             <button
                               onClick={() => generateInvoice(order)}
-                              className="inline-flex items-center gap-2 px-5 py-2.5 bg-dark text-primary text-[10px] font-mono font-black uppercase tracking-widest rounded-xl hover:bg-accent hover:text-dark transition-colors duration-200 border-none cursor-pointer"
+                              className="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-600 text-white text-[11px] font-mono font-black uppercase tracking-widest rounded-xl hover:bg-purple-700 transition-colors duration-200 border-none cursor-pointer shadow-sm"
                             >
                               <Download className="w-3.5 h-3.5" /> Download Invoice
                             </button>
                             <button
                               onClick={() => setRatingModal({ order, itemIdx: 0 })}
-                              className={`inline-flex items-center gap-2 px-5 py-2.5 border text-[10px] font-mono font-black uppercase tracking-widest rounded-xl transition-colors duration-200 cursor-pointer ${order.items?.every(item => userReviews.some(ur => ur.product_name === item.name))
-                                  ? 'bg-cream border-cream3 text-dark/40 hover:text-accent hover:border-accent'
-                                  : 'bg-cream border-cream3 text-dark hover:border-accent hover:text-accent'
+                              className={`inline-flex items-center gap-2 px-5 py-2.5 border text-[11px] font-mono font-black uppercase tracking-widest rounded-xl transition-colors duration-200 cursor-pointer ${order.items?.every(item => userReviews.some(ur => ur.product_name === item.name))
+                                  ? 'bg-cream border-cream3 text-dark/40 hover:text-purple-600 hover:border-purple-400'
+                                  : 'bg-cream border-cream3 text-dark hover:border-purple-600 hover:text-purple-600'
                                 }`}
                             >
                               {order.items?.every(item => userReviews.some(ur => ur.product_name === item.name)) ? (

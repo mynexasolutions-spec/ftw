@@ -21,7 +21,7 @@ import {
   XCircle, Search, Percent, ChevronRight, Eye, IndianRupee, Check, X, ShieldAlert, ArrowRight, Layers, Sparkles, Truck, MapPin, Menu,
   Type, Image as ImageIcon, Download, Printer, BookOpen
 } from 'lucide-react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 
@@ -48,7 +48,11 @@ const PRODUCT_STYLES = {
 export default function Admin() {
   const { user, isAdmin, signOut, loading: authLoading } = useAuth()
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState('dashboard')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const activeTab = searchParams.get('tab') || 'dashboard'
+  const setActiveTab = (tabId) => {
+    setSearchParams({ tab: tabId })
+  }
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   // Datasets State
@@ -80,7 +84,12 @@ export default function Admin() {
     shipping_flat_rate: 99,
     enable_razorpay: true,
     enable_cod: true,
-    store_address: 'FTW Streetwear Lab, Mumbai, IN'
+    store_address: 'FTW Streetwear Lab, Mumbai, IN',
+    support_email: 'forthewinmail8@gmail.com',
+    support_whatsapp: '+91 XXXXX XXXXX',
+    support_instagram: 'ftw_streetwear',
+    support_hours: 'MON – SAT: 10:00 AM – 7:00 PM IST',
+    facebook_link: 'https://facebook.com'
   })
 
   const [customizerConfig, setCustomizerConfig] = useState(null)
@@ -910,7 +919,7 @@ export default function Admin() {
   ]
 
   return (
-    <div className="bg-cream text-dark font-sans min-h-screen relative selection:bg-accent selection:text-cream pt-28 pb-12 px-4 sm:px-6 md:px-12 max-w-[1600px] mx-auto">
+    <div className="admin-theme bg-cream text-dark font-sans min-h-screen relative selection:bg-purple-600 selection:text-cream pt-28 pb-12 px-4 sm:px-6 md:px-12 max-w-[1600px] mx-auto">
 
       {/* Top Navigation Bar */}
       <nav className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md border-b border-cream3 z-40 px-4 sm:px-6 md:px-12 py-4">
@@ -920,7 +929,7 @@ export default function Admin() {
               <img src="/images/ftw-logo.webp" alt="For The Win Logo" className="h-[50px] sm:h-[60px] w-auto object-contain transition-all duration-300 group-hover:scale-105 shrink-0" />
               <span className="font-display text-[10px] sm:text-[12px] leading-none tracking-[0.22em] font-black uppercase text-dark flex items-center gap-1 shrink-0">
                 <span>FOR THE</span>
-                <span className="text-accent italic transform -skew-x-6 inline-block">WIN</span>
+                <span className="text-purple-600 italic transform -skew-x-6 inline-block">WIN</span>
               </span>
             </Link>
             <span className="h-5 w-px bg-cream3 hidden xs:inline-block" />
@@ -930,7 +939,7 @@ export default function Admin() {
             <Link
               to="/"
               title="View Site"
-              className="p-2.5 sm:px-4 sm:py-2 bg-white sm:bg-dark text-dark sm:text-cream hover:bg-cream/40 hover:sm:bg-accent hover:sm:text-dark border border-cream3 sm:border-none transition-all duration-300 font-sans font-bold uppercase tracking-wider text-[10px] rounded-xl flex items-center justify-center gap-1.5 shadow-xs sm:shadow-md hover:scale-105 active:scale-95"
+              className="p-2.5 sm:px-4 sm:py-2 bg-white sm:bg-dark text-dark sm:text-cream hover:bg-cream/40 hover:sm:bg-purple-600 hover:sm:text-dark border border-cream3 sm:border-none transition-all duration-300 font-sans font-bold uppercase tracking-wider text-[10px] rounded-xl flex items-center justify-center gap-1.5 shadow-xs sm:shadow-md hover:scale-105 active:scale-95"
             >
               <Globe className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-dark sm:text-cream hover:text-inherit" />
               <span className="hidden sm:inline">View Site</span>
@@ -977,7 +986,7 @@ export default function Admin() {
               <div className="flex flex-col gap-6 overflow-y-auto max-h-[calc(100vh-140px)] pr-1">
                 {/* Header Badge */}
                 <div className="flex justify-between items-center pb-3 border-b border-cream3">
-                  <span className="text-[13px] font-mono uppercase tracking-[0.2em] text-accent font-black">Admin Panel</span>
+                  <span className="text-[13px] font-mono uppercase tracking-[0.2em] text-purple-600 font-black">Admin Panel</span>
                   <button
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="p-1.5 rounded-xl hover:bg-cream3 border-none bg-transparent cursor-pointer text-dark flex items-center justify-center"
@@ -1009,16 +1018,16 @@ export default function Admin() {
                           <div className="absolute inset-0 bg-dark z-0 rounded-2xl shadow-md" />
                         )}
                         {isTabActive && (
-                          <div className="absolute left-0 top-3 bottom-3 w-1 bg-accent rounded-r-full z-10" />
+                          <div className="absolute left-0 top-3 bottom-3 w-1 bg-purple-600 rounded-r-full z-10" />
                         )}
                         <div className="relative z-10 flex items-center gap-3">
-                          <Icon className={`w-[18px] h-[18px] shrink-0 ${isTabActive ? 'text-accent' : 'text-dark2/50'
+                          <Icon className={`w-[18px] h-[18px] shrink-0 ${isTabActive ? 'text-purple-600' : 'text-dark2/50'
                             }`} />
                           <span className="text-[12px] font-bold uppercase tracking-wider font-sans">{tab.label}</span>
                         </div>
                         {tab.badge !== undefined && tab.badge > 0 && (
                           <span className={`relative z-10 px-2 py-0.5 rounded-full text-[9px] font-bold font-mono ${isTabActive
-                            ? 'bg-accent text-white'
+                            ? 'bg-purple-600 text-white'
                             : tab.badgeType === 'alert' ? 'bg-red-500 text-white' : tab.badgeType === 'info' ? 'bg-blue-550 text-white' : 'bg-cream3 text-dark2'
                             }`}>
                             {tab.badge}
@@ -1035,7 +1044,7 @@ export default function Admin() {
                 <Link
                   to="/"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full px-4 py-2.5 bg-dark text-cream hover:bg-accent hover:text-dark transition-all duration-300 font-sans font-bold uppercase tracking-wider text-[10px] rounded-xl flex items-center justify-center gap-1.5 shadow-md"
+                  className="w-full px-4 py-2.5 bg-dark text-cream hover:bg-purple-600 hover:text-dark transition-all duration-300 font-sans font-bold uppercase tracking-wider text-[10px] rounded-xl flex items-center justify-center gap-1.5 shadow-md"
                 >
                   <Globe className="w-3.5 h-3.5" /> View Site
                 </Link>
@@ -1060,7 +1069,7 @@ export default function Admin() {
         <aside className="hidden lg:flex w-full lg:w-[290px] shrink-0 lg:sticky lg:top-24 bg-white/90 backdrop-blur-md border border-cream3 p-5 rounded-3xl shadow-sm flex-col gap-1.5 font-sans">
           {/* Header Console Badge */}
           <div className="px-3.5 py-3 mb-3 border-b border-cream3/80 flex items-center select-none">
-            <span className="text-[13px] font-mono uppercase tracking-[0.2em] text-accent font-black">Admin Panel</span>
+            <span className="text-[13px] font-mono uppercase tracking-[0.2em] text-purple-600 font-black">Admin Panel</span>
           </div>
 
           {tabs.map(tab => {
@@ -1087,18 +1096,18 @@ export default function Admin() {
                 )}
                 {/* Active edge highlight */}
                 {isTabActive && (
-                  <div className="absolute left-0 top-3 bottom-3 w-1 bg-accent rounded-r-full z-10" />
+                  <div className="absolute left-0 top-3 bottom-3 w-1 bg-purple-600 rounded-r-full z-10" />
                 )}
 
                 <div className="relative z-10 flex items-center gap-3">
-                  <Icon className={`w-[18px] h-[18px] shrink-0 transition-transform group-hover:scale-105 duration-200 ${isTabActive ? 'text-accent' : 'text-dark2/50 group-hover:text-dark'
+                  <Icon className={`w-[18px] h-[18px] shrink-0 transition-transform group-hover:scale-105 duration-200 ${isTabActive ? 'text-purple-600' : 'text-dark2/50 group-hover:text-dark'
                     }`} />
                   <span className="text-[13px] font-bold uppercase tracking-wider font-sans">{tab.label}</span>
                 </div>
 
                 {tab.badge !== undefined && tab.badge > 0 && (
                   <span className={`relative z-10 px-2 py-0.5 rounded-full text-[9px] font-bold font-mono ${isTabActive
-                    ? 'bg-accent text-white'
+                    ? 'bg-purple-600 text-white'
                     : tab.badgeType === 'alert' ? 'bg-red-500 text-white' : tab.badgeType === 'info' ? 'bg-blue-550 text-white' : 'bg-cream3 text-dark2'
                     }`}>
                     {tab.badge}
@@ -1621,8 +1630,8 @@ export default function Admin() {
                                       : <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0"><ImageIcon className="w-3.5 h-3.5 text-blue-400" /></div>
                                   )}
                                   {el.type === 'preset' && (
-                                    <div className="w-8 h-8 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center shrink-0">
-                                      <Sparkles className="w-3.5 h-3.5 text-orange-400" />
+                                    <div className="w-8 h-8 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center shrink-0">
+                                      <Sparkles className="w-3.5 h-3.5 text-purple-600" />
                                     </div>
                                   )}
 

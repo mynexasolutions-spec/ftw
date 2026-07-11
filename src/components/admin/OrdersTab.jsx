@@ -163,7 +163,7 @@ export default function OrdersTab({
         >
           <div>
             <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans font-black text-purple-700/80 uppercase tracking-widest block">Total Orders</span>
-            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-sans font-black text-purple-950 mt-1 font-mono">{totalCount}</p>
+            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-sans font-black text-purple-950 mt-1 font-sans">{totalCount}</p>
           </div>
           <div className="flex justify-between items-center mt-2 sm:mt-3">
             <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold text-purple-600 bg-purple-50/90 px-2 py-0.5 rounded border border-purple-150/50">All received</span>
@@ -181,7 +181,7 @@ export default function OrdersTab({
         >
           <div>
             <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans font-black text-amber-700/80 uppercase tracking-widest block">Pending Orders</span>
-            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-sans font-black text-amber-950 mt-1 font-mono">{pendingCount}</p>
+            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-sans font-black text-amber-950 mt-1 font-sans">{pendingCount}</p>
           </div>
           <div className="flex justify-between items-center mt-2 sm:mt-3">
             <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold text-amber-600 bg-amber-50/90 px-2 py-0.5 rounded border border-amber-150/50 animate-pulse">Awaiting dispatch</span>
@@ -199,7 +199,7 @@ export default function OrdersTab({
         >
           <div>
             <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans font-black text-blue-700/80 uppercase tracking-widest block">Shipped Orders</span>
-            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-sans font-black text-blue-950 mt-1 font-mono">{shippedCount}</p>
+            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-sans font-black text-blue-955 mt-1 font-sans">{shippedCount}</p>
           </div>
           <div className="flex justify-between items-center mt-2 sm:mt-3">
             <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold text-blue-600 bg-blue-50/90 px-2 py-0.5 rounded border border-blue-150/50">In transit</span>
@@ -217,7 +217,7 @@ export default function OrdersTab({
         >
           <div>
             <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans font-black text-emerald-700/80 uppercase tracking-widest block">Delivered Orders</span>
-            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-sans font-black text-emerald-950 mt-1 font-mono">{deliveredCount}</p>
+            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-sans font-black text-emerald-955 mt-1 font-sans">{deliveredCount}</p>
           </div>
           <div className="flex justify-between items-center mt-2 sm:mt-3">
             <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold text-emerald-600 bg-emerald-550/10 px-2 py-0.5 rounded border border-teal-150/50">Completed</span>
@@ -334,7 +334,7 @@ export default function OrdersTab({
                     const hasCustom = order.items?.some(item => item.designId || item.customDesign)
                     return (
                       <tr key={order.id} className="hover:bg-cream/20 transition-colors group text-dark font-sans">
-                        <td className="p-4 lg:p-4.5 pl-6 font-bold text-dark font-mono truncate max-w-[120px] lg:max-w-[140px] text-xs lg:text-sm" title={order.id}>{order.id}</td>
+                        <td className="p-4 lg:p-4.5 pl-6 font-bold text-dark font-sans truncate max-w-[120px] lg:max-w-[140px] text-xs lg:text-sm" title={order.id}>{order.id}</td>
                         <td className="p-4 lg:p-4.5">
                           <div className="flex items-center gap-2">
                             <span className="font-bold text-dark uppercase block text-xs lg:text-sm">{order.customer_name}</span>
@@ -342,7 +342,7 @@ export default function OrdersTab({
                           </div>
                           <span className="text-[9px] lg:text-[10.5px] text-dark2/45 block mt-0.5">{order.email}</span>
                         </td>
-                        <td className="p-4 lg:p-4.5 font-bold text-dark font-mono text-xs lg:text-sm">₹{order.total.toLocaleString('en-IN')}</td>
+                        <td className="p-4 lg:p-4.5 font-bold text-dark font-sans text-xs lg:text-sm">₹{order.total.toLocaleString('en-IN')}</td>
                         <td className="p-4 lg:p-4.5">
                           <div className="space-y-1">
                             <span className="text-[9px] lg:text-[10px] uppercase font-black text-dark2/50 block leading-none">{order.payment_method}</span>
@@ -352,7 +352,7 @@ export default function OrdersTab({
                         <td className="p-4 lg:p-4.5">
                           <span className={`text-[9px] lg:text-[10px] font-black uppercase px-2.5 py-1 rounded-full border inline-flex items-center ${order.status === 'Delivered' ? 'bg-green-550/10 text-green-700 border-green-150' : order.status === 'Shipped' || order.status === 'Dispatched' ? 'bg-blue-550/10 text-blue-700 border-blue-150' : order.status === 'Processing' ? 'bg-purple-550/10 text-purple-700 border-purple-150' : order.status === 'Cancelled' ? 'bg-red-550/10 text-red-700 border-red-150' : order.status === 'Pending' ? 'bg-yellow-555/10 text-yellow-700 border-yellow-150' : 'bg-yellow-555/10 text-yellow-700 border-yellow-150'}`}>{order.status || 'Pending'}</span>
                         </td>
-                        <td className="p-4 lg:p-4.5 text-dark2/50 font-mono text-[10px] lg:text-xs">{formatOrderDate(order.created_at)}</td>
+                        <td className="p-4 lg:p-4.5 text-dark2/50 font-sans text-[10px] lg:text-xs">{formatOrderDate(order.created_at)}</td>
                         <td className="p-4 lg:p-4.5">
                           <select value={order.status || 'Pending'} onChange={(e) => handleStatusChange(order.id, e.target.value)} className="px-2 lg:px-2.5 py-1 lg:py-1.5 bg-cream/70 hover:bg-cream border border-cream3 rounded-lg text-[10px] lg:text-xs font-sans font-bold text-dark focus:outline-none cursor-pointer focus:border-dark transition-all">
                             <option value="Pending">Pending</option>
@@ -388,9 +388,9 @@ export default function OrdersTab({
                           <span className="font-extrabold text-dark text-xs uppercase">{order.customer_name}</span>
                           {hasCustom && <span className="bg-accent/10 text-accent border border-accent/20 text-[8px] font-black uppercase px-2 py-0.5 rounded-lg tracking-wider shrink-0">Custom</span>}
                         </div>
-                        <span className="text-[9.5px] text-dark2/45 font-mono block">Ref: {order.id}</span>
+                        <span className="text-[9.5px] text-dark2/45 font-sans block">Ref: {order.id}</span>
                       </div>
-                      <span className="font-extrabold text-dark font-mono text-sm shrink-0">₹{order.total.toLocaleString('en-IN')}</span>
+                      <span className="font-extrabold text-dark font-sans text-sm shrink-0">₹{order.total.toLocaleString('en-IN')}</span>
                     </div>
                     <div className="grid grid-cols-2 gap-3 bg-white border border-cream3 p-3 rounded-xl shadow-xs text-[10px]">
                       <div>
@@ -400,7 +400,7 @@ export default function OrdersTab({
                       </div>
                       <div className="text-right border-l border-cream3/50 pl-3">
                         <span className="text-[8px] uppercase font-black text-dark2/45 block mb-0.5">Status</span>
-                        <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border inline-flex items-center ${order.status === 'Delivered' ? 'bg-green-550/10 text-green-700 border-green-150' : order.status === 'Shipped' || order.status === 'Dispatched' ? 'bg-blue-550/10 text-blue-700 border-blue-150' : order.status === 'Processing' ? 'bg-purple-550/10 text-purple-700 border-purple-150' : order.status === 'Cancelled' ? 'bg-red-550/10 text-red-700 border-red-150' : 'bg-yellow-555/10 text-yellow-700 border-yellow-150'}`}>{order.status || 'Pending'}</span>
+                        <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border inline-flex items-center ${order.status === 'Delivered' ? 'bg-green-550/10 text-green-700 border-green-150' : order.status === 'Shipped' || order.status === 'Dispatched' ? 'bg-blue-550/10 text-blue-700 border-blue-150' : order.status === 'Processing' ? 'bg-purple-550/10 text-purple-700 border-purple-150' : order.status === 'Cancelled' ? 'bg-red-550/10 text-red-700 border-red-150' : order.status === 'Pending' ? 'bg-yellow-555/10 text-yellow-700 border-yellow-150' : 'bg-yellow-555/10 text-yellow-700 border-yellow-150'}`}>{order.status || 'Pending'}</span>
                       </div>
                     </div>
                     <div className="flex gap-2.5 justify-between items-center pt-1 flex-wrap">
@@ -459,13 +459,13 @@ export default function OrdersTab({
 
                 {/* Title & Status Header */}
                 <div className="border-b border-cream3 pb-4 mb-5 pr-12 select-none">
-                  <span className="text-[9px] lg:text-xs font-mono text-dark2/45 uppercase tracking-widest font-black block mb-1">MANAGEMENT PANEL</span>
+                  <span className="text-[9px] lg:text-xs font-sans text-dark2/45 uppercase tracking-widest font-black block mb-1">MANAGEMENT PANEL</span>
                   <h3 className="font-sans text-xl sm:text-2xl lg:text-3xl font-black uppercase text-dark">Order Overview</h3>
                   <div className="flex flex-wrap items-center gap-2.5 sm:gap-3.5 mt-2">
                     <span className={`px-3 py-1 rounded-full text-[10px] lg:text-xs font-black uppercase border ${isCancelled ? 'bg-red-500/10 text-red-700 border-red-150' : selectedOrder.status === 'Delivered' ? 'bg-green-550/10 text-green-700 border-green-150' : selectedOrder.status === 'Shipped' || selectedOrder.status === 'Dispatched' ? 'bg-blue-550/10 text-blue-700 border-blue-150' : selectedOrder.status === 'Processing' ? 'bg-purple-550/10 text-purple-700 border-purple-150' : 'bg-yellow-555/10 text-yellow-700 border-yellow-150'}`}>{selectedOrder.status || 'Pending'}</span>
                     <button
                       onClick={() => handleCopy(selectedOrder.id, 'id')}
-                      className="text-[11px] lg:text-xs font-mono font-bold text-dark/70 hover:text-dark flex items-center gap-2 bg-cream2 px-3 py-1 rounded-lg border border-cream3 transition-all cursor-pointer"
+                      className="text-[11px] lg:text-xs font-sans font-bold text-dark/70 hover:text-dark flex items-center gap-2 bg-cream2 px-3 py-1 rounded-lg border border-cream3 transition-all cursor-pointer"
                     >
                       <span>ID: {selectedOrder.id}</span>
                       {copiedField === 'id' ? <Check className="w-3.5 h-3.5 text-green-600 animate-bounce" /> : <Copy className="w-3.5 h-3.5 text-dark2/50" />}
@@ -493,8 +493,8 @@ export default function OrdersTab({
                     {/* Items Overview */}
                     <div className="bg-white border border-cream3 rounded-3xl p-5 sm:p-6 shadow-xs space-y-4">
                       <div className="flex items-center justify-between border-b border-cream3 pb-3">
-                        <span className="text-[10px] lg:text-xs text-dark/60 uppercase font-mono font-black tracking-widest block">Items Overview ({selectedOrder.items?.length || 0})</span>
-                        <span className="text-[10px] font-mono text-dark/40 uppercase">Articles in Shipment</span>
+                        <span className="text-[10px] lg:text-xs text-dark/60 uppercase font-sans font-black tracking-widest block">Items Overview ({selectedOrder.items?.length || 0})</span>
+                        <span className="text-[10px] font-sans text-dark/40 uppercase">Articles in Shipment</span>
                       </div>
                       
                       <div className="space-y-4 max-h-[340px] overflow-y-auto pr-1.5 scrollbar-thin">
@@ -507,7 +507,7 @@ export default function OrdersTab({
                                   <img src={item.image} alt={item.name} className="w-full h-full object-contain hover:scale-105 transition-transform duration-300" />
                                 </div>
                               ) : (
-                                <div className="w-16 h-20 sm:w-20 sm:h-24 lg:w-22 lg:h-26 bg-cream border border-cream3 rounded-xl shrink-0 flex items-center justify-center text-dark/30 font-mono text-[10px]">
+                                <div className="w-16 h-20 sm:w-20 sm:h-24 lg:w-22 lg:h-26 bg-cream border border-cream3 rounded-xl shrink-0 flex items-center justify-center text-dark/30 font-sans text-[10px]">
                                   No Image
                                 </div>
                               )}
@@ -519,15 +519,15 @@ export default function OrdersTab({
 
                                 {/* Clean Specification Badges */}
                                 <div className="flex flex-wrap items-center gap-2">
-                                  <span className="px-2.5 py-1 bg-white border border-cream3 rounded-lg text-[10px] lg:text-xs font-mono font-bold text-dark/70 shadow-2xs">
+                                  <span className="px-2.5 py-1 bg-white border border-cream3 rounded-lg text-[10px] lg:text-xs font-sans font-bold text-dark/70 shadow-2xs">
                                     SKU: <span className="font-black text-dark">{item.sku || item.id?.split('-')[0] || 'CUSTOM'}</span>
                                   </span>
                                   
-                                  <span className="px-2.5 py-1 bg-dark text-white rounded-lg text-[10px] lg:text-xs font-mono font-black shadow-2xs">
+                                  <span className="px-2.5 py-1 bg-dark text-white rounded-lg text-[10px] lg:text-xs font-sans font-black shadow-2xs">
                                     SIZE: {item.size || 'M'}
                                   </span>
                                   
-                                  <span className="px-2.5 py-1 bg-white border border-cream3 rounded-lg text-[10px] lg:text-xs font-mono font-bold text-dark/80 inline-flex items-center gap-1.5 shadow-2xs">
+                                  <span className="px-2.5 py-1 bg-white border border-cream3 rounded-lg text-[10px] lg:text-xs font-sans font-bold text-dark/80 inline-flex items-center gap-1.5 shadow-2xs">
                                     <span
                                       style={{ backgroundColor: getColorHex(item.color) }}
                                       className="w-3 h-3 rounded-full border border-black/15 shrink-0 inline-block"
@@ -535,7 +535,7 @@ export default function OrdersTab({
                                     <span>COLOR: {item.color?.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '') || 'Standard'}</span>
                                   </span>
 
-                                  <span className="px-2.5 py-1 bg-amber-500/10 border border-amber-500/25 text-amber-900 rounded-lg text-[10px] lg:text-xs font-mono font-black shadow-2xs">
+                                  <span className="px-2.5 py-1 bg-amber-500/10 border border-amber-500/25 text-amber-900 rounded-lg text-[10px] lg:text-xs font-sans font-black shadow-2xs">
                                     QTY: {item.qty || 1}
                                   </span>
                                 </div>
@@ -544,7 +544,7 @@ export default function OrdersTab({
 
                             {/* Price & Action Button */}
                             <div className="flex md:flex-col justify-between md:justify-center items-end md:items-end w-full md:w-auto pt-3 md:pt-0 border-t md:border-t-0 border-cream3/60 gap-3 shrink-0">
-                              <div className="text-left md:text-right font-mono">
+                              <div className="text-left md:text-right font-sans">
                                 <span className="font-black block text-sm lg:text-base text-dark">₹{((item.price || 0) * (item.qty || 1)).toLocaleString('en-IN')}</span>
                                 <span className="text-dark/45 block text-[10px] lg:text-xs">₹{(item.price || 0).toLocaleString('en-IN')} each</span>
                               </div>
@@ -566,12 +566,12 @@ export default function OrdersTab({
                     </div>
 
                     {/* Amount Breakdown */}
-                    <div className="bg-white border border-cream3 rounded-2xl p-5 lg:p-6 space-y-2.5 font-mono text-xs lg:text-sm text-dark shadow-xs">
+                    <div className="bg-white border border-cream3 rounded-2xl p-5 lg:p-6 space-y-2.5 font-sans text-xs lg:text-sm text-dark shadow-xs">
                       <span className="text-[10px] lg:text-xs text-dark2/45 uppercase font-black tracking-widest block border-b border-cream3 pb-2.5 mb-3">Invoice Summary</span>
                       <div className="flex justify-between text-dark/70"><span>Subtotal</span><span>₹{itemsSubtotal.toLocaleString('en-IN')}</span></div>
                       {discount > 0 && (<div className="flex justify-between text-accent font-bold"><span>Applied Discount</span><span>-₹{discount.toLocaleString('en-IN')}</span></div>)}
                       <div className="flex justify-between text-dark/70"><span>Delivery Charge</span>{shippingFee === 0 ? <span className="text-green-700 font-bold uppercase">FREE</span> : <span>₹{shippingFee.toLocaleString('en-IN')}</span>}</div>
-                      <div className="flex justify-between border-t border-cream3 pt-3 font-black text-xs sm:text-sm lg:text-base text-dark"><span>Grand Total</span><span className="font-mono text-sm lg:text-base">₹{selectedOrder.total.toLocaleString('en-IN')}</span></div>
+                      <div className="flex justify-between border-t border-cream3 pt-3 font-black text-xs sm:text-sm lg:text-base text-dark"><span>Grand Total</span><span className="font-sans text-sm lg:text-base">₹{selectedOrder.total.toLocaleString('en-IN')}</span></div>
                     </div>
 
                   </div>

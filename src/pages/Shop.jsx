@@ -4,9 +4,9 @@ import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import { useAuth } from '../context/AuthContext'
 import { toast } from 'react-hot-toast'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { getProducts, getProductRating, getCategories } from '../lib/supabase'
-import { ShoppingBag, Eye, Upload, Palette, Calculator, Check, ArrowRight, ShieldAlert, Heart, SlidersHorizontal, X, Star } from 'lucide-react'
+import { ShoppingBag, Eye, Upload, Palette, Calculator, Check, ArrowRight, ShieldAlert, Heart, SlidersHorizontal, X, Star, Zap, Gamepad2, Swords, Target, Trophy, Laptop, Crown, Flame, Sparkles } from 'lucide-react'
 
 // Full dataset for filters
 const DATASET = [
@@ -85,98 +85,6 @@ const SHOP_PRODUCT_STYLES = [
   { id: 'oversize', name: 'Oversize Tee', shortName: 'Oversize', price: 450, image: '/images/oversize T.png' },
   { id: 'polo', name: 'Collared Tee', shortName: 'Polo', price: 480, image: '/images/Collered T.png' },
 ]
-
-// High-fidelity vector preview of blank crewneck streetwear t-shirts (Front and Back)
-function TShirtVector({ color, side }) {
-  const fill = color === 'Black' ? '#161616' : color === 'White' ? '#FAF9F6' : '#F5F2E9'
-  const stroke = color === 'Black' ? '#2A2A2A' : color === 'White' ? '#E6E4DD' : '#E2DEC8'
-  const creaseColor = color === 'Black' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'
-  const shadowColor = color === 'Black' ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.08)'
-
-  return (
-    <svg viewBox="0 0 400 450" className="w-full h-full select-none pointer-events-none drop-shadow-[0_12px_36px_rgba(0,0,0,0.12)]">
-      {/* Dynamic base t-shirt shape outline */}
-      <path
-        d="M 120 40 
-           C 150 40, 155 58, 200 58 
-           C 245 58, 250 40, 280 40
-           L 380 90
-           L 345 190
-           L 300 178
-           L 305 420
-           L 95 420
-           L 100 178
-           L 55 190
-           L 20 90 Z"
-        fill={fill}
-        stroke={stroke}
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-
-      {/* Crewneck Ribbed Collar */}
-      {side === 'front' ? (
-        <>
-          <path
-            d="M 120 40 C 150 64, 250 64, 280 40"
-            fill="none"
-            stroke={stroke}
-            strokeWidth="5"
-          />
-          <path
-            d="M 120 40 C 150 60, 250 60, 280 40"
-            fill="none"
-            stroke={creaseColor}
-            strokeWidth="2.5"
-          />
-        </>
-      ) : (
-        <>
-          <path
-            d="M 120 40 C 150 46, 250 46, 280 40"
-            fill="none"
-            stroke={stroke}
-            strokeWidth="5.5"
-          />
-          <path
-            d="M 120 40 C 150 45, 250 45, 280 40"
-            fill="none"
-            stroke={creaseColor}
-            strokeWidth="2"
-          />
-          <path
-            d="M 100 85 C 200 110, 300 85, 300 85"
-            fill="none"
-            stroke={creaseColor}
-            strokeWidth="1"
-            strokeDasharray="4 3"
-          />
-        </>
-      )}
-
-      {/* Drop Shoulder seam lines */}
-      <path d="M 100 80 L 100 178" fill="none" stroke={creaseColor} strokeWidth="1" />
-      <path d="M 300 80 L 300 178" fill="none" stroke={creaseColor} strokeWidth="1" />
-
-      {/* Shoulder stitching */}
-      <path d="M 120 40 L 100 80" fill="none" stroke={creaseColor} strokeWidth="1.5" strokeDasharray="3 3" />
-      <path d="M 280 40 L 300 80" fill="none" stroke={creaseColor} strokeWidth="1.5" strokeDasharray="3 3" />
-
-      {/* Sleeve Hem stitching lines */}
-      <path d="M 55 190 L 28 108" fill="none" stroke={creaseColor} strokeWidth="1" strokeDasharray="3 3" />
-      <path d="M 345 190 L 372 108" fill="none" stroke={creaseColor} strokeWidth="1" strokeDasharray="3 3" />
-
-      {/* Bottom Hem stitching */}
-      <path d="M 95 410 L 305 410" fill="none" stroke={creaseColor} strokeWidth="1" strokeDasharray="3 2" />
-
-      {/* Armpit and Side fold creases for realistic depth */}
-      <path d="M 100 178 Q 115 190, 130 185" fill="none" stroke={shadowColor} strokeWidth="1.5" />
-      <path d="M 300 178 Q 285 190, 270 185" fill="none" stroke={shadowColor} strokeWidth="1.5" />
-      <path d="M 100 130 Q 120 140, 125 155" fill="none" stroke={shadowColor} strokeWidth="1" opacity="0.7" />
-      <path d="M 300 130 Q 280 140, 275 155" fill="none" stroke={shadowColor} strokeWidth="1" opacity="0.7" />
-    </svg>
-  )
-}
 
 export default function Shop() {
   const navigate = useNavigate()
@@ -285,90 +193,6 @@ export default function Shop() {
     }
   }, [productsList])
 
-  // DTF Pre-selection states
-  const [customStyle, setCustomStyle] = useState('regular')
-  const [customColor, setCustomColor] = useState('White')
-
-  // DTF Config state
-  const CLIENT_PRESETS = {
-    CN001: {
-      name: 'Vanguard Core Classic',
-      pdf: 'FTW_TS_CN001.pdf',
-      color: 'Black',
-      position: 'Front Center',
-      technique: 'Cut & Sew + High-Density Screen Print',
-      fabric: '240 GSM Heavy Cotton',
-      content: '100% Cotton',
-      preview: '/images/1.1.jpeg'
-    },
-    CN002: {
-      name: 'Cyber Sigil Reflective',
-      pdf: 'FTW_TS_CN002.pdf',
-      color: 'Black',
-      position: 'Front Center',
-      technique: 'Screen Print + Reflective Neon Overlay',
-      fabric: '260 GSM French Terry',
-      content: '100% Cotton',
-      preview: '/images/2.1.jpeg'
-    },
-    CN003: {
-      name: 'Sunset Meditation Art',
-      pdf: 'FTW_TS_CN003.pdf',
-      color: 'Cream',
-      position: 'Large Back',
-      technique: 'Screen Print + Puff Print Art',
-      fabric: '220 GSM French Terry',
-      content: '100% Cotton',
-      preview: '/images/design_cn003.png'
-    },
-    CN004: {
-      name: 'Minimalist Debossed Monogram',
-      pdf: 'FTW_TS_CN004.pdf',
-      color: 'Cream',
-      position: 'Left Chest',
-      technique: 'Debossed Rubber Logo',
-      fabric: '240 GSM Soft Compact Cotton',
-      content: '100% Cotton',
-      preview: '/images/4.1.jpeg'
-    },
-    CN005: {
-      name: 'Gaming Controller Lossless Art',
-      pdf: 'FTW_TS_CN005.pdf',
-      color: 'Cream',
-      position: 'Large Back',
-      technique: 'Cut & Sew + Screen Print + Puff Print + Contrast Neck Band',
-      fabric: '220 GSM French Terry',
-      content: '100% Cotton',
-      preview: '/images/design_cn005.png'
-    }
-  }
-
-  const [dtfSourceType, setDtfSourceType] = useState('custom')
-  const [dtfColor, setDtfColor] = useState('Black')
-  const [dtfSize, setDtfSize] = useState('M')
-  const [dtfQty, setDtfQty] = useState(1)
-  const [dtfUploadedFile, setDtfUploadedFile] = useState(null)
-  const [dtfArtwork, setDtfArtwork] = useState('Front Center')
-  const [dtfPreviewUrl, setDtfPreviewUrl] = useState(null)
-
-  // Drag-and-scale canvas customization states (Dual-Sided Crewneck Blanks)
-  const [activeSide, setActiveSide] = useState('front') // 'front' | 'back'
-  const [frontPrintSize, setFrontPrintSize] = useState(112)
-  const [frontPrintRotation, setFrontPrintRotation] = useState(0)
-  const [frontPreviewUrl, setFrontPreviewUrl] = useState(null)
-  const [frontUploadedFile, setFrontUploadedFile] = useState(null)
-
-  const [backPrintSize, setBackPrintSize] = useState(112)
-  const [backPrintRotation, setBackPrintRotation] = useState(0)
-  const [backPreviewUrl, setBackPreviewUrl] = useState(null)
-  const [backUploadedFile, setBackUploadedFile] = useState(null)
-
-  const mockupContainerRef = useRef(null)
-
-  const baseDtfPrice = 1499
-  const printDtfPrice = 500
-  const totalDtfEstimate = (baseDtfPrice + printDtfPrice) * dtfQty
-
   // Handle Tab Switch
   const setTab = (tab) => {
     setSearchParams({ tab })
@@ -386,7 +210,7 @@ export default function Shop() {
       const matchesCategory = (p.category || '').toLowerCase().includes(q)
       const matchesTag = (p.tag || '').toLowerCase().includes(q)
       const matchesColors = pColors.some(c => c.toLowerCase().includes(q))
-      
+
       if (!matchesName && !matchesCategory && !matchesTag && !matchesColors) return false
     }
 
@@ -420,77 +244,12 @@ export default function Shop() {
     return (a.name || '').localeCompare(b.name || '')
   })
 
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      const url = URL.createObjectURL(file)
-      if (activeSide === 'front') {
-        setFrontUploadedFile(file.name)
-        setFrontPreviewUrl(url)
-      } else {
-        setBackUploadedFile(file.name)
-        setBackPreviewUrl(url)
-      }
-      toast.success(`Design "${file.name}" applied to T-shirt ${activeSide}!`, {
-        style: { background: '#0B0B0B', color: '#FFFFFF' }
-      })
-    }
-  }
-
-  const handleOrderDtf = () => {
-    if (dtfSourceType === 'custom' && !frontPreviewUrl && !backPreviewUrl) {
-      toast.error("Please upload or drag a design file to the front or back first.", {
-        style: { background: '#0B0B0B', color: '#FFFFFF' }
-      })
-      return
-    }
-
-    const isPreset = dtfSourceType !== 'custom'
-    const preset = isPreset ? CLIENT_PRESETS[dtfSourceType] : null
-
-    let printDetails = ''
-    if (!isPreset) {
-      let details = []
-      if (frontPreviewUrl) {
-        details.push(`Front: Size ${Math.round((frontPrintSize / 112) * 100)}% / Rot: ${frontPrintRotation}°`)
-      }
-      if (backPreviewUrl) {
-        details.push(`Back: Size ${Math.round((backPrintSize / 112) * 100)}% / Rot: ${backPrintRotation}°`)
-      }
-      printDetails = ` (${details.join(' | ')})`
-    }
-
-    const customProduct = {
-      id: isPreset ? `client-preset-${dtfSourceType}-${Date.now()}` : `custom-dtf-${Date.now()}`,
-      name: isPreset
-        ? `Client Design Preset (${preset.pdf})`
-        : `Custom DTF Tee (${dtfColor}${printDetails})`,
-      price: baseDtfPrice + printDtfPrice,
-      image: isPreset
-        ? (dtfSourceType === 'CN003' || dtfSourceType === 'CN005' ? `/images/design_cn003.png` : preset.preview)
-        : (dtfColor === 'Black'
-          ? '/images/1.1.jpeg'
-          : '/images/2.1.jpeg')
-    }
-
-    for (let i = 0; i < dtfQty; i++) {
-      addToCart(customProduct, dtfSize)
-    }
-
-    toast.success(
-      isPreset
-        ? `${dtfQty}x Client Design "${preset.pdf}" added to bag!`
-        : `${dtfQty}x Custom DTF Print T-shirts added to bag!`,
-      { style: { background: '#0B0B0B', color: '#FFFFFF' } }
-    )
-  }
-
   const renderFiltersContent = () => {
     return (
-      <>
+      <div className="space-y-6">
         {/* Filter Size */}
         <div>
-          <span className="text-[9px] text-dark2/40 font-mono uppercase tracking-[0.15em] font-black block mb-3">Size</span>
+          <span className="text-[12.5px] text-dark font-mono uppercase tracking-[0.15em] font-black block mb-3">Size</span>
           <div className="flex flex-wrap gap-1.5">
             {availableSizes.map(sz => {
               const isSelected = sz === 'all' ? filterSizes.length === 0 : filterSizes.includes(sz);
@@ -506,9 +265,9 @@ export default function Shop() {
                       )
                     }
                   }}
-                  className={`w-9 h-9 border text-[10px] font-mono rounded-xl transition-all cursor-pointer flex items-center justify-center font-bold ${isSelected
-                      ? 'bg-dark border-dark text-[#D6FF40] shadow-md'
-                      : 'border-[#E8E5DC] text-dark2/70 hover:bg-[#F5F3EC] hover:border-dark/20 bg-white'
+                  className={`w-10 h-10 border text-[11.5px] font-mono rounded-xl transition-all cursor-pointer flex items-center justify-center font-bold ${isSelected
+                    ? 'bg-dark border-dark text-[#D6FF40] shadow-md'
+                    : 'border-[#E8E5DC] text-dark hover:bg-[#F5F3EC] hover:border-dark/20 bg-white font-extrabold'
                     }`}
                 >
                   {sz === 'all' ? 'All' : sz}
@@ -520,7 +279,7 @@ export default function Shop() {
 
         {/* Filter Color */}
         <div>
-          <span className="text-[9px] text-dark2/40 font-mono uppercase tracking-[0.15em] font-black block mb-3">Color</span>
+          <span className="text-[12.5px] text-dark font-mono uppercase tracking-[0.15em] font-black block mb-3">Color</span>
           <div className="flex flex-wrap gap-2">
             {availableColors.map(col => {
               const colorMap = {
@@ -548,9 +307,9 @@ export default function Shop() {
                       )
                     }
                   }}
-                  className={`flex items-center gap-1.5 px-2.5 py-1.5 border text-[9px] font-mono uppercase tracking-wider rounded-xl transition-all cursor-pointer ${isSelected
-                      ? 'bg-dark border-dark text-[#D6FF40] font-black shadow-sm'
-                      : 'border-[#E8E5DC] text-dark2/60 hover:bg-[#F5F3EC] bg-white'
+                  className={`flex items-center gap-1.5 px-3 py-2 border text-[10.5px] font-mono uppercase tracking-wider rounded-xl transition-all cursor-pointer font-bold ${isSelected
+                    ? 'bg-dark border-dark text-[#D6FF40] font-black shadow-sm'
+                    : 'border-[#E8E5DC] text-dark hover:bg-[#F5F3EC] bg-white font-extrabold'
                     }`}
                 >
                   {col !== 'all' && hex && (
@@ -570,8 +329,8 @@ export default function Shop() {
         {/* Filter Price */}
         <div>
           <div className="flex justify-between items-center mb-3">
-            <span className="text-[9px] text-dark2/40 font-mono uppercase tracking-[0.15em] font-black">Max Price</span>
-            <span className="text-[11px] text-dark font-mono font-black">₹{filterPrice.toLocaleString()}</span>
+            <span className="text-[12.5px] text-dark font-mono uppercase tracking-[0.15em] font-black">Max Price</span>
+            <span className="text-[13.5px] text-dark font-mono font-black">₹{filterPrice.toLocaleString()}</span>
           </div>
           <input
             type="range"
@@ -583,14 +342,14 @@ export default function Shop() {
             className="w-full accent-dark cursor-pointer h-1.5 rounded-lg appearance-none bg-[#E8E5DC]"
           />
           <div className="flex justify-between mt-1.5">
-            <span className="text-[8px] font-mono text-dark2/30">₹{minProductPrice}</span>
-            <span className="text-[8px] font-mono text-dark2/30">₹{maxProductPrice}</span>
+            <span className="text-[10.5px] font-mono text-dark font-bold">₹{minProductPrice}</span>
+            <span className="text-[10.5px] font-mono text-dark font-bold">₹{maxProductPrice}</span>
           </div>
         </div>
 
         {/* Availability */}
         <div>
-          <span className="text-[9px] text-dark2/40 font-mono uppercase tracking-[0.15em] font-black block mb-3">Availability</span>
+          <span className="text-[12.5px] text-dark font-mono uppercase tracking-[0.15em] font-black block mb-3">Availability</span>
           <div className="flex flex-col gap-1.5">
             {[
               { key: 'all', label: 'Show All', icon: '◉' },
@@ -600,494 +359,637 @@ export default function Shop() {
               <button
                 key={opt.key}
                 onClick={() => setFilterAvailability(opt.key)}
-                className={`w-full py-2.5 px-3.5 border text-left rounded-xl transition-all cursor-pointer flex items-center gap-2 ${filterAvailability === opt.key
-                    ? 'bg-dark border-dark text-[#D6FF40] font-black shadow-sm'
-                    : 'border-[#E8E5DC] text-dark2/60 hover:bg-[#F5F3EC] bg-white'
+                className={`w-full py-2.5 px-3.5 border text-left rounded-xl transition-all cursor-pointer flex items-center gap-2 font-bold ${filterAvailability === opt.key
+                  ? 'bg-dark border-dark text-[#D6FF40] font-black shadow-sm'
+                  : 'border-[#E8E5DC] text-dark hover:bg-[#F5F3EC] bg-white font-extrabold'
                   }`}
               >
-                <span className="text-[10px] font-mono">{opt.icon}</span>
-                <span className="text-[10px] font-mono uppercase tracking-wider">{opt.label}</span>
+                <span className="text-[11.5px] font-mono font-black">{opt.icon}</span>
+                <span className="text-[11.5px] font-mono uppercase tracking-wider font-black">{opt.label}</span>
               </button>
             ))}
           </div>
         </div>
-      </>
+      </div>
     )
   }
 
   return (
-    <div className="bg-[#FAF9F6] text-[#161616] min-h-screen relative overflow-hidden font-sans bg-grid-dots bg-grain">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-3 pb-8 sm:pt-4 sm:pb-12 text-dark">
+    <div className="bg-[#FAF9F6] text-[#161616] min-h-screen relative overflow-hidden font-sans bg-grain pb-12">
 
-      {/* Page Header */}
-      <div className="mb-8 sm:mb-10">
-        <span className="text-[10px] text-accent font-mono uppercase tracking-[0.2em] font-black">ForTheWin Studio</span>
-        <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-black uppercase tracking-tight text-dark mt-1 leading-none">
-          THE <span className="text-orange-500 italic transform skew-x-3 inline-block">CATALOG</span>
-        </h1>
-        <p className="text-xs text-dark2/50 mt-1.5 font-sans">Premium streetwear, limited runs & custom DTF printing.</p>
+      {/* Large Decorative Gaming Backdrop Icons (Reduced to 5, spaced further apart) */}
+      <div className="absolute right-[2%] top-[22%] opacity-[0.2] md:opacity-[0.28] text-purple-600 pointer-events-none z-0">
+        <Gamepad2 className="w-[80px] h-[80px] md:w-[150px] md:h-[150px] rotate-[15deg]" />
+      </div>
+      <div className="absolute left-[2%] top-[38%] opacity-[0.16] md:opacity-[0.24] text-purple-600 pointer-events-none z-0">
+        <Swords className="w-[70px] h-[70px] md:w-[130px] md:h-[130px] rotate-[-20deg]" />
+      </div>
+      <div className="absolute right-[2%] top-[55%] opacity-[0.18] md:opacity-[0.26] text-purple-600 pointer-events-none z-0">
+        <Target className="w-[75px] h-[75px] md:w-[140px] md:h-[140px] rotate-[35deg]" />
+      </div>
+      <div className="absolute left-[2%] top-[72%] opacity-[0.16] md:opacity-[0.24] text-purple-600 pointer-events-none z-0">
+        <Trophy className="w-[70px] h-[70px] md:w-[130px] md:h-[130px] rotate-[-10deg]" />
+      </div>
+      <div className="absolute right-[2%] top-[88%] opacity-[0.15] md:opacity-[0.22] text-purple-600 pointer-events-none z-0">
+        <Sparkles className="w-[70px] h-[70px] md:w-[130px] md:h-[130px] rotate-[25deg]" />
       </div>
 
-      {/* Category Navigation Tabs */}
-      <div className="w-full mb-8 sm:mb-10">
-        <div className="flex overflow-x-auto gap-2 pb-1 scroll-smooth no-scrollbar select-none">
-          {[
-            { key: 'all', label: 'All Catalog' },
-            ...dbCategories
-              .filter(cat => !['custom dtf', 'dtf', 'custom+dtf'].includes(cat.name?.toLowerCase()))
-              .map(cat => ({ key: cat.name, label: cat.name })),
-            { key: 'Custom DTF', label: '\u2726 Custom DTF' }
-          ].map(tab => {
-            const isTabActive = activeTab === tab.key || (tab.key === 'Custom DTF' && (activeTab === 'dtf' || activeTab === 'Custom+DTF'));
-            const isDTF = tab.key === 'Custom DTF';
-            return (
-              <button
-                key={tab.key}
-                onClick={() => setTab(tab.key)}
-                className={`px-4 sm:px-5 py-2.5 text-[10px] sm:text-[11px] font-mono font-black uppercase tracking-widest rounded-xl transition-all duration-200 shrink-0 cursor-pointer border whitespace-nowrap ${isTabActive
+      {/* Gaming UI grid lines, scanlines, and glowing effects in light theme */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .bg-grain {
+            background-image: 
+              radial-gradient(rgba(139, 92, 246, 0.08) 1.2px, transparent 1.2px),
+              radial-gradient(circle at 10% 10%, rgba(139, 92, 246, 0.04) 0%, transparent 40%),
+              radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.04) 0%, transparent 40%);
+            background-size: 20px 20px, 100% 100%, 100% 100%;
+          }
+          .no-scrollbar::-webkit-scrollbar {
+            display: none;
+          }
+          .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+
+          /* Full subtle scanline overlay */
+          .shop-scanlines {
+            position: absolute; inset: 0; z-index: 1; pointer-events: none;
+            background: repeating-linear-gradient(
+              0deg,
+              transparent,
+              transparent 2px,
+              rgba(139,92,246,0.02) 2px,
+              rgba(139,92,246,0.02) 4px
+            );
+          }
+
+          /* Outer border wrapper for helpline card — darker gaming border */
+          .hud-card-border {
+            background: linear-gradient(135deg, rgba(168,85,247,0.8), rgba(99,58,214,0.6), rgba(37,99,235,0.6));
+            clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px), 0 18px);
+            padding: 1.5px;
+            position: relative;
+            transition: all 0.3s ease;
+          }
+          .hud-card-border:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(139,92,246,0.12), 0 0 12px rgba(139,92,246,0.08);
+          }
+
+          /* HUD Card layout matching screenshot */
+          .hud-shop-card {
+            background: #FFFFFF;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px), 0 18px);
+          }
+          .hud-shop-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 2.5px;
+            background: linear-gradient(90deg, transparent, #8B5CF6 20%, #C084FC 50%, #6D28D9 80%, transparent);
+            z-index: 5;
+          }
+          
+          /* HUD corner ticks */
+          .hud-corner { position: absolute; width: 12px; height: 12px; border-color: rgba(139,92,246,0.45); border-style: solid; z-index: 10; }
+          .hud-tl { top: 6px; left: 6px; border-width: 2px 0 0 2px; }
+          .hud-tr { top: 6px; right: 6px; border-width: 2px 2px 0 0; }
+          .hud-bl { bottom: 6px; left: 6px; border-width: 0 0 2px 2px; }
+          .hud-br { bottom: 6px; right: 6px; border-width: 0 2px 2px 0; }
+
+          /* Hex values for tech gaming vibe */
+          .hud-hex { position: absolute; font-size: 7px; font-family: monospace; color: rgba(139,92,246,0.45); letter-spacing: 0.05em; font-weight: bold; z-index: 10; }
+          .hud-hex-tl { top: 4px; left: 24px; }
+          .hud-hex-tr { top: 4px; right: 24px; }
+
+          .hud-shop-title {
+            font-family: 'Orbitron', 'Space Grotesk', sans-serif;
+            font-weight: 1000;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            line-height: 1.1;
+            color: #161616;
+          }
+
+          /* Tech submit button styled exact */
+          .hud-action-btn {
+            background: linear-gradient(90deg, #7C3AED 0%, #9333EA 50%, #6D28D9 100%);
+            color: #FFFFFF;
+            font-family: 'Orbitron', 'Space Grotesk', sans-serif;
+            font-weight: 900;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            font-size: 11px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 28px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
+            box-shadow: 0 4px 15px rgba(124,58,237,0.25);
+            text-decoration: none;
+          }
+          .hud-action-btn:hover {
+            box-shadow: 0 8px 20px rgba(124,58,237,0.38);
+          }
+          .hud-shop-title span {
+            background: linear-gradient(90deg, #8B5CF6 0%, #6366F1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-style: italic;
+          }
+        `
+      }} />
+
+      <div className="shop-scanlines" />
+
+      {/* Decorative vertical texts */}
+      <div className="absolute left-6 top-[30%] rotate-[-90deg] origin-left text-[9px] font-mono text-gray-400 tracking-[0.3em] uppercase select-none pointer-events-none">
+        FTW // WEAPONS_CATALOG // DEPOT
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 pb-12 sm:pt-8 sm:pb-16 relative z-10 text-dark">
+
+        {/* Page Header */}
+        <div className="mb-8 sm:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <h1 className="hud-shop-title text-4xl sm:text-5xl">
+              THE <span>CATALOG</span>
+            </h1>
+            <p className="text-xs sm:text-sm lg:text-[15.5px] text-dark2/50 mt-2 font-mono uppercase tracking-wider font-bold">Premium streetwear, limited tactical drops & custom gaming apparel.</p>
+          </div>
+        </div>
+
+        {/* Category Navigation Tabs */}
+        <div className="w-full mb-8 sm:mb-10">
+          <div className="flex overflow-x-auto gap-2 pb-1 scroll-smooth no-scrollbar select-none border-b border-purple-500/15">
+            {[
+              { key: 'all', label: 'All Catalog' },
+              ...dbCategories
+                .filter(cat => !['custom dtf', 'dtf', 'custom+dtf'].includes(cat.name?.toLowerCase()))
+                .map(cat => ({ key: cat.name, label: cat.name })),
+              { key: 'Custom DTF', label: '✦ CUSTOM CUSTOMIZER' }
+            ].map(tab => {
+              const isTabActive = activeTab === tab.key || (tab.key === 'Custom DTF' && (activeTab === 'dtf' || activeTab === 'Custom+DTF'));
+              const isDTF = tab.key === 'Custom DTF';
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => setTab(tab.key)}
+                  className={`px-4 sm:px-5 py-3 text-[12px] sm:text-[13px] font-mono font-black uppercase tracking-widest transition-all duration-200 shrink-0 cursor-pointer border-b-2 whitespace-nowrap ${isTabActive
                     ? isDTF
-                      ? 'bg-accent border-accent text-dark shadow-lg shadow-accent/25'
-                      : 'bg-dark border-dark text-[#D6FF40] shadow-lg shadow-dark/20'
-                    : isDTF
-                      ? 'bg-accent/10 border-accent/30 text-accent hover:bg-accent/20 hover:border-accent/50'
-                      : 'bg-transparent border-transparent text-[#888] hover:text-dark'
-                  }`}
-              >
-                {tab.label}
-              </button>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* Active Filter Chips */}
-      {(filterSizes.length > 0 || filterColors.length > 0 || filterPrice < maxProductPrice || filterAvailability !== 'all' || searchQuery) && (
-        <div className="flex flex-wrap items-center gap-2 mb-8 animate-fade-in text-[10px] font-sans">
-          <span className="text-dark2/50 uppercase tracking-widest font-bold mr-2 select-none">Active Filters:</span>
-
-          {searchQuery && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-dark text-[#D6FF40] rounded-lg font-bold">
-              Search: "{searchQuery}"
-              <button
-                onClick={() => {
-                  const newParams = new URLSearchParams(searchParams)
-                  newParams.delete('search')
-                  setSearchParams(newParams)
-                }}
-                className="text-[#D6FF40] hover:text-white font-bold ml-1 border-none bg-transparent cursor-pointer flex items-center justify-center text-[10px]"
-              >
-                ✕
-              </button>
-            </span>
-          )}
-
-          {filterSizes.map(sz => (
-            <span key={sz} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-dark text-[#D6FF40] rounded-lg font-bold">
-              Size: {sz}
-              <button
-                onClick={() => setFilterSizes(prev => prev.filter(s => s !== sz))}
-                className="text-[#D6FF40] hover:text-white font-bold ml-1 border-none bg-transparent cursor-pointer flex items-center justify-center"
-              >
-                ✕
-              </button>
-            </span>
-          ))}
-
-          {filterColors.map(col => (
-            <span key={col} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-dark text-[#D6FF40] rounded-lg font-bold">
-              Color: {col.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '')}
-              <button
-                onClick={() => setFilterColors(prev => prev.filter(c => c !== col))}
-                className="text-[#D6FF40] hover:text-white font-bold ml-1 border-none bg-transparent cursor-pointer flex items-center justify-center"
-              >
-                ✕
-              </button>
-            </span>
-          ))}
-
-          {filterPrice < maxProductPrice && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-dark text-[#D6FF40] rounded-lg font-bold">
-              Max: ₹{filterPrice}
-              <button
-                onClick={() => setFilterPrice(maxProductPrice)}
-                className="text-[#D6FF40] hover:text-white font-bold ml-1 border-none bg-transparent cursor-pointer flex items-center justify-center"
-              >
-                ✕
-              </button>
-            </span>
-          )}
-
-          {filterAvailability !== 'all' && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-dark text-[#D6FF40] rounded-lg font-bold">
-              Status: {filterAvailability === 'in-stock' ? 'In Stock' : 'Sold Out'}
-              <button
-                onClick={() => setFilterAvailability('all')}
-                className="text-[#D6FF40] hover:text-white font-bold ml-1 border-none bg-transparent cursor-pointer flex items-center justify-center"
-              >
-                ✕
-              </button>
-            </span>
-          )}
-
-          <button
-            onClick={() => {
-              setFilterSizes([])
-              setFilterColors([])
-              setFilterPrice(maxProductPrice)
-              setFilterAvailability('all')
-              const newParams = new URLSearchParams(searchParams)
-              newParams.delete('search')
-              setSearchParams(newParams)
-            }}
-            className="text-red-500 hover:text-red-700 underline font-bold ml-2 border-none bg-transparent cursor-pointer uppercase tracking-wider text-[10px]"
-          >
-            Clear All
-          </button>
-        </div>
-      )}
-
-      {activeTab === 'coming-soon' ? (
-        <div className="text-center py-24 bg-white border border-[#E8E5DC] rounded-3xl shadow-sm">
-          <span className="text-4xl block mb-5">⌛</span>
-          <h2 className="font-display text-2xl font-black uppercase text-dark mb-3">SATORI SHADOW COLLECTION</h2>
-          <p className="text-xs text-dark2/55 max-w-sm mx-auto mb-8 leading-relaxed font-sans">
-            Previews will open shortly. Join our alerts list on the home page to be first in line.
-          </p>
-          <Link to="/" className="inline-block px-7 py-3 bg-dark text-[#D6FF40] text-[11px] font-sans font-bold uppercase tracking-widest rounded-xl hover:bg-accent hover:text-dark transition-all">Go Home</Link>
-        </div>
-      ) : (activeTab === 'dtf' || activeTab === 'Custom DTF' || activeTab === 'Custom+DTF') ? (
-        /* Customizer Studio — Light Theme matching Home.jsx */
-        <div className="space-y-8 animate-fadeIn">
-          <div className="relative bg-white border border-[#E8E5DC] rounded-3xl p-6 sm:p-10 md:p-14 overflow-hidden shadow-[0_4px_40px_rgba(0,0,0,0.04)] flex flex-col items-center justify-center text-center">
-            {/* Decorative blobs */}
-            <div className="absolute -top-16 -right-16 w-72 h-72 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-16 -left-16 w-72 h-72 bg-dark/5 rounded-full blur-3xl pointer-events-none" />
-
-            <span className="relative z-10 inline-flex items-center gap-2 bg-accent/15 text-accent border border-accent/30 font-mono uppercase tracking-[0.2em] text-[9px] sm:text-[10px] font-black px-4 py-2 rounded-full mb-4">
-              <Palette className="w-3 h-3" /> FTW Customizer Studio
-            </span>
-            <h2 className="relative z-10 font-display text-3xl sm:text-4xl md:text-6xl font-black uppercase text-dark tracking-tight mb-4 leading-none">
-              Create Your<br /><span className="text-accent">Custom Drop</span>
-            </h2>
-            <p className="relative z-10 text-[12px] sm:text-sm text-dark/50 max-w-lg mx-auto mb-10 leading-relaxed font-sans">
-              Upload any artwork and build your premium streetwear design in real-time. No minimum order.
-            </p>
-
-            {/* Steps */}
-            <div className="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 w-full mt-4">
-              {[
-                { step: '01', icon: ShoppingBag, title: 'CHOOSE BLANK & COLOR', desc: 'Pick your blank t-shirt and choose your favorite color.' },
-                { step: '02', icon: Upload, title: 'UPLOAD & ADD TEXT', desc: 'Upload your design image and write custom text on the canvas.' },
-                { step: '03', icon: Palette, title: 'SAVE & SELECT SIZE', desc: 'Save your design and select your size and quantity.' },
-                { step: '04', icon: Check, title: 'PRINT & SHIP', desc: 'We print your custom order with premium DTF and ship it to you.' }
-              ].map((s, idx) => (
-                <div
-                  key={idx}
-                  className="bg-white/90 backdrop-blur-md border border-[#E8E5DC] rounded-[20px] sm:rounded-[24px] p-3.5 sm:p-6 text-left group hover:border-accent hover:shadow-[0_20px_50px_rgba(214,255,64,0.12)] hover:-translate-y-1.5 transition-all duration-500 cursor-default flex flex-col justify-between relative overflow-hidden min-h-[165px] sm:min-h-[190px]"
+                      ? 'border-purple-600 text-purple-600 bg-purple-500/5'
+                      : 'border-dark text-dark bg-dark/5'
+                    : 'border-transparent text-gray-400 hover:text-dark'
+                    }`}
                 >
-                  <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-accent to-orange-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
-                  <div>
-                    <div className="flex items-center justify-between mb-3 sm:mb-5">
-                      <div className="p-2 sm:p-3 bg-[#F5F3EC] text-dark rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-dark group-hover:text-[#D6FF40] group-hover:rotate-6 group-hover:scale-110 transition-all duration-300">
-                        <s.icon className="w-4 h-4 sm:w-5 h-5" />
-                      </div>
-                      <span className="text-[8px] sm:text-[9px] font-mono font-black uppercase tracking-widest text-dark/40 bg-neutral-100/80 border border-neutral-200/50 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full group-hover:bg-accent/15 group-hover:text-accent group-hover:border-accent/25 transition-all duration-300">
-                        STEP {s.step}
-                      </span>
-                    </div>
-                    <h4 className="font-display text-xs sm:text-sm font-black uppercase tracking-wide text-dark mb-1 sm:mb-2.5 group-hover:text-accent transition-colors duration-300">
-                      {s.title}
-                    </h4>
-                    <p className="text-[10px] sm:text-xs text-dark/50 group-hover:text-dark/70 font-sans leading-relaxed transition-colors duration-300">
-                      {s.desc}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Launch Customizer Action Button */}
-            <div className="relative z-10 w-full mt-10 flex flex-col items-center justify-center">
-              <Link
-                to="/customizer"
-                onClick={(e) => {
-                  if (!user) {
-                    e.preventDefault()
-                    toast.error("Please login to access the customizer!", {
-                      id: 'auth-required-shop-dtf',
-                      style: { background: '#161616', color: '#FAF9F6' }
-                    })
-                    navigate('/auth?redirect=/customizer')
-                  }
-                }}
-                className="w-fit px-6 sm:px-8 py-3.5 sm:py-4 bg-dark text-[#D6FF40] hover:bg-accent hover:text-dark transition-all duration-300 font-mono font-black text-[10px] sm:text-xs uppercase tracking-widest rounded-2xl shadow-[0_10px_35px_rgba(0,0,0,0.15)] hover:shadow-[0_15px_40px_rgba(214,255,64,0.25)] flex items-center justify-center gap-2 cursor-pointer border-none text-center decoration-none"
-              >
-                <Palette className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-pulse" />
-                Launch Customizer Studio
-              </Link>
-              <div className="flex items-center justify-center gap-5 mt-4 flex-wrap">
-                <span className="text-[9px] text-dark/40 font-mono uppercase tracking-wider flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 bg-accent rounded-full"></span> No minimum order
-                </span>
-                <span className="text-[9px] text-dark/40 font-mono uppercase tracking-wider flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 bg-accent rounded-full"></span> High-density DTF print
-                </span>
-                <span className="text-[9px] text-dark/40 font-mono uppercase tracking-wider flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 bg-accent rounded-full"></span> Ships in 7–10 days
-                </span>
-              </div>
-            </div>
+                  {tab.label}
+                </button>
+              )
+            })}
           </div>
         </div>
-      ) : loadingProducts ? (
-        <div className="text-center py-28 font-sans text-dark2/50 text-xs">
-          <div className="w-8 h-8 border-2 border-dark/20 border-t-dark rounded-full animate-spin mx-auto mb-4" />
-          <span className="font-mono uppercase tracking-widest text-[10px]">Loading catalog...</span>
-        </div>
-      ) : (
-        /* Regular Shop Layout with Filters */
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-10 items-start">
-          {/* Side Filters Panel (Desktop only) */}
-          <div className="hidden lg:block lg:col-span-1 bg-white border border-[#E8E5DC] rounded-3xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] overflow-hidden">
-            <div className="px-5 pt-5 pb-3 border-b border-[#EDEADE]">
-              <span className="text-[10px] text-dark2/40 font-mono uppercase tracking-widest font-black">Refine Results</span>
-            </div>
-            <div className="p-5 space-y-7">
-              {renderFiltersContent()}
-            </div>
-          </div>
 
-          {/* Product Grid Area */}
-          <div className="lg:col-span-3">
-            {/* Mobile Filters Toggle Button */}
-            <button
-              onClick={() => setMobileFiltersOpen(true)}
-              className="lg:hidden w-full h-11 px-4 mb-6 bg-white border border-[#E8E5DC] hover:border-dark/30 text-dark font-sans text-[11px] font-bold uppercase tracking-widest rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all shadow-sm"
-            >
-              <SlidersHorizontal className="w-3.5 h-3.5 text-dark" />
-              Filter Products
-            </button>
-            {filteredProducts.length === 0 ? (
-              <div className="text-center py-24 bg-white border border-[#E8E5DC] rounded-3xl font-sans shadow-sm">
-                <span className="text-3xl block mb-4">🔍</span>
-                <p className="text-xs text-dark2/50">No products match your filters. Try adjusting your selection.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 lg:gap-5">
-                {sortedFilteredProducts.map((product, pi) => {
-                  const categoryStr = (product.category || '').toLowerCase().replace(/[\s-_]+/g, ' ').trim()
-                  const tagStr = (product.tag || '').toLowerCase().replace(/[\s-_]+/g, ' ').trim()
-                  const isComingSoon = categoryStr === 'coming soon' || tagStr === 'coming soon'
+        {/* Active Filter Chips */}
+        {(filterSizes.length > 0 || filterColors.length > 0 || filterPrice < maxProductPrice || filterAvailability !== 'all' || searchQuery) && (
+          <div className="flex flex-wrap items-center gap-2 mb-8 animate-fade-in text-[10px] font-sans">
+            <span className="text-dark2/50 uppercase tracking-widest font-bold mr-2 select-none">Active Filters:</span>
 
-                  const defaultColorCleaned = product.default_color ? product.default_color.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim() : '';
-                  const defaultColorVariant = defaultColorCleaned
-                    ? (product.variants || []).find(v => v.color && v.color.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim() === defaultColorCleaned)
-                    : null;
-
-                  const firstVariantWithPrice = defaultColorVariant && defaultColorVariant.price !== undefined
-                    ? defaultColorVariant
-                    : ((product.variants || []).find(v => v.price !== undefined) || {});
-
-                  const firstVariantWithImages = defaultColorVariant && defaultColorVariant.images && defaultColorVariant.images.length > 0
-                    ? defaultColorVariant
-                    : ((product.variants || []).find(v => v.images && v.images.length > 0) || {});
-
-                  const displayPrice = product.price !== undefined && product.price !== null && product.price !== 0 ? product.price : (firstVariantWithPrice.price || 0)
-                  const displayOriginalPrice = product.originalPrice ? product.originalPrice : firstVariantWithPrice.originalPrice
-                  const displayImage = product.image ? product.image : ((firstVariantWithImages.images && firstVariantWithImages.images[0]) || '/images/1.1.jpeg')
-
-                  return (
-                    <motion.div
-                      key={product.id}
-                      initial={{ opacity: 0, y: 16 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: pi * 0.04, ease: 'easeOut' }}
-                      className="bg-white border border-[#E8E5DC] rounded-2xl sm:rounded-3xl overflow-hidden hover:border-dark/20 hover:shadow-[0_12px_40px_rgba(0,0,0,0.07)] transition-all duration-300 flex flex-col justify-between group/card"
-                    >
-                      <Link to={`/product/${product.id}`} className="relative aspect-[4/5] bg-[#F5F3EC] overflow-hidden block">
-                        <img
-                          src={displayImage}
-                          alt={product.name}
-                          className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-700"
-                        />
-                        {product.tag && (
-                          <span className={`absolute top-3 left-3 text-[8px] font-mono uppercase tracking-widest font-black px-2.5 py-1.5 rounded-lg shadow-sm ${product.tag.includes('OFF') || product.tag.includes('Sale') ? 'bg-accent text-dark' : 'bg-dark text-[#D6FF40]'
-                            }`}>
-                            {product.tag}
-                          </span>
-                        )}
-
-                        {/* Rating Badge */}
-                        <div className="absolute bottom-3 left-3 bg-white/85 backdrop-blur-md px-2.5 py-1 rounded-lg text-[9px] font-mono font-bold text-dark border border-white/60 flex items-center gap-1 shadow-sm z-10">
-                          <Star className="w-3 h-3 fill-accent text-accent shrink-0" />
-                          <span>{getProductRating(product.name) || '0.0'}</span>
-                        </div>
-
-                        {/* Wishlist Button */}
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            toggleWishlist(product)
-                            toast.success(
-                              isInWishlist(product.id) ? `Removed from wishlist.` : `Added to wishlist!`,
-                              { style: { background: '#161616', color: '#FAF9F6' } }
-                            )
-                          }}
-                          className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/85 backdrop-blur-md border border-white/60 flex items-center justify-center hover:scale-110 transition-all cursor-pointer shadow-sm"
-                          title={isInWishlist(product.id) ? 'Remove from wishlist' : 'Add to wishlist'}
-                        >
-                          <Heart className={`w-3.5 h-3.5 transition-colors ${isInWishlist(product.id) ? 'fill-accent text-accent' : 'text-dark/50'}`} />
-                        </button>
-
-                        {!product.available && (
-                          <div className="absolute inset-0 bg-white/55 backdrop-blur-[2px] flex items-center justify-center">
-                            <span className="bg-dark text-[#D6FF40] px-3 py-1.5 rounded-lg text-[9px] uppercase font-mono tracking-widest font-black shadow-md">SOLD OUT</span>
-                          </div>
-                        )}
-                      </Link>
-
-                      <div className="p-3 sm:p-4 flex-grow flex flex-col justify-between">
-                        <div>
-                          {/* Name + Price */}
-                          <div className="flex justify-between items-start gap-2 mb-2">
-                            <h3 className="font-sans text-[11px] sm:text-sm font-bold text-dark leading-snug">{product.name}</h3>
-                            <div className="flex flex-col items-end shrink-0">
-                              <span className="text-[11px] sm:text-sm font-mono font-black text-dark">₹{displayPrice}</span>
-                              {displayOriginalPrice && (
-                                <span className="text-[9px] line-through font-mono" style={{ color: '#aaa' }}>₹{displayOriginalPrice}</span>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Color Swatches */}
-                          <div className="flex items-center gap-1.5 mb-3">
-                            {(Array.isArray(product.colors)
-                              ? product.colors
-                              : (product.colors ? String(product.colors).split(',').map(c => c.trim()) : [])
-                            ).slice(0, 6).map((col, ci) => {
-                              const cName = col.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim()
-                              const hexMatch = col.match(/#([0-9a-fA-F]{3,6})/)
-                              const colorMap = { Black: '#161616', White: '#FAFAFA', Charcoal: '#4A4A4A', Lime: '#A3E635', Beige: '#E6D3B3', Cream: '#F5F2E9' }
-                              const bg = hexMatch ? `#${hexMatch[1]}` : (colorMap[cName] || '#ccc')
-                              return (
-                                <span
-                                  key={ci}
-                                  title={cName}
-                                  style={{ backgroundColor: bg }}
-                                  className="w-3.5 h-3.5 rounded-full border border-black/10 shrink-0 inline-block"
-                                />
-                              )
-                            })}
-                          </div>
-                        </div>
-
-                        {/* CTA */}
-                        <div className="mt-1 min-h-[36px] sm:min-h-[40px]">
-                          {selectingSizeProduct === product.id ? (
-                            <div className="space-y-1.5 text-center">
-                              <span className="text-[9px] text-dark2/40 font-mono uppercase tracking-widest block">Pick a Size</span>
-                              <div className="flex flex-wrap gap-1 justify-center">
-                                {(Array.isArray(product.sizes) ? product.sizes : (product.sizes ? String(product.sizes).split(',').map(s => s.trim()) : [])).map(sz => (
-                                  <button
-                                    key={sz}
-                                    onClick={() => {
-                                      addToCart(product, sz)
-                                      toast.success(`${product.name} [${sz}] added!`, { style: { background: '#161616', color: '#FAF9F6' } })
-                                      setSelectingSizeProduct(null)
-                                    }}
-                                    className="h-7 px-2.5 border border-dark text-dark hover:bg-dark hover:text-[#D6FF40] transition-all text-[9px] font-mono font-black rounded-lg cursor-pointer bg-transparent"
-                                  >
-                                    {sz}
-                                  </button>
-                                ))}
-                                <button
-                                  onClick={() => setSelectingSizeProduct(null)}
-                                  className="h-7 px-2 border border-dark/15 text-dark/30 hover:border-red-400 hover:text-red-400 transition-all text-[9px] font-mono font-bold rounded-lg cursor-pointer bg-transparent"
-                                >
-                                  ✕
-                                </button>
-                              </div>
-                            </div>
-                          ) : isComingSoon ? (
-                            <button
-                              disabled
-                              className="w-full h-9 px-4 bg-amber-50/50 text-amber-700/60 border border-amber-200/50 text-[9px] font-mono font-bold uppercase tracking-widest rounded-xl cursor-not-allowed flex items-center justify-center gap-1.5"
-                            >
-                              <ShieldAlert className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
-                              Coming Soon
-                            </button>
-                          ) : product.available ? (
-                            <button
-                              onClick={() => {
-                                const sizes = Array.isArray(product.sizes) ? product.sizes : (product.sizes ? String(product.sizes).split(',').map(s => s.trim()) : [])
-                                if (sizes.length === 0) {
-                                  addToCart(product, 'M')
-                                  toast.success(`${product.name} added to bag!`, { style: { background: '#161616', color: '#FAF9F6' } })
-                                } else {
-                                  setSelectingSizeProduct(product.id)
-                                }
-                              }}
-                              className="w-full h-9 sm:h-10 px-2 bg-dark text-[#D6FF40] hover:bg-accent hover:text-dark transition-all duration-200 text-[9px] sm:text-[10px] font-mono font-black uppercase tracking-widest rounded-xl flex items-center justify-center gap-1.5 cursor-pointer border-none"
-                            >
-                              <ShoppingBag className="w-3.5 h-3.5" />
-                              Add to Bag
-                            </button>
-                          ) : (
-                            <button
-                              disabled
-                              className="w-full h-9 px-4 bg-[#F0EEE7] text-dark2/30 text-[9px] font-mono font-bold uppercase tracking-widest rounded-xl cursor-not-allowed flex items-center justify-center gap-1.5 border-none"
-                            >
-                              <ShieldAlert className="w-3.5 h-3.5" />
-                              No Stock
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )
-                })}
-              </div>
+            {searchQuery && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-dark text-[#D6FF40] rounded-lg font-bold">
+                Search: "{searchQuery}"
+                <button
+                  onClick={() => {
+                    const newParams = new URLSearchParams(searchParams)
+                    newParams.delete('search')
+                    setSearchParams(newParams)
+                  }}
+                  className="text-[#D6FF40] hover:text-white font-bold ml-1 border-none bg-transparent cursor-pointer flex items-center justify-center text-[10px]"
+                >
+                  ✕
+                </button>
+              </span>
             )}
-          </div>
-        </div>
-      )}
 
-      {/* Mobile Sidebar Overlay */}
-      <div className={`fixed inset-0 z-[999] bg-dark/60 backdrop-blur-xs transition-opacity duration-300 lg:hidden ${mobileFiltersOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        }`} onClick={() => setMobileFiltersOpen(false)} />
+            {filterSizes.map(sz => (
+              <span key={sz} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-dark text-[#D6FF40] rounded-lg font-bold">
+                Size: {sz}
+                <button
+                  onClick={() => setFilterSizes(prev => prev.filter(s => s !== sz))}
+                  className="text-[#D6FF40] hover:text-white font-bold ml-1 border-none bg-transparent cursor-pointer flex items-center justify-center"
+                >
+                  ✕
+                </button>
+              </span>
+            ))}
 
-      {/* Mobile Sidebar Drawer */}
-      <div className={`fixed top-0 right-0 bottom-0 z-[1000] w-80 max-w-[85vw] bg-white border-l border-cream3 shadow-2xl transition-transform duration-300 ease-in-out transform flex flex-col p-6 lg:hidden ${mobileFiltersOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}>
-        <div className="flex justify-between items-center pb-4 border-b border-cream3 mb-6">
-          <h3 className="font-sans text-xs uppercase tracking-widest text-dark font-black">Catalog Filters</h3>
-          <button
-            onClick={() => setMobileFiltersOpen(false)}
-            className="p-1 rounded-full hover:bg-cream2 text-dark border-none bg-transparent cursor-pointer flex items-center justify-center"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-        <div className="flex-1 overflow-y-auto space-y-8 pr-1 scrollbar-none">
-          <div className="flex justify-end">
+            {filterColors.map(col => (
+              <span key={col} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-dark text-[#D6FF40] rounded-lg font-bold">
+                Color: {col.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '')}
+                <button
+                  onClick={() => setFilterColors(prev => prev.filter(c => c !== col))}
+                  className="text-[#D6FF40] hover:text-white font-bold ml-1 border-none bg-transparent cursor-pointer flex items-center justify-center"
+                >
+                  ✕
+                </button>
+              </span>
+            ))}
+
+            {filterPrice < maxProductPrice && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-dark text-[#D6FF40] rounded-lg font-bold">
+                Max: ₹{filterPrice}
+                <button
+                  onClick={() => setFilterPrice(maxProductPrice)}
+                  className="text-[#D6FF40] hover:text-white font-bold ml-1 border-none bg-transparent cursor-pointer flex items-center justify-center"
+                >
+                  ✕
+                </button>
+              </span>
+            )}
+
+            {filterAvailability !== 'all' && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-dark text-[#D6FF40] rounded-lg font-bold">
+                Status: {filterAvailability === 'in-stock' ? 'In Stock' : 'Sold Out'}
+                <button
+                  onClick={() => setFilterAvailability('all')}
+                  className="text-[#D6FF40] hover:text-white font-bold ml-1 border-none bg-transparent cursor-pointer flex items-center justify-center"
+                >
+                  ✕
+                </button>
+              </span>
+            )}
+
             <button
               onClick={() => {
-                setFilterSize('all')
-                setFilterColor('all')
+                setFilterSizes([])
+                setFilterColors([])
                 setFilterPrice(maxProductPrice)
                 setFilterAvailability('all')
-                setMobileFiltersOpen(false)
+                const newParams = new URLSearchParams(searchParams)
+                newParams.delete('search')
+                setSearchParams(newParams)
               }}
-              className="text-[10px] text-red-500 hover:text-red-700 underline font-sans cursor-pointer border-none bg-transparent"
+              className="text-red-500 hover:text-red-700 underline font-bold ml-2 border-none bg-transparent cursor-pointer uppercase tracking-wider text-[10px]"
             >
-              Reset All
+              Clear All
             </button>
           </div>
-          {renderFiltersContent()}
+        )}
+
+        {activeTab === 'coming-soon' ? (
+          <div className="text-center py-24 bg-white border border-[#E8E5DC] rounded-3xl shadow-sm">
+            <span className="text-4xl block mb-5">⌛</span>
+            <h2 className="font-display text-2xl font-black uppercase text-dark mb-3">SATORI SHADOW COLLECTION</h2>
+            <p className="text-xs text-dark2/55 max-w-sm mx-auto mb-8 leading-relaxed font-sans">
+              Previews will open shortly. Join our alerts list on the home page to be first in line.
+            </p>
+            <Link to="/" className="inline-block px-7 py-3 bg-dark text-[#D6FF40] text-[11px] font-sans font-bold uppercase tracking-widest rounded-xl hover:bg-[#8B5CF6] hover:text-white transition-all shadow-md">Go Home</Link>
+          </div>
+        ) : (activeTab === 'dtf' || activeTab === 'Custom DTF' || activeTab === 'Custom+DTF') ? (
+          /* Customizer promo block - Light HUD theme */
+          <div className="space-y-8 animate-fadeIn">
+            <div className="relative bg-white border border-[#E8E5DC] rounded-3xl p-6 sm:p-10 md:p-14 overflow-hidden shadow-[0_4px_40px_rgba(0,0,0,0.03)] flex flex-col items-center justify-center text-center">
+              <div className="absolute -top-16 -right-16 w-72 h-72 bg-purple-500/5 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-16 -left-16 w-72 h-72 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
+
+              <span className="relative z-10 inline-flex items-center gap-2 bg-purple-500/10 text-purple-600 border border-purple-500/20 font-mono uppercase tracking-[0.2em] text-[9px] sm:text-[10px] font-black px-4 py-2 rounded-full mb-4">
+                <Palette className="w-3 h-3" /> FTW Customizer Studio
+              </span>
+              <h2 className="relative z-10 font-display text-3xl sm:text-4xl md:text-6xl font-black uppercase text-dark tracking-tight mb-4 leading-none">
+                Create Your<br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">Custom Drop</span>
+              </h2>
+              <p className="relative z-10 text-[12px] sm:text-sm text-dark2/50 max-w-lg mx-auto mb-10 leading-relaxed font-sans">
+                Upload any artwork and build your premium streetwear design in real-time. No minimum order.
+              </p>
+
+              {/* Steps */}
+              <div className="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 w-full mt-4">
+                {[
+                  { step: '01', icon: ShoppingBag, title: 'CHOOSE BLANK & COLOR', desc: 'Pick your blank t-shirt and choose your favorite color.' },
+                  { step: '02', icon: Upload, title: 'UPLOAD & ADD TEXT', desc: 'Upload your design image and write custom text on the canvas.' },
+                  { step: '03', icon: Palette, title: 'SAVE & SELECT SIZE', desc: 'Save your design and select your size and quantity.' },
+                  { step: '04', icon: Check, title: 'PRINT & SHIP', desc: 'We print your custom order with premium DTF and ship it to you.' }
+                ].map((s, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-white border border-[#E8E5DC] rounded-[24px] p-4 sm:p-6 text-left group hover:border-purple-500 hover:shadow-[0_12px_36px_rgba(139,92,246,0.08)] hover:-translate-y-1.5 transition-all duration-500 cursor-default flex flex-col justify-between relative overflow-hidden min-h-[165px] sm:min-h-[190px]"
+                  >
+                    <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-purple-500 to-indigo-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+                    <div>
+                      <div className="flex items-center justify-between mb-3 sm:mb-5">
+                        <div className="p-2 sm:p-3 bg-[#F5F3EC] text-purple-600 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-[#8B5CF6] group-hover:text-white group-hover:rotate-6 group-hover:scale-110 transition-all duration-300">
+                          <s.icon className="w-4 h-4 sm:w-5 h-5" />
+                        </div>
+                        <span className="text-[8px] sm:text-[9px] font-mono font-black uppercase tracking-widest text-dark2/40 bg-neutral-100/80 border border-neutral-200/50 px-2.5 py-1 rounded-full group-hover:bg-purple-500/10 group-hover:text-purple-600 group-hover:border-purple-500/20 transition-all duration-300">
+                          STEP {s.step}
+                        </span>
+                      </div>
+                      <h4 className="font-display text-xs sm:text-sm font-black uppercase tracking-wide text-dark mb-1 sm:mb-2.5 group-hover:text-purple-600 transition-colors duration-300">
+                        {s.title}
+                      </h4>
+                      <p className="text-[10px] sm:text-xs text-dark2/55 group-hover:text-dark2/75 font-sans leading-relaxed transition-colors duration-300">
+                        {s.desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Launch Customizer Action Button */}
+              <div className="relative z-10 w-full mt-10 flex flex-col items-center justify-center">
+                <Link
+                  to="/customizer"
+                  onClick={(e) => {
+                    if (!user) {
+                      e.preventDefault()
+                      toast.error("Please login to access the customizer!", {
+                        id: 'auth-required-shop-dtf',
+                        style: { background: '#161616', color: '#FAF9F6' }
+                      })
+                      navigate('/auth?redirect=/customizer')
+                    }
+                  }}
+                  className="w-fit px-6 sm:px-8 py-3.5 sm:py-4 bg-dark text-[#D6FF40] hover:bg-purple-600 hover:text-white transition-all duration-300 font-mono font-black text-[10px] sm:text-xs uppercase tracking-widest rounded-2xl shadow-md hover:shadow-[0_8px_25px_rgba(139,92,246,0.25)] flex items-center justify-center gap-2 cursor-pointer border-none text-center decoration-none"
+                >
+                  <Palette className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-pulse" />
+                  Launch Customizer Studio
+                </Link>
+                <div className="flex items-center justify-center gap-5 mt-4 flex-wrap">
+                  <span className="text-[9px] text-dark2/40 font-mono uppercase tracking-wider flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 bg-purple-500 rounded-full"></span> No minimum order
+                  </span>
+                  <span className="text-[9px] text-dark2/40 font-mono uppercase tracking-wider flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 bg-purple-500 rounded-full"></span> High-density DTF print
+                  </span>
+                  <span className="text-[9px] text-dark2/40 font-mono uppercase tracking-wider flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 bg-purple-500 rounded-full"></span> Ships in 7–10 days
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : loadingProducts ? (
+          <div className="text-center py-28 font-sans text-dark2/50 text-xs">
+            <div className="w-8 h-8 border-2 border-purple-500/10 border-t-purple-500 rounded-full animate-spin mx-auto mb-4" />
+            <span className="font-mono uppercase tracking-widest text-[10px]">Loading catalog...</span>
+          </div>
+        ) : (
+          /* Regular Shop Layout with Filters */
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-10 items-start">
+            {/* Side Filters Panel (Desktop only) */}
+            <div className="hidden lg:block lg:col-span-1 hud-card-border">
+              <div className="hud-shop-card p-5">
+                
+                <div className="pb-3 mb-4 border-b border-[#EDEADE] flex items-center justify-between">
+                  <span className="text-[12.5px] text-dark font-mono uppercase tracking-widest font-black">Refine Results</span>
+                  <span className="hud-hex font-mono text-[7px] text-purple-600/50">0xFILTER</span>
+                </div>
+                {renderFiltersContent()}
+              </div>
+            </div>
+
+            {/* Product Grid Area */}
+            <div className="lg:col-span-3">
+              {/* Mobile Filters Toggle Button */}
+              <button
+                onClick={() => setMobileFiltersOpen(true)}
+                className="lg:hidden w-full h-11 px-4 mb-6 bg-white border border-[#E8E5DC] hover:border-dark/30 text-dark font-sans text-[11px] font-bold uppercase tracking-widest rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all shadow-sm"
+              >
+                <SlidersHorizontal className="w-3.5 h-3.5 text-purple-600" />
+                Filter Products
+              </button>
+              {filteredProducts.length === 0 ? (
+                <div className="hud-card-border max-w-md mx-auto">
+                  <div className="hud-shop-card text-center py-20 px-5">
+                    <span className="text-3xl block mb-4">🔍</span>
+                    <p className="text-xs text-dark2/50 font-mono uppercase">No products match your filters. Try adjusting your selection.</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  {sortedFilteredProducts.map((product, pi) => {
+                    const categoryStr = (product.category || '').toLowerCase().replace(/[\s-_]+/g, ' ').trim()
+                    const tagStr = (product.tag || '').toLowerCase().replace(/[\s-_]+/g, ' ').trim()
+                    const isComingSoon = categoryStr === 'coming soon' || tagStr === 'coming soon'
+
+                    const defaultColorCleaned = product.default_color ? product.default_color.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim() : '';
+                    const defaultColorVariant = defaultColorCleaned
+                      ? (product.variants || []).find(v => v.color && v.color.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim() === defaultColorCleaned)
+                      : null;
+
+                    const firstVariantWithPrice = defaultColorVariant && defaultColorVariant.price !== undefined
+                      ? defaultColorVariant
+                      : ((product.variants || []).find(v => v.price !== undefined) || {});
+
+                    const firstVariantWithImages = defaultColorVariant && defaultColorVariant.images && defaultColorVariant.images.length > 0
+                      ? defaultColorVariant
+                      : ((product.variants || []).find(v => v.images && v.images.length > 0) || {});
+
+                    const displayPrice = product.price !== undefined && product.price !== null && product.price !== 0 ? product.price : (firstVariantWithPrice.price || 0)
+                    const displayOriginalPrice = product.originalPrice ? product.originalPrice : firstVariantWithPrice.originalPrice
+                    const displayImage = product.image ? product.image : ((firstVariantWithImages.images && firstVariantWithImages.images[0]) || '/images/1.1.jpeg')
+
+                    return (
+                      <motion.div
+                        key={product.id}
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: pi * 0.04, ease: 'easeOut' }}
+                        className="hud-card-border"
+                      >
+                        <div className="hud-shop-card">
+
+                          {/* Telemetry Hex tag */}
+                          <span className="hud-hex hud-hex-tl">ITEM_REF_{product.id.substring(0,5).toUpperCase()}</span>
+                          <span className="hud-hex hud-hex-tr">0x{displayPrice.toString(16).toUpperCase()}</span>
+
+                          <Link to={`/product/${product.id}`} className="relative aspect-[4/5] bg-[#F5F3EC] overflow-hidden block border-b border-purple-500/10">
+                            <img
+                              src={displayImage}
+                              alt={product.name}
+                              className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-700"
+                            />
+                            {product.tag && (
+                              <span className={`absolute top-3 left-3 text-[8px] font-mono uppercase tracking-widest font-black px-2.5 py-1.5 rounded-lg shadow-sm ${product.tag.includes('OFF') || product.tag.includes('Sale') ? 'bg-[#D6FF40] text-dark' : 'bg-dark text-[#D6FF40]'
+                                }`}>
+                                {product.tag}
+                              </span>
+                            )}
+
+                            {/* Rating Badge */}
+                            <div className="absolute bottom-3 left-3 bg-white/85 backdrop-blur-md px-2.5 py-1 rounded-lg text-[9px] font-mono font-bold text-dark border border-white/60 flex items-center gap-1 shadow-sm z-10">
+                              <Star className="w-3 h-3 fill-purple-600 text-purple-600 shrink-0" />
+                              <span>{getProductRating(product.name) || '0.0'}</span>
+                            </div>
+
+                            {/* Wishlist Button */}
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                toggleWishlist(product)
+                                toast.success(
+                                  isInWishlist(product.id) ? `Removed from wishlist.` : `Added to wishlist!`,
+                                  { style: { background: '#161616', color: '#FAF9F6' } }
+                                )
+                              }}
+                              className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/85 backdrop-blur-md border border-white/60 flex items-center justify-center hover:scale-110 transition-all cursor-pointer shadow-sm text-dark"
+                              title={isInWishlist(product.id) ? 'Remove from wishlist' : 'Add to wishlist'}
+                            >
+                              <Heart className={`w-3.5 h-3.5 transition-colors ${isInWishlist(product.id) ? 'fill-purple-600 text-purple-600' : 'text-dark/50'}`} />
+                            </button>
+
+                            {!product.available && (
+                              <div className="absolute inset-0 bg-white/55 backdrop-blur-[2px] flex items-center justify-center">
+                                <span className="bg-dark text-[#D6FF40] px-3 py-1.5 rounded-lg text-[9px] uppercase font-mono tracking-widest font-black shadow-md">SOLD OUT</span>
+                              </div>
+                            )}
+                          </Link>
+
+                          <div className="p-3 sm:p-4 flex-grow flex flex-col justify-between relative z-10">
+                            <div>
+                              {/* Name + Price */}
+                              <div className="flex justify-between items-start gap-2 mb-2">
+                                <h3 className="font-sans text-[13px] sm:text-base font-bold text-dark leading-snug">{product.name}</h3>
+                                <div className="flex flex-col items-end shrink-0">
+                                  <span className="text-[13px] sm:text-base font-mono font-black text-dark">₹{displayPrice}</span>
+                                  {displayOriginalPrice && (
+                                    <span className="text-[10px] sm:text-xs line-through font-mono text-gray-400">₹{displayOriginalPrice}</span>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Color Swatches */}
+                              <div className="flex items-center gap-1.5 mb-3">
+                                {(Array.isArray(product.colors)
+                                  ? product.colors
+                                  : (product.colors ? String(product.colors).split(',').map(c => c.trim()) : [])
+                                ).slice(0, 6).map((col, ci) => {
+                                  const cName = col.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim()
+                                  const hexMatch = col.match(/#([0-9a-fA-F]{3,6})/)
+                                  const colorMap = { Black: '#161616', White: '#FAFAFA', Charcoal: '#4A4A4A', Lime: '#A3E635', Beige: '#E6D3B3', Cream: '#F5F2E9' }
+                                  const bg = hexMatch ? `#${hexMatch[1]}` : (colorMap[cName] || '#ccc')
+                                  return (
+                                    <span
+                                      key={ci}
+                                      title={cName}
+                                      style={{ backgroundColor: bg }}
+                                      className="w-3.5 h-3.5 rounded-full border border-black/10 shrink-0 inline-block"
+                                    />
+                                  )
+                                })}
+                              </div>
+                            </div>
+
+                            {/* CTA */}
+                            <div className="mt-1 min-h-[36px] sm:min-h-[40px]">
+                              {selectingSizeProduct === product.id ? (
+                                <div className="space-y-1.5 text-center">
+                                  <span className="text-[11px] text-gray-500 font-mono uppercase tracking-widest block">Pick a Size</span>
+                                  <div className="flex flex-wrap gap-1 justify-center">
+                                    {(Array.isArray(product.sizes) ? product.sizes : (product.sizes ? String(product.sizes).split(',').map(s => s.trim()) : [])).map(sz => (
+                                      <button
+                                        key={sz}
+                                        onClick={() => {
+                                          addToCart(product, sz)
+                                          toast.success(`${product.name} [${sz}] added!`, { style: { background: '#161616', color: '#FAF9F6' } })
+                                          setSelectingSizeProduct(null)
+                                        }}
+                                        className="h-7.5 px-3 border border-dark text-dark hover:bg-dark hover:text-[#D6FF40] transition-all text-[10px] font-mono font-black rounded-lg cursor-pointer bg-transparent"
+                                      >
+                                        {sz}
+                                      </button>
+                                    ))}
+                                    <button
+                                      onClick={() => setSelectingSizeProduct(null)}
+                                      className="h-7.5 px-2 border border-dark/15 text-dark/30 hover:border-red-400 hover:text-red-400 transition-all text-[10px] font-mono font-bold rounded-lg cursor-pointer bg-transparent"
+                                    >
+                                      ✕
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : product.available ? (
+                              <button
+                                onClick={() => {
+                                  const sizes = Array.isArray(product.sizes) ? product.sizes : (product.sizes ? String(product.sizes).split(',').map(s => s.trim()) : [])
+                                  if (sizes.length === 0) {
+                                    addToCart(product, 'M')
+                                    toast.success(`${product.name} added to bag!`, { style: { background: '#161616', color: '#FAF9F6' } })
+                                  } else {
+                                    setSelectingSizeProduct(product.id)
+                                  }
+                                }}
+                                className="w-full h-9 sm:h-10 px-2 bg-purple-600 text-white hover:bg-purple-700 transition-all duration-200 text-[11px] sm:text-[12px] font-mono font-black uppercase tracking-widest rounded-xl flex items-center justify-center gap-1.5 cursor-pointer border-none shadow-sm"
+                              >
+                                <ShoppingBag className="w-3.5 h-3.5" />
+                                Add to Bag
+                              </button>
+                            ) : (
+                              <button
+                                disabled
+                                className="w-full h-9 px-4 bg-[#F0EEE7] text-dark2/30 text-[9px] font-mono font-bold uppercase tracking-widest rounded-xl cursor-not-allowed flex items-center justify-center gap-1.5 border-none"
+                              >
+                                <ShieldAlert className="w-3.5 h-3.5" />
+                                No Stock
+                              </button>
+                            )}
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Mobile Sidebar Overlay */}
+        <div className={`fixed inset-0 z-[999] bg-dark/60 backdrop-blur-xs transition-opacity duration-300 lg:hidden ${mobileFiltersOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`} onClick={() => setMobileFiltersOpen(false)} />
+
+        {/* Mobile Sidebar Drawer */}
+        <div className={`fixed top-0 right-0 bottom-0 z-[1000] w-80 max-w-[85vw] bg-white border-l border-[#E8E5DC] shadow-2xl transition-transform duration-300 ease-in-out transform flex flex-col p-6 lg:hidden ${mobileFiltersOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}>
+          <div className="flex justify-between items-center pb-4 border-b border-[#E8E5DC] mb-6">
+            <h3 className="font-sans text-xs uppercase tracking-widest text-dark font-black">Catalog Filters</h3>
+            <button
+              onClick={() => setMobileFiltersOpen(false)}
+              className="p-1 rounded-full hover:bg-neutral-100 text-dark border-none bg-transparent cursor-pointer flex items-center justify-center"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto space-y-8 pr-1 scrollbar-none">
+            <div className="flex justify-end">
+              <button
+                onClick={() => {
+                  setFilterSizes([])
+                  setFilterColors([])
+                  setFilterPrice(maxProductPrice)
+                  setFilterAvailability('all')
+                  setMobileFiltersOpen(false)
+                }}
+                className="text-[10px] text-red-500 hover:text-red-700 underline font-sans cursor-pointer border-none bg-transparent"
+              >
+                Reset All
+              </button>
+            </div>
+            {renderFiltersContent()}
+          </div>
         </div>
       </div>
-    </div>
     </div>
   )
 }

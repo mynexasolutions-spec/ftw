@@ -30,7 +30,7 @@ function FTWLogo({ small = false }) {
         gap: '3px'
       }}>
         <span>FOR THE</span>
-        <span style={{ color: '#F97316', fontStyle: 'italic', transform: 'skewX(-6deg)', display: 'inline-block' }}>WIN</span>
+        <span style={{ color: '#8B5CF6', fontStyle: 'italic', transform: 'skewX(-6deg)', display: 'inline-block' }}>WIN</span>
       </span>
     </div>
   )
@@ -166,14 +166,14 @@ export default function Interactive3DBag({ hideHint = false }) {
         {/* Drop shadow ellipse */}
         <div style={{
           position: 'absolute',
-          bottom: 8,
+          bottom: -4,
           left: '50%',
           transform: 'translateX(-50%) rotateX(85deg)',
-          width: 110,
-          height: 16,
+          width: 120,
+          height: 18,
           borderRadius: '50%',
           background: 'rgba(22,22,22,0.18)',
-          filter: 'blur(8px)',
+          filter: 'blur(9px)',
           pointerEvents: 'none',
         }} />
 
@@ -264,11 +264,11 @@ export default function Interactive3DBag({ hideHint = false }) {
             position: 'absolute',
             width: 140,
             height: 50,
-            bottom: -25,
+            bottom: 0,
             left: 0,
             ...BOTTOM_FACE_STYLE,
-            transform: 'rotateX(90deg) translateZ(0)',
-            transformOrigin: 'center center',
+            transform: 'rotateX(-90deg) translateZ(0px)',
+            transformOrigin: 'center bottom',
             backfaceVisibility: 'hidden',
           }}>
             <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%' }}>

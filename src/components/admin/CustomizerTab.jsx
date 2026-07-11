@@ -221,7 +221,7 @@ export default function CustomizerTab({ onPreviewImage }) {
 
   if (loading) {
     return (
-      <div className="py-20 text-center font-mono text-xs uppercase text-dark2/50 tracking-widest animate-pulse">
+      <div className="py-20 text-center font-sans text-xs uppercase text-dark2/50 tracking-widest animate-pulse">
         Fetching Customizer config...
       </div>
     )
@@ -255,7 +255,7 @@ export default function CustomizerTab({ onPreviewImage }) {
         <div className="lg:col-span-2 space-y-6">
           {/* Add Color Form */}
           <div id="color-form-card" className="bg-white border border-cream3 rounded-3xl p-6 shadow-sm space-y-5">
-            <span className="text-[10px] lg:text-xs text-accent font-black uppercase tracking-widest block border-b border-cream3 pb-2 font-mono">
+            <span className="text-[10px] lg:text-xs text-accent font-black uppercase tracking-widest block border-b border-cream3 pb-2 font-sans">
               {editingColorName ? `1. Edit Customizer Color: ${editingColorName}` : '1. Define New Customizer Color Mockups'}
             </span>
             <form onSubmit={handleAddColor} className="space-y-6 text-xs lg:text-sm font-sans">
@@ -263,10 +263,10 @@ export default function CustomizerTab({ onPreviewImage }) {
               {/* Quick Preset Color Swatches */}
               <div className="bg-cream/40 border border-cream3 p-4 rounded-2xl space-y-2.5">
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] lg:text-xs font-mono font-bold text-dark/70 uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="text-[10px] lg:text-xs font-sans font-bold text-dark/70 uppercase tracking-wider flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5 text-accent" /> Quick Pick Color Palette
                   </span>
-                  <span className="text-[9px] font-mono text-dark/40 uppercase">1-Click Auto Fill</span>
+                  <span className="text-[9px] font-sans text-dark/40 uppercase">1-Click Auto Fill</span>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {[
@@ -329,7 +329,7 @@ export default function CustomizerTab({ onPreviewImage }) {
                       placeholder="#333333"
                       value={newColorHex}
                       onChange={(e) => setNewColorHex(e.target.value)}
-                      className="flex-1 px-4 py-2.5 lg:py-3 bg-cream/35 border border-cream3 rounded-xl focus:outline-none focus:border-dark focus:bg-white text-xs lg:text-sm font-sans font-mono font-bold transition-all placeholder-dark/30"
+                      className="flex-1 px-4 py-2.5 lg:py-3 bg-cream/35 border border-cream3 rounded-xl focus:outline-none focus:border-dark focus:bg-white text-xs lg:text-sm font-sans font-bold transition-all placeholder-dark/30"
                     />
                   </div>
                 </div>
@@ -338,7 +338,7 @@ export default function CustomizerTab({ onPreviewImage }) {
               {/* Copy Mockups Helper */}
               {config.colors.length > 0 && (
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3.5 bg-cream2/50 border border-cream3 rounded-2xl gap-3">
-                  <span className="text-[10px] lg:text-xs font-mono text-dark/70 font-bold uppercase">⚡ Quick Fill Mockup Images from Active Color:</span>
+                  <span className="text-[10px] lg:text-xs font-sans text-dark/70 font-bold uppercase">⚡ Quick Fill Mockup Images from Active Color:</span>
                   <select
                     onChange={(e) => {
                       const found = config.colors.find(c => c.name === e.target.value)
@@ -363,9 +363,8 @@ export default function CustomizerTab({ onPreviewImage }) {
 
               {/* Upload sections for mockup files */}
               <div className="space-y-2">
-                <div className="flex justify-between items-center mb-1">
+                <div className="mb-1">
                   <label className="text-[10px] lg:text-xs uppercase tracking-wider block font-bold text-dark2/60">Upload Blank Mockups *</label>
-                  <span className="text-[9px] font-mono text-dark/40 uppercase">PNG with transparency recommended</span>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   {/* Front */}
@@ -418,7 +417,7 @@ export default function CustomizerTab({ onPreviewImage }) {
 
                   {/* Left Sleeve */}
                   <div className="space-y-1.5">
-                    <span className="text-[9px] lg:text-[10px] uppercase font-bold text-dark2/40 block text-center">Left Sleeve <span className="block text-[8px] text-dark/30 font-normal font-mono">(Optional)</span></span>
+                    <span className="text-[9px] lg:text-[10px] uppercase font-bold text-dark2/40 block text-center">Left Sleeve</span>
                     {mockupLeftSleeve ? (
                       <div className="border-2 border-cream3 rounded-xl p-3.5 flex flex-col items-center justify-center bg-cream2/30 aspect-square relative overflow-hidden group">
                         <img src={mockupLeftSleeve} alt="Left Sleeve" className="w-full h-full object-contain mix-blend-multiply" />
@@ -442,7 +441,7 @@ export default function CustomizerTab({ onPreviewImage }) {
 
                   {/* Right Sleeve */}
                   <div className="space-y-1.5">
-                    <span className="text-[9px] lg:text-[10px] uppercase font-bold text-dark2/40 block text-center">Right Sleeve <span className="block text-[8px] text-dark/30 font-normal font-mono">(Optional)</span></span>
+                    <span className="text-[9px] lg:text-[10px] uppercase font-bold text-dark2/40 block text-center">Right Sleeve</span>
                     {mockupRightSleeve ? (
                       <div className="border-2 border-cream3 rounded-xl p-3.5 flex flex-col items-center justify-center bg-cream2/30 aspect-square relative overflow-hidden group">
                         <img src={mockupRightSleeve} alt="Right Sleeve" className="w-full h-full object-contain mix-blend-multiply" />
@@ -496,7 +495,7 @@ export default function CustomizerTab({ onPreviewImage }) {
 
           {/* Customizer Size Chart Editor */}
           <div className="bg-white border border-cream3 rounded-3xl p-6 lg:p-7 shadow-sm space-y-5">
-            <span className="text-[10px] lg:text-xs text-accent font-black uppercase tracking-widest block border-b border-cream3 pb-2 font-mono">
+            <span className="text-[10px] lg:text-xs text-accent font-black uppercase tracking-widest block border-b border-cream3 pb-2 font-sans">
               Size Chart for All Mockup T-shirts
             </span>
             <div className="text-xs lg:text-sm font-sans space-y-4">
@@ -504,11 +503,11 @@ export default function CustomizerTab({ onPreviewImage }) {
               <div className="border border-cream3 rounded-2xl bg-white overflow-hidden">
                 <table className="w-full text-left border-collapse text-xs lg:text-sm font-sans">
                   <thead>
-                    <tr className="bg-cream2 text-dark/65 font-bold border-b border-cream3 font-mono text-[9px] lg:text-[10px] uppercase tracking-wider">
+                    <tr className="bg-cream2 text-dark/65 font-bold border-b border-cream3 font-sans text-[9px] lg:text-[10px] uppercase tracking-wider">
                       <th className="p-3.5 lg:p-4">Size</th>
                       <th className="p-3.5 lg:p-4 text-accent">A (Chest Width)</th>
                       <th className="p-3.5 lg:p-4 text-dark/85">B (Length)</th>
-                      <th className="p-3.5 lg:p-4 text-orange-500">C (Sleeve Length)</th>
+                      <th className="p-3.5 lg:p-4 text-purple-600">C (Sleeve Length)</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-cream3 text-dark/75">
@@ -516,7 +515,7 @@ export default function CustomizerTab({ onPreviewImage }) {
                       const szData = sizeChart[sz] || { chest: '', length: '', sleeve: '' }
                       return (
                         <tr key={sz} className="hover:bg-cream2/20">
-                          <td className="p-3.5 lg:p-4 font-bold font-mono text-dark text-sm lg:text-base">{sz}</td>
+                          <td className="p-3.5 lg:p-4 font-bold font-sans text-dark text-sm lg:text-base">{sz}</td>
                           <td className="p-3.5 lg:p-4">
                             <input
                               type="text"
@@ -567,7 +566,7 @@ export default function CustomizerTab({ onPreviewImage }) {
 
           {/* Customizer Pricing Settings */}
           <div className="bg-white border border-cream3 rounded-3xl p-6 lg:p-7 shadow-sm space-y-5">
-            <span className="text-[10px] lg:text-xs text-accent font-black uppercase tracking-widest block border-b border-cream3 pb-2 font-mono">
+            <span className="text-[10px] lg:text-xs text-accent font-black uppercase tracking-widest block border-b border-cream3 pb-2 font-sans">
               Customizer Pricing Settings
             </span>
             <div className="text-xs lg:text-sm font-sans space-y-5">
@@ -615,7 +614,7 @@ export default function CustomizerTab({ onPreviewImage }) {
         {/* Right Column: Active Colors Summary */}
         <div className="space-y-6">
           <div className="bg-white border border-cream3 rounded-3xl p-6 lg:p-7 shadow-sm space-y-4">
-            <span className="text-[10px] lg:text-xs text-accent font-black uppercase tracking-widest block border-b border-cream3 pb-2 font-mono">2. Active Customizer Colors ({config.colors.length})</span>
+            <span className="text-[10px] lg:text-xs text-accent font-black uppercase tracking-widest block border-b border-cream3 pb-2 font-sans">2. Active Customizer Colors ({config.colors.length})</span>
 
             {config.colors.length === 0 ? (
               <div className="text-center py-8 text-dark2/40 text-xs lg:text-sm flex flex-col items-center gap-2">
@@ -623,7 +622,7 @@ export default function CustomizerTab({ onPreviewImage }) {
                 <span>No customizer colors defined yet.</span>
               </div>
             ) : (
-              <div className="flex flex-col gap-3.5 max-h-[520px] overflow-y-auto pr-1">
+              <div className="flex flex-col gap-3.5 max-h-[520px] overflow-y-auto pr-1 custom-scrollbar">
                 {config.colors.map(col => (
                   <div key={col.name} className="flex flex-col gap-3.5 p-4 lg:p-5 bg-cream2 rounded-2xl border border-cream3 hover:border-dark/15 hover:shadow-xs transition-all duration-300">
                     {/* Top Row: Color circle, Name/Hex, Delete Button */}
@@ -635,7 +634,7 @@ export default function CustomizerTab({ onPreviewImage }) {
                         />
                         <div className="min-w-0">
                           <span className="font-extrabold text-xs lg:text-sm block text-dark leading-tight uppercase tracking-tight">{col.name}</span>
-                          <span className="text-[9px] lg:text-[10px] font-mono text-dark2/40 font-bold uppercase tracking-wider block mt-0.5">{col.hex}</span>
+                          <span className="text-[9px] lg:text-[10px] font-sans text-dark2/40 font-bold uppercase tracking-wider block mt-0.5">{col.hex}</span>
                         </div>
                       </div>
 
@@ -679,7 +678,7 @@ export default function CustomizerTab({ onPreviewImage }) {
                           })}
                         </div>
 
-                        <span className="text-[8px] lg:text-[9px] font-mono bg-dark/5 px-2 py-0.5 rounded border border-cream3 uppercase text-dark2/60 font-bold shrink-0">
+                        <span className="text-[8px] lg:text-[9px] font-sans bg-dark/5 px-2 py-0.5 rounded border border-cream3 uppercase text-dark2/60 font-bold shrink-0">
                           {Object.values(col.mockups || {}).filter(Boolean).length} mockups
                         </span>
                       </div>

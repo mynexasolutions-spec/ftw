@@ -108,7 +108,7 @@ export default function CategoriesTab({
                             </span>
                           )}
                         </td>
-                        <td className="p-4 lg:p-4.5 font-mono text-[10px] lg:text-xs text-dark2/50">
+                        <td className="p-4 lg:p-4.5 font-sans text-[10px] lg:text-xs text-dark2/50">
                           {cat.slug}
                         </td>
                         <td className="p-4 lg:p-4.5 text-dark2/60 max-w-[200px] truncate text-xs lg:text-sm" title={cat.description}>
@@ -168,7 +168,7 @@ export default function CategoriesTab({
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="font-extrabold text-dark text-xs uppercase tracking-wide">{cat.name}</h3>
-                        <p className="text-[9px] text-dark2/45 font-mono mt-0.5">Slug: {cat.slug}</p>
+                        <p className="text-[9px] text-dark2/45 font-sans mt-0.5">Slug: {cat.slug}</p>
                       </div>
                       
                       <div className="flex gap-2">
@@ -199,14 +199,14 @@ export default function CategoriesTab({
 
                     <div className="flex flex-wrap justify-between items-center gap-2 pt-2 border-t border-cream3/50 text-xs">
                       <div className="flex gap-1.5 items-center">
-                        <span className="text-[9px] uppercase font-mono font-bold">
+                        <span className="text-[9px] uppercase font-sans font-bold">
                           {isParent ? (
                             <span className="bg-dark text-white px-2 py-0.5 rounded">Main Category</span>
                           ) : (
                             <span className="bg-cream text-dark2/60 border border-cream3 px-2 py-0.5 rounded">Sub of {cat.parent}</span>
                           )}
                         </span>
-                        <span className="text-[9px] bg-cream font-mono font-bold text-dark2/60 border border-cream3 px-2 py-0.5 rounded">
+                        <span className="text-[9px] bg-cream font-sans font-bold text-dark2/60 border border-cream3 px-2 py-0.5 rounded">
                           Order: {cat.sort_order ?? 0}
                         </span>
                       </div>
