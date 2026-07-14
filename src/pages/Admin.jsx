@@ -3,6 +3,7 @@ import { getProducts, getOrders, getInquiries, insertProduct, updateProduct, del
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-hot-toast'
 import ProductFormModal from '../components/ProductFormModal'
+import Loader from '../components/Loader'
 import DashboardTab from '../components/admin/DashboardTab'
 import ProductsTab from '../components/admin/ProductsTab'
 import CategoriesTab from '../components/admin/CategoriesTab'
@@ -126,7 +127,9 @@ export default function Admin() {
     available: true,
     tag: 'New',
     seo_title: '',
-    seo_description: ''
+    seo_description: '',
+    customizable: false,
+    is_combo: false
   })
 
 
@@ -313,7 +316,9 @@ export default function Admin() {
       washing_instructions: '',
       size_guide: '',
       size_chart: {},
-      variants: []
+      variants: [],
+      customizable: false,
+      is_combo: false
     })
     setShowProductModal(true)
   }
@@ -345,7 +350,9 @@ export default function Admin() {
       washing_instructions: prod.washing_instructions || prod.washing || '',
       size_guide: prod.size_guide || '',
       size_chart: prod.size_chart || {},
-      variants: Array.isArray(prod.variants) ? prod.variants : []
+      variants: Array.isArray(prod.variants) ? prod.variants : [],
+      customizable: prod.customizable ?? false,
+      is_combo: prod.is_combo ?? false
     })
     setShowProductModal(true)
   }
@@ -870,7 +877,7 @@ export default function Admin() {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-cream flex flex-col items-center justify-center font-sans text-dark2/60 text-sm">
-        <span className="animate-spin w-6 h-6 border-2 border-dark border-t-transparent rounded-full inline-block mb-3" />
+        <Loader size="medium" className="mb-3" />
         Verifying credentials...
       </div>
     )
@@ -1123,7 +1130,7 @@ export default function Admin() {
 
           {loading ? (
             <div className="text-center py-24 font-sans text-dark2/60 text-sm">
-              <span className="animate-spin w-6 h-6 border-2 border-dark border-t-transparent rounded-full inline-block mb-3" /><br />
+              <Loader size="medium" className="mb-3" />
               Loading database records...
             </div>
           ) : (
@@ -1191,6 +1198,7 @@ export default function Admin() {
                 <ReviewsTab
                   reviews={reviews}
                   products={products}
+                  orders={orders}
                   handleApproveReview={handleApproveReview}
                   handleDeleteReview={handleDeleteReview}
                 />

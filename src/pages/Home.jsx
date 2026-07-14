@@ -9,7 +9,7 @@ import {
   ShoppingBag, Eye, Upload, Palette, Check, ArrowRight,
   Heart, Star, Flame, Sparkles, X, Mail, Bell, Gamepad2, Zap, Swords, Target, Trophy, Laptop, Crown
 } from 'lucide-react'
-import { getHomepageConfig, getProducts, getProductRating } from '../lib/supabase'
+import { getHomepageConfig, getProducts, getProductRating, getProductReviewCount } from '../lib/supabase'
 import Hero from '../components/Hero'
 import FeaturedCollection from '../components/FeaturedCollection'
 import SaleArchive from '../components/SaleArchive'
@@ -290,13 +290,47 @@ export default function Home() {
             setHeroBgBannerMobile(config.hero_bg_banner_mobile)
           }
 
+          // Helper to resolve display image (front)
+          const getProductDisplayImage = (prod) => {
+            if (!prod) return '/images/Regular-T.png';
+            const cleanColor = (c) => c ? c.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim().toLowerCase() : '';
+            const colorsArr = Array.isArray(prod.colors) ? prod.colors : (typeof prod.colors === 'string' ? prod.colors.split(',').map(c => c.trim()) : []);
+            const defaultColorName = prod.default_color ? cleanColor(prod.default_color) : (colorsArr.length > 0 ? cleanColor(colorsArr[0]) : '');
+            let resolvedVariants = prod.variants || [];
+            if (typeof resolvedVariants === 'string') {
+              try { resolvedVariants = JSON.parse(resolvedVariants); } catch (e) { resolvedVariants = []; }
+            }
+            const defaultVariant = Array.isArray(resolvedVariants) ? resolvedVariants.find(v => cleanColor(v.color) === defaultColorName && Array.isArray(v.images) && v.images.length > 0) : null;
+            if (defaultVariant && defaultVariant.images[0]) return defaultVariant.images[0];
+            if (prod.image) return prod.image;
+            if (Array.isArray(prod.images) && prod.images.length > 0) return prod.images[0];
+            return '/images/Regular-T.png';
+          };
+
+          // Helper to resolve second image (back)
+          const getProductBackImage = (prod) => {
+            if (!prod) return '/images/Regular-T.png';
+            const cleanColor = (c) => c ? c.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim().toLowerCase() : '';
+            const colorsArr = Array.isArray(prod.colors) ? prod.colors : (typeof prod.colors === 'string' ? prod.colors.split(',').map(c => c.trim()) : []);
+            const defaultColorName = prod.default_color ? cleanColor(prod.default_color) : (colorsArr.length > 0 ? cleanColor(colorsArr[0]) : '');
+            let resolvedVariants = prod.variants || [];
+            if (typeof resolvedVariants === 'string') {
+              try { resolvedVariants = JSON.parse(resolvedVariants); } catch (e) { resolvedVariants = []; }
+            }
+            const defaultVariant = Array.isArray(resolvedVariants) ? resolvedVariants.find(v => cleanColor(v.color) === defaultColorName && Array.isArray(v.images) && v.images.length > 0) : null;
+            if (defaultVariant && defaultVariant.images.length > 1) return defaultVariant.images[1];
+            if (Array.isArray(prod.images) && prod.images.length > 1) return prod.images[1];
+            if (prod.image) return prod.image;
+            return '/images/Regular-T.png';
+          };
+
           // Map featured product IDs to actual product objects from db
           if (config.featured_product_ids && config.featured_product_ids.length > 0 && dbProducts && dbProducts.length > 0) {
             const featured = dbProducts.filter(p => config.featured_product_ids.includes(p.id))
             const mappedFeatured = featured.map(p => ({
               ...p,
-              imageFront: p.images?.[0] || p.image || '/images/Regular-T.png',
-              imageBack: p.images?.[1] || p.image || '/images/Regular-T.png',
+              imageFront: getProductDisplayImage(p),
+              imageBack: getProductBackImage(p),
               details: p.tag ? `${p.tag} • ${p.category}` : p.category
             }))
             if (mappedFeatured.length > 0) {
@@ -309,8 +343,8 @@ export default function Home() {
             const sale = dbProducts.filter(p => config.sale_product_ids.includes(p.id))
             const mappedSale = sale.map(p => ({
               ...p,
-              imageFront: p.images?.[0] || p.image || '/images/Regular-T.png',
-              imageBack: p.images?.[1] || p.image || '/images/Regular-T.png',
+              imageFront: getProductDisplayImage(p),
+              imageBack: getProductBackImage(p),
               salePrice: p.price,
               originalPrice: p.originalPrice || Math.round(p.price * 1.3),
               discountPercent: p.originalPrice ? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100) : 30,
@@ -502,6 +536,7 @@ export default function Home() {
         toggleWishlist={toggleWishlist}
         isInWishlist={isInWishlist}
         getProductRating={getProductRating}
+        getProductReviewCount={getProductReviewCount}
         addToCart={addToCart}
         toast={toast}
       />
@@ -523,6 +558,7 @@ export default function Home() {
           toggleWishlist={toggleWishlist}
           isInWishlist={isInWishlist}
           getProductRating={getProductRating}
+          getProductReviewCount={getProductReviewCount}
           addToCart={addToCart}
           toast={toast}
         />

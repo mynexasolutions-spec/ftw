@@ -30,11 +30,11 @@ export default function Hero({ heroImages, heroBgBanner, heroBgBannerMobile, all
 
   const getScale = (isCenter) => {
     if (isCenter) {
-      if (isMobile) return 1.15
-      if (isTablet) return 1.25
-      return 1.45
+      if (isMobile) return 0.9;
+      if (isTablet) return 0.95;
+      return 1.05;
     }
-    return isMobile ? 1.05 : (isTablet ? 1.08 : 1.1)
+    return isMobile ? 0.8 : (isTablet ? 0.85 : 0.9);
   }
 
   const getProductForHeroImage = (item) => {
@@ -46,7 +46,7 @@ export default function Hero({ heroImages, heroBgBanner, heroBgBannerMobile, all
     const assignedId = typeof parsedItem === 'object' ? parsedItem?.productId : null;
 
     if (assignedId && allProducts && allProducts.length > 0) {
-      return allProducts.find(p => p.id === assignedId) || null;
+      return allProducts.find(p => String(p.id).trim() === String(assignedId).trim()) || null;
     }
     return null;
   }
@@ -716,7 +716,7 @@ export default function Hero({ heroImages, heroBgBanner, heroBgBannerMobile, all
         .phase-5 .nav-arrow-hero { opacity: 1; pointer-events: auto; }
       ` }} />
 
-      <div className="backdrop-hero" style={{ 
+      <div className="backdrop-hero" style={{
         '--bg-desktop': heroBgBanner ? `url(${heroBgBanner})` : 'none',
         '--bg-mobile': heroBgBannerMobile ? `url(${heroBgBannerMobile})` : (heroBgBanner ? `url(${heroBgBanner})` : 'none')
       }}></div>
@@ -770,9 +770,51 @@ export default function Hero({ heroImages, heroBgBanner, heroBgBannerMobile, all
           if (typeof currentImg === 'string' && currentImg.trim().startsWith('{')) {
             try { parsedImg = JSON.parse(currentImg); } catch (e) { }
           }
-          const imgSrc = typeof parsedImg === 'string' ? parsedImg : (parsedImg?.url || '')
           const targetProduct = getProductForHeroImage(currentImg)
           const targetUrl = targetProduct ? `/product/${targetProduct.id}` : null
+
+          // Helper to clean color names
+          const cleanColor = (c) => c ? c.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim().toLowerCase() : '';
+
+          // Resolve product colors array safely
+          const colorsArr = Array.isArray(targetProduct?.colors)
+            ? targetProduct.colors
+            : (typeof targetProduct?.colors === 'string'
+              ? targetProduct.colors.split(',').map(c => c.trim())
+              : []);
+
+          // Resolve default color
+          const defaultColorName = targetProduct?.default_color
+            ? cleanColor(targetProduct.default_color)
+            : (colorsArr.length > 0 ? cleanColor(colorsArr[0]) : '');
+
+          // Resolve variants safely (parse if stringified JSON)
+          let resolvedVariants = targetProduct?.variants || [];
+          if (typeof resolvedVariants === 'string') {
+            try {
+              resolvedVariants = JSON.parse(resolvedVariants);
+            } catch (e) {
+              resolvedVariants = [];
+            }
+          }
+
+          // Find the first variant matching default color that has images
+          const defaultVariant = (targetProduct && Array.isArray(resolvedVariants))
+            ? resolvedVariants.find(v => cleanColor(v.color) === defaultColorName && Array.isArray(v.images) && v.images.length > 0)
+            : null;
+
+          const customizerImageUrl = typeof parsedImg === 'string' ? parsedImg : (parsedImg?.url || '');
+          const firstSelectedImage = customizerImageUrl
+            ? customizerImageUrl
+            : (defaultVariant
+              ? defaultVariant.images[0]
+              : (targetProduct?.image
+                ? targetProduct.image
+                : ((targetProduct && Array.isArray(targetProduct.images) && targetProduct.images.length > 0)
+                  ? targetProduct.images[0]
+                  : '')));
+
+          const imgSrc = firstSelectedImage
           const badge = cardBadges[i % cardBadges.length]
 
           return (
@@ -817,7 +859,7 @@ export default function Hero({ heroImages, heroBgBanner, heroBgBannerMobile, all
                         left: 0,
                         width: '100%',
                         height: '100%',
-                        objectFit: 'contain',
+                        objectFit: 'cover',
                         objectPosition: 'center center',
                         backgroundColor: '#ffffff',
                       }}
@@ -829,7 +871,7 @@ export default function Hero({ heroImages, heroBgBanner, heroBgBannerMobile, all
                     <div className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-purple-600 flex items-center justify-center text-white shrink-0">
                       <Zap className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-white text-white" />
                     </div>
-                    <span className="tracking-wider text-[#161616] uppercase font-extrabold">{badge.text}</span>
+                    <span className="tracking-wider text-[#161616] uppercase font-extrabold">{targetProduct?.tag || badge.text}</span>
                   </div>
                 </div>
               </div>

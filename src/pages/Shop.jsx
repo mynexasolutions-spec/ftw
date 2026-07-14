@@ -5,8 +5,9 @@ import { useWishlist } from '../context/WishlistContext'
 import { useAuth } from '../context/AuthContext'
 import { toast } from 'react-hot-toast'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getProducts, getProductRating, getCategories } from '../lib/supabase'
-import { ShoppingBag, Eye, Upload, Palette, Calculator, Check, ArrowRight, ShieldAlert, Heart, SlidersHorizontal, X, Star, Zap, Gamepad2, Swords, Target, Trophy, Laptop, Crown, Flame, Sparkles } from 'lucide-react'
+import { getProducts, getProductRating, getProductReviewCount, getCategories } from '../lib/supabase'
+import { ChevronLeft, ChevronRight, Search, ShoppingBag, Eye, Upload, Palette, Calculator, Check, ArrowRight, ShieldAlert, Heart, SlidersHorizontal, X, Star, Zap, Gamepad2, Swords, Target, Trophy, Laptop, Crown, Flame, Sparkles } from 'lucide-react'
+import Loader from '../components/Loader'
 
 // Full dataset for filters
 const DATASET = [
@@ -80,6 +81,55 @@ const DATASET = [
   }
 ]
 
+const resolveColorHex = (colorStr) => {
+  if (!colorStr) return '#CCCCCC';
+  const hexMatch = colorStr.match(/#([0-9a-fA-F]{3,6})/);
+  if (hexMatch) return `#${hexMatch[1]}`;
+  const clean = colorStr.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim().toLowerCase();
+  const COLOR_MAP = {
+    'black': '#161616',
+    'white': '#FFFFFF',
+    'charcoal': '#4A4A4A',
+    'lime': '#A3E635',
+    'beige': '#E6D3B3',
+    'cream': '#F5F2E9',
+    'grey': '#888888',
+    'blue': '#3B82F6',
+    'sakura pink': '#FFC0CB',
+    'lavender': '#E6E6FA',
+    'navy': '#1E3A8A',
+    'acid purple': '#583F72',
+    'cyber blue': '#00E5FF',
+    'butter yellow': '#FDE047',
+    'brown': '#8B4513'
+  };
+  if (COLOR_MAP[clean]) return COLOR_MAP[clean];
+  for (const key in COLOR_MAP) {
+    if (clean.includes(key)) return COLOR_MAP[key];
+  }
+  return '#CCCCCC';
+};
+
+const getBackgroundStyle = (colorStr) => {
+  if (!colorStr) return { backgroundColor: '#CCCCCC' };
+  const separators = ['+', '/', ' and '];
+  let parts = [];
+  for (const sep of separators) {
+    if (colorStr.includes(sep)) {
+      parts = colorStr.split(sep).map(s => s.trim());
+      break;
+    }
+  }
+  if (parts.length > 1) {
+    const hex1 = resolveColorHex(parts[0]);
+    const hex2 = resolveColorHex(parts[1]);
+    return {
+      background: `linear-gradient(135deg, ${hex1} 50%, ${hex2} 50%)`
+    };
+  }
+  return { backgroundColor: resolveColorHex(colorStr) };
+};
+
 const SHOP_PRODUCT_STYLES = [
   { id: 'regular', name: 'Regular Tee', shortName: 'Regular', price: 380, image: '/images/Regular-T.png' },
   { id: 'oversize', name: 'Oversize Tee', shortName: 'Oversize', price: 450, image: '/images/oversize T.png' },
@@ -94,6 +144,18 @@ export default function Shop() {
   const searchQuery = searchParams.get('search') || ''
   const { addToCart } = useCart()
   const { toggleWishlist, isInWishlist } = useWishlist()
+
+  const categoryScrollRef = useRef(null)
+
+  const scrollCategories = (direction) => {
+    if (categoryScrollRef.current) {
+      const scrollAmount = 250
+      categoryScrollRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      })
+    }
+  }
 
   // Dynamic Products List
   const [productsList, setProductsList] = useState([])
@@ -161,13 +223,22 @@ export default function Shop() {
 
   // Derive unique sizes and colors dynamically from productsList
   const uniqueSizes = new Set()
-  const uniqueColors = new Set()
+  const uniqueColorsMap = new Map() // cleanName -> originalName
   productsList.forEach(p => {
     const sizes = Array.isArray(p.sizes) ? p.sizes : (p.sizes ? String(p.sizes).split(',').map(s => s.trim()) : [])
     const colors = Array.isArray(p.colors) ? p.colors : (p.colors ? String(p.colors).split(',').map(c => c.trim()) : [])
     sizes.forEach(s => { if (s) uniqueSizes.add(s) })
-    colors.forEach(c => { if (c) uniqueColors.add(c) })
+    colors.forEach(c => {
+      if (c) {
+        const clean = c.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim().toLowerCase()
+        // If color has hex code, prefer it. Otherwise keep the first match.
+        if (!uniqueColorsMap.has(clean) || c.includes('#')) {
+          uniqueColorsMap.set(clean, c)
+        }
+      }
+    })
   })
+  const uniqueColors = Array.from(uniqueColorsMap.values())
 
   const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL']
   const sortedSizes = Array.from(uniqueSizes).sort((a, b) => {
@@ -215,11 +286,19 @@ export default function Shop() {
     }
 
     // Category check
-    if (activeTab !== 'all' && p.category !== activeTab) return false
+    if (activeTab !== 'all') {
+      const cleanProdCat = (p.category || '').toLowerCase().replace(/[\s-_]+/g, '-').trim()
+      const cleanActiveTab = activeTab.toLowerCase().replace(/[\s-_]+/g, '-').trim()
+      if (cleanProdCat !== cleanActiveTab) return false
+    }
     // Size check
     if (filterSizes.length > 0 && !pSizes.some(s => filterSizes.includes(s))) return false
     // Color check
-    if (filterColors.length > 0 && !pColors.some(c => filterColors.includes(c))) return false
+    if (filterColors.length > 0) {
+      const cleanFilterColors = filterColors.map(fc => fc.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim().toLowerCase())
+      const cleanProductColors = pColors.map(pc => pc.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim().toLowerCase())
+      if (!cleanProductColors.some(c => cleanFilterColors.includes(c))) return false
+    }
     // Price check
     if (p.price > filterPrice) return false
     // Availability check
@@ -249,7 +328,7 @@ export default function Shop() {
       <div className="space-y-6">
         {/* Filter Size */}
         <div>
-          <span className="text-[12.5px] text-dark font-mono uppercase tracking-[0.15em] font-black block mb-3">Size</span>
+          <span className="text-[15.5px] text-dark font-sans uppercase tracking-wider font-black block mb-3">Size</span>
           <div className="flex flex-wrap gap-1.5">
             {availableSizes.map(sz => {
               const isSelected = sz === 'all' ? filterSizes.length === 0 : filterSizes.includes(sz);
@@ -265,9 +344,9 @@ export default function Shop() {
                       )
                     }
                   }}
-                  className={`w-10 h-10 border text-[11.5px] font-mono rounded-xl transition-all cursor-pointer flex items-center justify-center font-bold ${isSelected
+                  className={`w-10 h-10 border text-[13px] font-mono rounded-xl transition-all cursor-pointer flex items-center justify-center font-bold ${isSelected
                     ? 'bg-dark border-dark text-[#D6FF40] shadow-md'
-                    : 'border-[#E8E5DC] text-dark hover:bg-[#F5F3EC] hover:border-dark/20 bg-white font-extrabold'
+                    : 'border-[#E8E5DC] text-dark hover:bg-[#F5F3EC] hover:border-dark/25 bg-white font-black'
                     }`}
                 >
                   {sz === 'all' ? 'All' : sz}
@@ -279,20 +358,11 @@ export default function Shop() {
 
         {/* Filter Color */}
         <div>
-          <span className="text-[12.5px] text-dark font-mono uppercase tracking-[0.15em] font-black block mb-3">Color</span>
+          <span className="text-[15.5px] text-dark font-sans uppercase tracking-wider font-black block mb-3">Color</span>
           <div className="flex flex-wrap gap-2">
             {availableColors.map(col => {
-              const colorMap = {
-                Black: '#161616',
-                White: '#FFFFFF',
-                Charcoal: '#4A4A4A',
-                Lime: '#A3E635',
-                Beige: '#E6D3B3',
-                Cream: '#F5F2E9'
-              }
-              const displayName = col.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '')
-              const hexMatch = col.match(/#([0-9a-fA-F]{3,6})/)
-              const hex = hexMatch ? `#${hexMatch[1]}` : (colorMap[displayName] || null)
+              const displayName = col.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '');
+              const bgStyle = getBackgroundStyle(col);
               const isSelected = col === 'all' ? filterColors.length === 0 : filterColors.includes(col);
 
               return (
@@ -307,15 +377,15 @@ export default function Shop() {
                       )
                     }
                   }}
-                  className={`flex items-center gap-1.5 px-3 py-2 border text-[10.5px] font-mono uppercase tracking-wider rounded-xl transition-all cursor-pointer font-bold ${isSelected
+                  className={`flex items-center gap-1.5 px-3 py-2 border text-[12px] font-mono uppercase tracking-wider rounded-xl transition-all cursor-pointer font-bold ${isSelected
                     ? 'bg-dark border-dark text-[#D6FF40] font-black shadow-sm'
-                    : 'border-[#E8E5DC] text-dark hover:bg-[#F5F3EC] bg-white font-extrabold'
+                    : 'border-[#E8E5DC] text-dark hover:bg-[#F5F3EC] bg-white font-black'
                     }`}
                 >
-                  {col !== 'all' && hex && (
+                  {col !== 'all' && (
                     <span
-                      style={{ backgroundColor: hex }}
-                      className={`w-2.5 h-2.5 rounded-full border inline-block shrink-0 ${isSelected ? 'border-white/50' : 'border-black/10'
+                      style={bgStyle}
+                      className={`w-3.5 h-3.5 rounded-full border inline-block shrink-0 ${isSelected ? 'border-white/50' : 'border-neutral-300'
                         }`}
                     />
                   )}
@@ -329,8 +399,8 @@ export default function Shop() {
         {/* Filter Price */}
         <div>
           <div className="flex justify-between items-center mb-3">
-            <span className="text-[12.5px] text-dark font-mono uppercase tracking-[0.15em] font-black">Max Price</span>
-            <span className="text-[13.5px] text-dark font-mono font-black">₹{filterPrice.toLocaleString()}</span>
+            <span className="text-[15.5px] text-dark font-sans uppercase tracking-wider font-black">Max Price</span>
+            <span className="text-[15px] text-dark font-mono font-black">₹{filterPrice.toLocaleString()}</span>
           </div>
           <input
             type="range"
@@ -342,14 +412,14 @@ export default function Shop() {
             className="w-full accent-dark cursor-pointer h-1.5 rounded-lg appearance-none bg-[#E8E5DC]"
           />
           <div className="flex justify-between mt-1.5">
-            <span className="text-[10.5px] font-mono text-dark font-bold">₹{minProductPrice}</span>
-            <span className="text-[10.5px] font-mono text-dark font-bold">₹{maxProductPrice}</span>
+            <span className="text-[11.5px] font-mono text-dark font-black">₹{minProductPrice}</span>
+            <span className="text-[11.5px] font-mono text-dark font-black">₹{maxProductPrice}</span>
           </div>
         </div>
 
         {/* Availability */}
         <div>
-          <span className="text-[12.5px] text-dark font-mono uppercase tracking-[0.15em] font-black block mb-3">Availability</span>
+          <span className="text-[15.5px] text-dark font-sans uppercase tracking-wider font-black block mb-3">Availability</span>
           <div className="flex flex-col gap-1.5">
             {[
               { key: 'all', label: 'Show All', icon: '◉' },
@@ -361,11 +431,11 @@ export default function Shop() {
                 onClick={() => setFilterAvailability(opt.key)}
                 className={`w-full py-2.5 px-3.5 border text-left rounded-xl transition-all cursor-pointer flex items-center gap-2 font-bold ${filterAvailability === opt.key
                   ? 'bg-dark border-dark text-[#D6FF40] font-black shadow-sm'
-                  : 'border-[#E8E5DC] text-dark hover:bg-[#F5F3EC] bg-white font-extrabold'
+                  : 'border-[#E8E5DC] text-dark hover:bg-[#F5F3EC] bg-white font-black'
                   }`}
               >
-                <span className="text-[11.5px] font-mono font-black">{opt.icon}</span>
-                <span className="text-[11.5px] font-mono uppercase tracking-wider font-black">{opt.label}</span>
+                <span className="text-[12.5px] font-mono font-black">{opt.icon}</span>
+                <span className="text-[12.5px] font-mono uppercase tracking-wider font-black">{opt.label}</span>
               </button>
             ))}
           </div>
@@ -377,20 +447,20 @@ export default function Shop() {
   return (
     <div className="bg-[#FAF9F6] text-[#161616] min-h-screen relative overflow-hidden font-sans bg-grain pb-12">
 
-      {/* Large Decorative Gaming Backdrop Icons (Reduced to 5, spaced further apart) */}
-      <div className="absolute right-[2%] top-[22%] opacity-[0.2] md:opacity-[0.28] text-purple-600 pointer-events-none z-0">
+      {/* Large Decorative Gaming Backdrop Icons (Fixed pixel offsets for consistent spacing) */}
+      <div className="absolute right-[2%] top-[200px] opacity-[0.2] md:opacity-[0.28] text-purple-600 pointer-events-none z-0">
         <Gamepad2 className="w-[80px] h-[80px] md:w-[150px] md:h-[150px] rotate-[15deg]" />
       </div>
-      <div className="absolute left-[2%] top-[38%] opacity-[0.16] md:opacity-[0.24] text-purple-600 pointer-events-none z-0">
+      <div className="absolute left-[2%] top-[500px] opacity-[0.16] md:opacity-[0.24] text-purple-600 pointer-events-none z-0">
         <Swords className="w-[70px] h-[70px] md:w-[130px] md:h-[130px] rotate-[-20deg]" />
       </div>
-      <div className="absolute right-[2%] top-[55%] opacity-[0.18] md:opacity-[0.26] text-purple-600 pointer-events-none z-0">
+      <div className="absolute right-[2%] top-[850px] opacity-[0.18] md:opacity-[0.26] text-purple-600 pointer-events-none z-0">
         <Target className="w-[75px] h-[75px] md:w-[140px] md:h-[140px] rotate-[35deg]" />
       </div>
-      <div className="absolute left-[2%] top-[72%] opacity-[0.16] md:opacity-[0.24] text-purple-600 pointer-events-none z-0">
+      <div className="absolute left-[2%] top-[1200px] opacity-[0.16] md:opacity-[0.24] text-purple-600 pointer-events-none z-0">
         <Trophy className="w-[70px] h-[70px] md:w-[130px] md:h-[130px] rotate-[-10deg]" />
       </div>
-      <div className="absolute right-[2%] top-[88%] opacity-[0.15] md:opacity-[0.22] text-purple-600 pointer-events-none z-0">
+      <div className="absolute right-[2%] top-[1550px] opacity-[0.15] md:opacity-[0.22] text-purple-600 pointer-events-none z-0">
         <Sparkles className="w-[70px] h-[70px] md:w-[130px] md:h-[130px] rotate-[25deg]" />
       </div>
 
@@ -447,6 +517,20 @@ export default function Shop() {
             flex-direction: column;
             justify-content: space-between;
             clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px), 0 18px);
+          }
+          .hud-card-price-pill {
+            background: #7C3AED;
+            color: #FFFFFF;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 900;
+            font-size: 13px;
+            padding: 3px 10px;
+            border-radius: 6px;
+            display: inline-block;
+          }
+          .hud-card-price-pill.purple {
+            background: #F3E8FF;
+            color: #6B21A8;
           }
           .hud-shop-card::before {
             content: '';
@@ -513,15 +597,10 @@ export default function Shop() {
 
       <div className="shop-scanlines" />
 
-      {/* Decorative vertical texts */}
-      <div className="absolute left-6 top-[30%] rotate-[-90deg] origin-left text-[9px] font-mono text-gray-400 tracking-[0.3em] uppercase select-none pointer-events-none">
-        FTW // WEAPONS_CATALOG // DEPOT
-      </div>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 pb-12 sm:pt-8 sm:pb-16 relative z-10 text-dark">
 
         {/* Page Header */}
-        <div className="mb-8 sm:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="mb-5 sm:mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <h1 className="hud-shop-title text-4xl sm:text-5xl">
               THE <span>CATALOG</span>
@@ -531,34 +610,79 @@ export default function Shop() {
         </div>
 
         {/* Category Navigation Tabs */}
-        <div className="w-full mb-8 sm:mb-10">
-          <div className="flex overflow-x-auto gap-2 pb-1 scroll-smooth no-scrollbar select-none border-b border-purple-500/15">
-            {[
-              { key: 'all', label: 'All Catalog' },
-              ...dbCategories
-                .filter(cat => !['custom dtf', 'dtf', 'custom+dtf'].includes(cat.name?.toLowerCase()))
-                .map(cat => ({ key: cat.name, label: cat.name })),
-              { key: 'Custom DTF', label: '✦ CUSTOM CUSTOMIZER' }
-            ].map(tab => {
-              const isTabActive = activeTab === tab.key || (tab.key === 'Custom DTF' && (activeTab === 'dtf' || activeTab === 'Custom+DTF'));
-              const isDTF = tab.key === 'Custom DTF';
-              return (
+        {(() => {
+          const swiperCategories = [
+            { key: 'all', label: 'All Catalog' },
+            ...dbCategories
+              .filter(cat => !['custom dtf', 'dtf', 'custom+dtf'].includes(cat.name?.toLowerCase()))
+              .map(cat => ({ key: cat.name, label: cat.name }))
+          ];
+          const dtfTab = { key: 'Custom DTF', label: '✦ CUSTOM CUSTOMIZER' };
+          const isDtfActive = activeTab === 'Custom DTF' || activeTab === 'dtf' || activeTab === 'Custom+DTF';
+          const hasManyCategories = swiperCategories.length > 7;
+
+          return (
+            <div className="w-full mb-5 sm:mb-6 flex flex-col md:flex-row items-stretch md:items-center gap-3 bg-[#FAF9F6]/60 backdrop-blur-xs p-2 rounded-2xl border border-cream3/80 shadow-2xs">
+              {/* Left Scrollable Container */}
+              <div className="flex-1 min-w-0 relative">
+                {hasManyCategories && (
+                  <button
+                    type="button"
+                    onClick={() => scrollCategories('left')}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-20 p-2 bg-white border border-neutral-200 hover:border-dark hover:bg-dark hover:text-cream text-dark rounded-full shadow-md transition-all cursor-pointer hidden md:flex items-center justify-center"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                )}
+
+                <div
+                  ref={categoryScrollRef}
+                  className="flex overflow-x-auto gap-2 pb-1 md:pb-0 scroll-smooth no-scrollbar select-none px-1"
+                >
+                  {swiperCategories.map(tab => {
+                    const isTabActive = activeTab === tab.key;
+                    return (
+                      <button
+                        key={tab.key}
+                        onClick={() => setTab(tab.key)}
+                        className={`px-4 sm:px-5 py-2.5 text-[12.5px] font-mono font-black uppercase tracking-wider transition-all duration-200 shrink-0 cursor-pointer rounded-xl whitespace-nowrap hover:scale-[1.02] ${isTabActive
+                          ? 'bg-dark text-primary shadow-xs ring-1 ring-dark'
+                          : 'bg-[#FAF9F6]/40 text-dark2/60 border border-cream3/60 hover:bg-white hover:border-dark/30 hover:text-dark shadow-3xs'
+                          }`}
+                      >
+                        {tab.label}
+                      </button>
+                    )
+                  })}
+                </div>
+
+                {hasManyCategories && (
+                  <button
+                    type="button"
+                    onClick={() => scrollCategories('right')}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-20 p-2 bg-white border border-neutral-200 hover:border-dark hover:bg-dark hover:text-cream text-dark rounded-full shadow-md transition-all cursor-pointer hidden md:flex items-center justify-center"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+
+              {/* Fixed Right "CUSTOM CUSTOMIZER" Tab */}
+              <div className="shrink-0 flex items-center pl-2 md:border-l border-cream3/60">
                 <button
-                  key={tab.key}
-                  onClick={() => setTab(tab.key)}
-                  className={`px-4 sm:px-5 py-3 text-[12px] sm:text-[13px] font-mono font-black uppercase tracking-widest transition-all duration-200 shrink-0 cursor-pointer border-b-2 whitespace-nowrap ${isTabActive
-                    ? isDTF
-                      ? 'border-purple-600 text-purple-600 bg-purple-500/5'
-                      : 'border-dark text-dark bg-dark/5'
-                    : 'border-transparent text-gray-400 hover:text-dark'
+                  type="button"
+                  onClick={() => setTab(dtfTab.key)}
+                  className={`w-full md:w-auto px-5 py-2.5 text-[12.5px] font-mono font-black uppercase tracking-wider transition-all duration-200 cursor-pointer rounded-xl whitespace-nowrap hover:scale-[1.02] ${isDtfActive
+                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-500/25 border-none'
+                    : 'bg-white text-purple-600 border border-purple-500/25 hover:bg-purple-50 hover:border-purple-500/40 shadow-3xs'
                     }`}
                 >
-                  {tab.label}
+                  {dtfTab.label}
                 </button>
-              )
-            })}
-          </div>
-        </div>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Active Filter Chips */}
         {(filterSizes.length > 0 || filterColors.length > 0 || filterPrice < maxProductPrice || filterAvailability !== 'all' || searchQuery) && (
@@ -740,7 +864,7 @@ export default function Shop() {
           </div>
         ) : loadingProducts ? (
           <div className="text-center py-28 font-sans text-dark2/50 text-xs">
-            <div className="w-8 h-8 border-2 border-purple-500/10 border-t-purple-500 rounded-full animate-spin mx-auto mb-4" />
+            <Loader size="medium" className="mb-4" />
             <span className="font-mono uppercase tracking-widest text-[10px]">Loading catalog...</span>
           </div>
         ) : (
@@ -749,10 +873,14 @@ export default function Shop() {
             {/* Side Filters Panel (Desktop only) */}
             <div className="hidden lg:block lg:col-span-1 hud-card-border">
               <div className="hud-shop-card p-5">
-                
-                <div className="pb-3 mb-4 border-b border-[#EDEADE] flex items-center justify-between">
-                  <span className="text-[12.5px] text-dark font-mono uppercase tracking-widest font-black">Refine Results</span>
-                  <span className="hud-hex font-mono text-[7px] text-purple-600/50">0xFILTER</span>
+
+                <div className="pb-3.5 mb-5 border-b border-[#E8E5DC] flex items-center justify-between select-none">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-purple-500/5 border border-purple-500/10 flex items-center justify-center text-purple-600 shrink-0">
+                      <SlidersHorizontal className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-[13px] text-dark font-sans uppercase tracking-widest font-black block">Refine Results</span>
+                  </div>
                 </div>
                 {renderFiltersContent()}
               </div>
@@ -770,9 +898,21 @@ export default function Shop() {
               </button>
               {filteredProducts.length === 0 ? (
                 <div className="hud-card-border max-w-md mx-auto">
-                  <div className="hud-shop-card text-center py-20 px-5">
-                    <span className="text-3xl block mb-4">🔍</span>
-                    <p className="text-xs text-dark2/50 font-mono uppercase">No products match your filters. Try adjusting your selection.</p>
+                  <div className="hud-shop-card text-center py-16 px-5 flex flex-col items-center justify-center">
+                    <Search className="w-10 h-10 text-purple-600 mb-4 animate-pulse" />
+                    <p className="text-xs text-dark font-mono font-black uppercase tracking-wider mb-5">No products match your filters. Try adjusting your selection.</p>
+                    <button
+                      onClick={() => {
+                        setFilterSizes([])
+                        setFilterColors([])
+                        setFilterPrice(maxProductPrice)
+                        setFilterAvailability('all')
+                        setSearchParams({})
+                      }}
+                      className="px-6 py-2.5 bg-dark text-primary hover:bg-[#8B5CF6] hover:text-white transition-all text-xs font-mono font-black uppercase tracking-widest rounded-xl cursor-pointer border-none shadow-md hover:scale-[1.03]"
+                    >
+                      Clear All Filters
+                    </button>
                   </div>
                 </div>
               ) : (
@@ -796,8 +936,20 @@ export default function Shop() {
                       : ((product.variants || []).find(v => v.images && v.images.length > 0) || {});
 
                     const displayPrice = product.price !== undefined && product.price !== null && product.price !== 0 ? product.price : (firstVariantWithPrice.price || 0)
-                    const displayOriginalPrice = product.originalPrice ? product.originalPrice : firstVariantWithPrice.originalPrice
-                    const displayImage = product.image ? product.image : ((firstVariantWithImages.images && firstVariantWithImages.images[0]) || '/images/1.1.jpeg')
+                    const displayOriginalPrice = product.originalPrice ? Number(product.originalPrice) : null
+                    // Helper to resolve display image (front)
+                    const cleanColor = (c) => c ? c.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim().toLowerCase() : '';
+                    const colorsArr = Array.isArray(product.colors) ? product.colors : (typeof product.colors === 'string' ? product.colors.split(',').map(c => c.trim()) : []);
+                    const defaultColorName = product.default_color ? cleanColor(product.default_color) : (colorsArr.length > 0 ? cleanColor(colorsArr[0]) : '');
+                    let resolvedVariants = product.variants || [];
+                    if (typeof resolvedVariants === 'string') {
+                      try { resolvedVariants = JSON.parse(resolvedVariants); } catch (e) { resolvedVariants = []; }
+                    }
+                    const defaultVariant = Array.isArray(resolvedVariants) ? resolvedVariants.find(v => cleanColor(v.color) === defaultColorName && Array.isArray(v.images) && v.images.length > 0) : null;
+
+                    const displayImage = (defaultVariant && defaultVariant.images[0])
+                      ? defaultVariant.images[0]
+                      : (product.image ? product.image : ((firstVariantWithImages.images && firstVariantWithImages.images[0]) || null))
 
                     return (
                       <motion.div
@@ -809,28 +961,30 @@ export default function Shop() {
                       >
                         <div className="hud-shop-card">
 
-                          {/* Telemetry Hex tag */}
-                          <span className="hud-hex hud-hex-tl">ITEM_REF_{product.id.substring(0,5).toUpperCase()}</span>
-                          <span className="hud-hex hud-hex-tr">0x{displayPrice.toString(16).toUpperCase()}</span>
-
-                          <Link to={`/product/${product.id}`} className="relative aspect-[4/5] bg-[#F5F3EC] overflow-hidden block border-b border-purple-500/10">
-                            <img
-                              src={displayImage}
-                              alt={product.name}
-                              className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-700"
-                            />
+                          <Link to={`/product/${product.id}`} className="relative aspect-[4/5] bg-[#F5F3EC] overflow-hidden flex items-center justify-center border-b border-purple-500/10">
+                            {displayImage ? (
+                              <img
+                                src={displayImage}
+                                alt={product.name}
+                                className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-700"
+                              />
+                            ) : (
+                              <div className="text-xs font-bold font-sans text-dark/30 uppercase text-center px-4">No Image</div>
+                            )}
                             {product.tag && (
-                              <span className={`absolute top-3 left-3 text-[8px] font-mono uppercase tracking-widest font-black px-2.5 py-1.5 rounded-lg shadow-sm ${product.tag.includes('OFF') || product.tag.includes('Sale') ? 'bg-[#D6FF40] text-dark' : 'bg-dark text-[#D6FF40]'
+                              <span className={`absolute top-3 left-3 text-[10px] font-sans uppercase tracking-widest font-black px-3 py-1.5 rounded-lg shadow-md ${product.tag.includes('OFF') || product.tag.includes('Sale') ? 'bg-[#D6FF40] text-dark' : 'bg-dark text-[#D6FF40]'
                                 }`}>
                                 {product.tag}
                               </span>
                             )}
 
                             {/* Rating Badge */}
-                            <div className="absolute bottom-3 left-3 bg-white/85 backdrop-blur-md px-2.5 py-1 rounded-lg text-[9px] font-mono font-bold text-dark border border-white/60 flex items-center gap-1 shadow-sm z-10">
-                              <Star className="w-3 h-3 fill-purple-600 text-purple-600 shrink-0" />
-                              <span>{getProductRating(product.name) || '0.0'}</span>
-                            </div>
+                            {getProductRating(product.name) > 0 && (
+                              <div className="absolute bottom-3 left-3 bg-white/85 backdrop-blur-md px-2.5 py-1 rounded-lg text-[10px] font-mono font-black text-dark border border-white/60 flex items-center gap-1 shadow-sm z-10">
+                                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
+                                <span>{getProductRating(product.name).toFixed(1)}</span>
+                              </div>
+                            )}
 
                             {/* Wishlist Button */}
                             <button
@@ -849,7 +1003,7 @@ export default function Shop() {
                               <Heart className={`w-3.5 h-3.5 transition-colors ${isInWishlist(product.id) ? 'fill-purple-600 text-purple-600' : 'text-dark/50'}`} />
                             </button>
 
-                            {!product.available && (
+                    {!product.available && (
                               <div className="absolute inset-0 bg-white/55 backdrop-blur-[2px] flex items-center justify-center">
                                 <span className="bg-dark text-[#D6FF40] px-3 py-1.5 rounded-lg text-[9px] uppercase font-mono tracking-widest font-black shadow-md">SOLD OUT</span>
                               </div>
@@ -862,87 +1016,126 @@ export default function Shop() {
                               <div className="flex justify-between items-start gap-2 mb-2">
                                 <h3 className="font-sans text-[13px] sm:text-base font-bold text-dark leading-snug">{product.name}</h3>
                                 <div className="flex flex-col items-end shrink-0">
-                                  <span className="text-[13px] sm:text-base font-mono font-black text-dark">₹{displayPrice}</span>
+                                  <div className="hud-card-price-pill purple text-[12px] sm:text-[14px]">
+                                    ₹{displayPrice}
+                                  </div>
                                   {displayOriginalPrice && (
-                                    <span className="text-[10px] sm:text-xs line-through font-mono text-gray-400">₹{displayOriginalPrice}</span>
+                                    <span className="text-[10px] sm:text-xs line-through font-mono text-gray-400 mt-1">₹{displayOriginalPrice}</span>
                                   )}
                                 </div>
                               </div>
 
                               {/* Color Swatches */}
                               <div className="flex items-center gap-1.5 mb-3">
-                                {(Array.isArray(product.colors)
-                                  ? product.colors
-                                  : (product.colors ? String(product.colors).split(',').map(c => c.trim()) : [])
-                                ).slice(0, 6).map((col, ci) => {
-                                  const cName = col.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim()
-                                  const hexMatch = col.match(/#([0-9a-fA-F]{3,6})/)
-                                  const colorMap = { Black: '#161616', White: '#FAFAFA', Charcoal: '#4A4A4A', Lime: '#A3E635', Beige: '#E6D3B3', Cream: '#F5F2E9' }
-                                  const bg = hexMatch ? `#${hexMatch[1]}` : (colorMap[cName] || '#ccc')
-                                  return (
-                                    <span
-                                      key={ci}
-                                      title={cName}
-                                      style={{ backgroundColor: bg }}
-                                      className="w-3.5 h-3.5 rounded-full border border-black/10 shrink-0 inline-block"
-                                    />
-                                  )
-                                })}
+                                {(() => {
+                                  let colorsList = Array.isArray(product.colors)
+                                    ? [...product.colors]
+                                    : (product.colors ? String(product.colors).split(',').map(c => c.trim()) : []);
+                                  const cleanColor = (c) => c ? c.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim().toLowerCase() : '';
+
+                                  if (product.is_combo && colorsList.length === 2) {
+                                    const hex1 = resolveColorHex(colorsList[0]);
+                                    const hex2 = resolveColorHex(colorsList[1]);
+                                    const c1Name = colorsList[0].replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim();
+                                    const c2Name = colorsList[1].replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim();
+                                    return (
+                                      <span
+                                        title={`${c1Name} + ${c2Name} Combo`}
+                                        style={{ background: `linear-gradient(135deg, ${hex1} 50%, ${hex2} 50%)` }}
+                                        className="w-4 h-4 sm:w-5 sm:h-5 rounded-full border border-neutral-300 shrink-0 inline-block shadow-inner hover:scale-110 transition-transform"
+                                      />
+                                    );
+                                  }
+
+                                  if (product.default_color) {
+                                    const defClean = product.default_color.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim().toLowerCase();
+                                    const matchedIndex = colorsList.findIndex(c => cleanColor(c) === defClean);
+                                    if (matchedIndex > -1) {
+                                      const [matchedColor] = colorsList.splice(matchedIndex, 1);
+                                      colorsList = [matchedColor, ...colorsList];
+                                    }
+                                  }
+
+                                  return colorsList.slice(0, 5).map((col, ci) => {
+                                    const cName = col.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim();
+                                    const bgStyle = getBackgroundStyle(col);
+                                    return (
+                                      <span
+                                        key={ci}
+                                        title={cName}
+                                        style={bgStyle}
+                                        className="w-4 h-4 sm:w-5 sm:h-5 rounded-full border border-neutral-300 shrink-0 inline-block shadow-inner hover:scale-110 transition-transform"
+                                      />
+                                    );
+                                  });
+                                })()}
                               </div>
                             </div>
 
                             {/* CTA */}
                             <div className="mt-1 min-h-[36px] sm:min-h-[40px]">
                               {selectingSizeProduct === product.id ? (
-                                <div className="space-y-1.5 text-center">
-                                  <span className="text-[11px] text-gray-500 font-mono uppercase tracking-widest block">Pick a Size</span>
-                                  <div className="flex flex-wrap gap-1 justify-center">
+                                <div className="space-y-2 text-center select-none">
+                                  <span className="text-[10px] text-purple-600 font-sans uppercase font-black tracking-widest block">Select Size</span>
+                                  <div className="flex flex-wrap gap-1.5 justify-center items-center">
                                     {(Array.isArray(product.sizes) ? product.sizes : (product.sizes ? String(product.sizes).split(',').map(s => s.trim()) : [])).map(sz => (
                                       <button
                                         key={sz}
                                         onClick={() => {
-                                          addToCart(product, sz)
-                                          toast.success(`${product.name} [${sz}] added!`, { style: { background: '#161616', color: '#FAF9F6' } })
+                                          let finalColor = product.default_color || (product.colors && product.colors[0]) || 'Standard'
+                                          if (product.is_combo && product.colors && product.colors.length === 2) {
+                                            const c1 = product.colors[0].replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim()
+                                            const c2 = product.colors[1].replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim()
+                                            finalColor = `${c1} + ${c2}`
+                                          }
+                                          addToCart(product, sz, finalColor)
+                                          toast.success(`${product.name} [Size ${sz} / Color ${finalColor}] added!`, { style: { background: '#161616', color: '#FAF9F6' } })
                                           setSelectingSizeProduct(null)
                                         }}
-                                        className="h-7.5 px-3 border border-dark text-dark hover:bg-dark hover:text-[#D6FF40] transition-all text-[10px] font-mono font-black rounded-lg cursor-pointer bg-transparent"
+                                        className="h-8 min-w-[34px] px-2 bg-white border border-[#E8E5DC] text-dark hover:bg-dark hover:text-[#D6FF40] hover:border-dark transition-all duration-200 text-[11px] font-sans font-black rounded-xl cursor-pointer shadow-3xs flex items-center justify-center"
                                       >
                                         {sz}
                                       </button>
                                     ))}
                                     <button
                                       onClick={() => setSelectingSizeProduct(null)}
-                                      className="h-7.5 px-2 border border-dark/15 text-dark/30 hover:border-red-400 hover:text-red-400 transition-all text-[10px] font-mono font-bold rounded-lg cursor-pointer bg-transparent"
+                                      className="h-8 w-8 bg-red-50 border border-red-100 text-red-500 hover:bg-red-500 hover:text-white hover:border-transparent transition-all duration-200 text-[9px] rounded-xl cursor-pointer flex items-center justify-center"
                                     >
                                       ✕
                                     </button>
                                   </div>
                                 </div>
                               ) : product.available ? (
-                              <button
-                                onClick={() => {
-                                  const sizes = Array.isArray(product.sizes) ? product.sizes : (product.sizes ? String(product.sizes).split(',').map(s => s.trim()) : [])
-                                  if (sizes.length === 0) {
-                                    addToCart(product, 'M')
-                                    toast.success(`${product.name} added to bag!`, { style: { background: '#161616', color: '#FAF9F6' } })
-                                  } else {
-                                    setSelectingSizeProduct(product.id)
-                                  }
-                                }}
-                                className="w-full h-9 sm:h-10 px-2 bg-purple-600 text-white hover:bg-purple-700 transition-all duration-200 text-[11px] sm:text-[12px] font-mono font-black uppercase tracking-widest rounded-xl flex items-center justify-center gap-1.5 cursor-pointer border-none shadow-sm"
-                              >
-                                <ShoppingBag className="w-3.5 h-3.5" />
-                                Add to Bag
-                              </button>
-                            ) : (
-                              <button
-                                disabled
-                                className="w-full h-9 px-4 bg-[#F0EEE7] text-dark2/30 text-[9px] font-mono font-bold uppercase tracking-widest rounded-xl cursor-not-allowed flex items-center justify-center gap-1.5 border-none"
-                              >
-                                <ShieldAlert className="w-3.5 h-3.5" />
-                                No Stock
-                              </button>
-                            )}
+                                <button
+                                  onClick={() => {
+                                    const sizes = Array.isArray(product.sizes) ? product.sizes : (product.sizes ? String(product.sizes).split(',').map(s => s.trim()) : [])
+                                    if (sizes.length === 0) {
+                                      let finalColor = product.default_color || (product.colors && product.colors[0]) || 'Standard'
+                                      if (product.is_combo && product.colors && product.colors.length === 2) {
+                                        const c1 = product.colors[0].replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim()
+                                        const c2 = product.colors[1].replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim()
+                                        finalColor = `${c1} + ${c2}`
+                                      }
+                                      addToCart(product, 'M', finalColor)
+                                      toast.success(`${product.name} added to bag!`, { style: { background: '#161616', color: '#FAF9F6' } })
+                                    } else {
+                                      setSelectingSizeProduct(product.id)
+                                    }
+                                  }}
+                                  className="w-full h-9 sm:h-10 px-2 bg-purple-600 text-white hover:bg-purple-700 transition-all duration-200 text-[11px] sm:text-[12px] font-mono font-black uppercase tracking-widest rounded-xl flex items-center justify-center gap-1.5 cursor-pointer border-none shadow-sm"
+                                >
+                                  <ShoppingBag className="w-3.5 h-3.5" />
+                                  Add to Bag
+                                </button>
+                              ) : (
+                                <button
+                                  disabled
+                                  className="w-full h-9 px-4 bg-[#F0EEE7] text-dark2/30 text-[9px] font-mono font-bold uppercase tracking-widest rounded-xl cursor-not-allowed flex items-center justify-center gap-1.5 border-none"
+                                >
+                                  <ShieldAlert className="w-3.5 h-3.5" />
+                                  No Stock
+                                </button>
+                              )}
                             </div>
                           </div>
                         </div>

@@ -29,6 +29,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                     fontFamily: "'Space Grotesk', sans-serif",
                     fontSize: '0.88rem',
                     boxShadow: '0 10px 30px rgba(139, 92, 246, 0.08)',
+                    whiteSpace: 'nowrap',
+                    maxWidth: 'none',
                   },
                   success: {
                     style: {

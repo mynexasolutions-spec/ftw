@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-hot-toast'
+import Loader from '../components/Loader'
 import { openRazorpayCheckout } from '../lib/razorpay'
 import { insertOrder, getCoupons, getStoreSettings, getProducts, decrementProductStock } from '../lib/supabase'
 import {
@@ -78,6 +79,26 @@ const getColorHex = (colorName) => {
   }
 
   return '#0F0F0F'
+}
+
+const getColorBackgroundStyle = (colorStr) => {
+  if (!colorStr) return { backgroundColor: '#0F0F0F' }
+  const separators = ['+', '/', ' and ', '&']
+  let parts = []
+  for (const sep of separators) {
+    if (colorStr.includes(sep)) {
+      parts = colorStr.split(sep).map(s => s.trim())
+      break
+    }
+  }
+  if (parts.length > 1) {
+    const hex1 = getColorHex(parts[0])
+    const hex2 = getColorHex(parts[1])
+    return {
+      background: `linear-gradient(135deg, ${hex1} 50%, ${hex2} 50%)`
+    }
+  }
+  return { backgroundColor: getColorHex(colorStr) }
 }
 
 // ─── CONFETTI EFFECT ─────────────────────────────────────────────────────────
@@ -364,8 +385,15 @@ export default function Checkout() {
     }, 1200)
   }
 
-  const handleRazorpayPayment = () => {
+  const handleRazorpayPayment = async () => {
     const randomOrderId = `FTW-${Math.floor(100000 + Math.random() * 900000)}`
+
+    // Pre-save order as Unpaid to capture user checkout details securely
+    try {
+      await saveOrderToDB(randomOrderId, 'Unpaid')
+    } catch (err) {
+      console.error('Failed to pre-save checkout session order:', err)
+    }
 
     openRazorpayCheckout({
       keyId: RAZORPAY_KEY_ID,
@@ -380,6 +408,7 @@ export default function Checkout() {
         contact: formData.phone,
       },
       notes: {
+        db_order_id: randomOrderId,
         address: `${formData.address}, ${formData.city}, ${formData.state} - ${formData.zip}`,
         promo_code: appliedPromo?.code || 'none',
       },
@@ -388,19 +417,46 @@ export default function Checkout() {
         backdrop_color: '#0B0B0B',
       },
       onSuccess: async (response) => {
-        const rzpOrderId = response.razorpay_order_id || 'N/A'
-        setOrderId(randomOrderId)
         setIsPlacing(true)
         setPlaceStep(2)
-        await saveOrderToDB(randomOrderId, `Paid - Razorpay ID: ${rzpOrderId}`)
-        setTimeout(() => {
+        
+        try {
+          const verifyRes = await fetch('/api/razorpay-verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature
+            })
+          })
+
+          if (!verifyRes.ok) {
+            throw new Error('Payment signature verification failed.')
+          }
+
+          const verifyData = await verifyRes.json()
+          if (!verifyData.verified) {
+            throw new Error('Spoofed payment signature detected.')
+          }
+
+          const rzpOrderId = response.razorpay_order_id || 'N/A'
+          setOrderId(randomOrderId)
+          await saveOrderToDB(randomOrderId, `Paid - Razorpay ID: ${rzpOrderId}`)
+          setTimeout(() => {
+            setIsPlacing(false)
+            setOrderCompleted(true)
+            clearCart()
+          }, 1500)
+          toast.success('Payment verified successfully! 🎉', {
+            style: { background: '#161616', color: '#D6FF40' }
+          })
+        } catch (err) {
           setIsPlacing(false)
-          setOrderCompleted(true)
-          clearCart()
-        }, 1500)
-        toast.success('Payment successful! 🎉', {
-          style: { background: '#161616', color: '#D6FF40' }
-        })
+          toast.error(`Security check failed: ${err.message}`, {
+            style: { background: '#7F1D1D', color: '#FAF9F6' }
+          })
+        }
       },
       onDismiss: () => {
         toast('Payment cancelled.', {
@@ -464,7 +520,7 @@ export default function Checkout() {
             order placed
           </h1>
           <p className="text-dark2/60 text-xs md:text-sm font-mono uppercase tracking-widest mb-6">
-            Ref: {orderId}
+            <span className="font-black text-dark">Ref: {orderId}</span>
           </p>
           <p className="text-dark2 text-sm leading-relaxed mb-6 md:mb-8 max-w-md mx-auto">
             you get invoice after order delivered
@@ -473,7 +529,7 @@ export default function Checkout() {
           <div className="bg-[#FAF9F6] border border-[#E8E5DC] rounded-2xl p-4 sm:p-6 text-left space-y-4 mb-6 md:mb-8">
             <div className="flex justify-between items-center text-xs sm:text-sm font-mono border-b border-[#E8E5DC]/60 pb-3">
               <span className="text-dark2/50">ESTIMATED ARRIVAL</span>
-              <span className="font-bold text-dark">3 – 5 BUSINESS DAYS</span>
+              <span className="font-bold text-dark">5 – 7 BUSINESS DAYS</span>
             </div>
             <div className="flex justify-between items-center text-xs sm:text-sm font-mono">
               <span className="text-dark2/50">PAYMENT CHANNEL</span>
@@ -717,10 +773,15 @@ export default function Checkout() {
 
                     <button
                       type="button"
+                      disabled={items.length === 0}
                       onClick={() => {
                         if (validateAddressStep()) setCurrentStep(2)
                       }}
-                      className="w-fit mx-auto px-6 sm:px-8 py-3.5 sm:py-4 bg-dark text-[#D6FF40] hover:bg-purple-600 hover:text-white transition-all font-mono font-black text-xs uppercase tracking-widest rounded-xl sm:rounded-2xl flex items-center justify-center gap-2 shadow-xl border-none cursor-pointer"
+                      className={`w-fit mx-auto px-6 sm:px-8 py-3.5 sm:py-4 font-mono font-black text-xs uppercase tracking-widest rounded-xl sm:rounded-2xl flex items-center justify-center gap-2 shadow-xl border-none ${
+                        items.length === 0
+                          ? 'bg-dark/10 text-dark2/30 cursor-not-allowed shadow-none'
+                          : 'bg-dark text-[#D6FF40] hover:bg-purple-600 hover:text-white transition-all cursor-pointer'
+                      }`}
                     >
                       Continue to Payment
                       <CreditCard className="w-4 h-4" />
@@ -845,10 +906,10 @@ export default function Checkout() {
                           Back to Address
                         </button>
                         <motion.button
-                          whileTap={(!dbSettings.enable_razorpay && !dbSettings.enable_cod) ? {} : { scale: 0.98 }}
+                          whileTap={(items.length === 0 || (!dbSettings.enable_razorpay && !dbSettings.enable_cod)) ? {} : { scale: 0.98 }}
                           type="submit"
-                          disabled={!dbSettings.enable_razorpay && !dbSettings.enable_cod}
-                          className={`w-fit mx-auto px-6 sm:px-8 py-3.5 sm:py-4 font-mono font-black text-xs uppercase tracking-widest rounded-xl sm:rounded-2xl flex items-center justify-center gap-2 shadow-xl border-none ${(!dbSettings.enable_razorpay && !dbSettings.enable_cod)
+                          disabled={items.length === 0 || (!dbSettings.enable_razorpay && !dbSettings.enable_cod)}
+                          className={`w-fit mx-auto px-6 sm:px-8 py-3.5 sm:py-4 font-mono font-black text-xs uppercase tracking-widest rounded-xl sm:rounded-2xl flex items-center justify-center gap-2 shadow-xl border-none ${(items.length === 0 || (!dbSettings.enable_razorpay && !dbSettings.enable_cod))
                               ? 'bg-dark/10 text-dark2/30 cursor-not-allowed shadow-none'
                               : 'bg-dark hover:bg-purple-600 hover:text-white text-[#D6FF40] transition-all cursor-pointer'
                             }`}
@@ -956,8 +1017,8 @@ export default function Checkout() {
                           {item.color && (
                             <span className="inline-flex items-center gap-1.5 text-[12.5px] text-dark px-2.5 py-0.5 rounded-lg bg-neutral-100 border border-neutral-200 font-mono font-black uppercase">
                               <span 
-                                style={{ backgroundColor: getColorHex(item.color) }} 
-                                className="w-3 h-3 rounded-full border border-black/20 shadow-xs inline-block shrink-0" 
+                                style={getColorBackgroundStyle(item.color)} 
+                                className="w-5 h-5 rounded-full border border-black/20 shadow-xs inline-block shrink-0 shadow-inner" 
                               />
                               COLOR {item.color.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '')}
                             </span>
@@ -1046,7 +1107,7 @@ export default function Checkout() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-dark/95 backdrop-blur-md flex flex-col items-center justify-center text-cream px-6"
           >
-            <div className="w-16 h-16 border-2 border-purple-500/20 border-t-purple-600 rounded-full animate-spin mb-8" />
+            <Loader size="large" className="mb-8" />
             <div className="h-8 overflow-hidden relative w-72 text-center">
               <AnimatePresence mode="wait">
                 {placeStep === 0 && (

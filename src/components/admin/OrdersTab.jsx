@@ -71,6 +71,26 @@ const getColorHex = (colorName) => {
   return '#0F0F0F'
 }
 
+const getColorBackgroundStyle = (colorStr) => {
+  if (!colorStr) return { backgroundColor: '#0F0F0F' }
+  const separators = ['+', '/', ' and ', '&']
+  let parts = []
+  for (const sep of separators) {
+    if (colorStr.includes(sep)) {
+      parts = colorStr.split(sep).map(s => s.trim())
+      break
+    }
+  }
+  if (parts.length > 1) {
+    const hex1 = getColorHex(parts[0])
+    const hex2 = getColorHex(parts[1])
+    return {
+      background: `linear-gradient(135deg, ${hex1} 50%, ${hex2} 50%)`
+    }
+  }
+  return { backgroundColor: getColorHex(colorStr) }
+}
+
 export default function OrdersTab({
   filteredOrders,
   searchQuery,
@@ -447,15 +467,17 @@ export default function OrdersTab({
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-cream border border-cream3 w-full max-w-4xl lg:max-w-5xl p-5 sm:p-7 lg:p-8 rounded-[32px] shadow-2xl relative z-10 font-sans text-dark max-h-[90vh] overflow-y-auto"
+                className="bg-cream border border-cream3 w-full max-w-4xl lg:max-w-5xl rounded-[32px] shadow-2xl relative z-10 font-sans text-dark max-h-[90vh] overflow-hidden flex flex-col"
               >
                 {/* Close Button */}
                 <button
                   onClick={() => setSelectedOrder(null)}
-                  className="absolute top-5 right-5 p-2.5 rounded-full hover:bg-cream3 transition-colors bg-white/70 border border-cream3 cursor-pointer z-10 shadow-xs"
+                  className="absolute top-5 right-5 p-2.5 rounded-full hover:bg-cream3 transition-colors bg-white/70 border border-cream3 cursor-pointer z-20 shadow-xs"
                 >
                   <X className="w-5 h-5 text-dark" />
                 </button>
+
+                <div className="overflow-y-auto p-5 sm:p-7 lg:p-8 modal-purple-scrollbar flex-grow">
 
                 {/* Title & Status Header */}
                 <div className="border-b border-cream3 pb-4 mb-5 pr-12 select-none">
@@ -494,10 +516,10 @@ export default function OrdersTab({
                     <div className="bg-white border border-cream3 rounded-3xl p-5 sm:p-6 shadow-xs space-y-4">
                       <div className="flex items-center justify-between border-b border-cream3 pb-3">
                         <span className="text-[10px] lg:text-xs text-dark/60 uppercase font-sans font-black tracking-widest block">Items Overview ({selectedOrder.items?.length || 0})</span>
-                        <span className="text-[10px] font-sans text-dark/40 uppercase">Articles in Shipment</span>
+                        <span className="text-[10px] font-sans font-bold text-dark/60 uppercase">Articles in Shipment</span>
                       </div>
                       
-                      <div className="space-y-4 max-h-[340px] overflow-y-auto pr-1.5 scrollbar-thin">
+                      <div className="space-y-4 max-h-[340px] overflow-y-auto pr-1.5 modal-purple-scrollbar">
                         {selectedOrder.items && selectedOrder.items.map((item, idx) => (
                           <div key={idx} className="bg-[#FAF9F5] border border-cream3/80 rounded-2xl p-4 lg:p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-dark/20 transition-all shadow-2xs">
                             {/* Product Info & Thumbnail */}
@@ -529,8 +551,8 @@ export default function OrdersTab({
                                   
                                   <span className="px-2.5 py-1 bg-white border border-cream3 rounded-lg text-[10px] lg:text-xs font-sans font-bold text-dark/80 inline-flex items-center gap-1.5 shadow-2xs">
                                     <span
-                                      style={{ backgroundColor: getColorHex(item.color) }}
-                                      className="w-3 h-3 rounded-full border border-black/15 shrink-0 inline-block"
+                                      style={getColorBackgroundStyle(item.color)}
+                                      className="w-5 h-5 rounded-full border border-black/15 shrink-0 inline-block shadow-inner"
                                     />
                                     <span>COLOR: {item.color?.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '') || 'Standard'}</span>
                                   </span>
@@ -553,7 +575,7 @@ export default function OrdersTab({
                                 <button
                                   type="button"
                                   onClick={() => handleViewOrderItemDesign(item)}
-                                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#161616] hover:bg-accent hover:text-dark text-white rounded-xl text-[10.5px] lg:text-xs font-sans font-black uppercase tracking-wider transition-all duration-300 shadow-xs hover:shadow-md active:scale-95 cursor-pointer whitespace-nowrap border-none"
+                                  className="group inline-flex items-center gap-2 px-4 py-2.5 bg-[#161616] hover:bg-accent hover:text-dark text-white rounded-xl text-[10.5px] lg:text-xs font-sans font-black uppercase tracking-wider transition-all duration-300 shadow-xs hover:shadow-md active:scale-95 cursor-pointer whitespace-nowrap border-none"
                                 >
                                   <Sparkles className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-accent group-hover:text-dark shrink-0" />
                                   <span>View Studio Design</span>
@@ -624,8 +646,8 @@ export default function OrdersTab({
                         {rzpOrderId && (
                           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1">
                             <span className="text-dark/50 shrink-0">Razorpay ID:</span>
-                            <button onClick={() => handleCopy(rzpOrderId, 'rzp')} className="font-mono text-[10px] lg:text-xs font-bold text-dark/80 hover:text-accent truncate text-left flex items-center gap-1.5 border-none bg-transparent cursor-pointer break-all">
-                              <span className="truncate max-w-[140px]">{rzpOrderId}</span>
+                            <button onClick={() => handleCopy(rzpOrderId, 'rzp')} className="font-mono text-[10.5px] lg:text-xs font-bold text-dark/80 hover:text-accent text-left flex items-center gap-1.5 border-none bg-transparent cursor-pointer select-all">
+                              <span>{rzpOrderId}</span>
                               {copiedField === 'rzp' ? <Check className="w-3.5 h-3.5 text-green-600 animate-bounce" /> : <Copy className="w-3 h-3 text-dark2/40" />}
                             </button>
                           </div>
@@ -647,6 +669,7 @@ export default function OrdersTab({
                   </div>
                 </div>
 
+                </div> {/* End of inner scroll container */}
               </motion.div>
             </div>
           )

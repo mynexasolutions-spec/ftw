@@ -84,6 +84,27 @@ const getColorHex = (colorName) => {
   return '#0F0F0F'
 }
 
+const getColorBackgroundStyle = (colorStr) => {
+  if (!colorStr) return { backgroundColor: '#0F0F0F' }
+  const separators = ['+', '/', ' and ', '&']
+  let parts = []
+  for (const sep of separators) {
+    if (colorStr.includes(sep)) {
+      parts = colorStr.split(sep).map(s => s.trim())
+      break
+    }
+  }
+  if (parts.length > 1) {
+    const hex1 = getColorHex(parts[0])
+    const hex2 = getColorHex(parts[1])
+    return {
+      background: `linear-gradient(135deg, ${hex1} 50%, ${hex2} 50%)`
+    }
+  }
+  return { backgroundColor: getColorHex(colorStr) }
+}
+
+
 export default function BagAnimationOverlay() {
   const { animatingProduct, setAnimatingProduct, setCartOpen } = useCart()
   const [stage, setStage] = useState('idle') // 'idle', 'flying', 'bagBounce', 'completed'
@@ -250,8 +271,8 @@ export default function BagAnimationOverlay() {
                 <>
                   <span className="inline-flex items-center gap-1.5 bg-dark/5 px-2.5 py-0.5 rounded border border-dark/10 uppercase font-bold">
                     <span 
-                      style={{ backgroundColor: getColorHex(animatingProduct.color) }} 
-                      className="w-3.5 h-3.5 rounded-full border border-black/20 shadow-xs inline-block shrink-0" 
+                      style={getColorBackgroundStyle(animatingProduct.color)} 
+                      className="w-5 h-5 rounded-full border border-black/20 shadow-inner inline-block shrink-0" 
                     />
                     Color: <strong className="text-dark">{animatingProduct.color.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '')}</strong>
                   </span>

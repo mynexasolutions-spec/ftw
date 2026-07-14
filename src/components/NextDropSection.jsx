@@ -29,6 +29,24 @@ export default function NextDropSection({
       {/* HUD Gaming Styling for Next Drop Section */}
       <style dangerouslySetInnerHTML={{
         __html: `
+        @keyframes scanner {
+          0% { top: 0%; opacity: 0; }
+          10% { opacity: 0.7; }
+          90% { opacity: 0.7; }
+          100% { top: 100%; opacity: 0; }
+        }
+        .animate-scanner {
+          animation: scanner 4.5s linear infinite;
+        }
+
+        @keyframes arrowsSlide {
+          0%, 100% { transform: translateX(0); opacity: 0.5; }
+          50% { transform: translateX(5px); opacity: 1; }
+        }
+        .animate-arrows-slide {
+          animation: arrowsSlide 1.5s ease-in-out infinite;
+        }
+
         /* Background details matching screenshot */
         .hud-grid-deco {
           position: absolute;
@@ -111,20 +129,22 @@ export default function NextDropSection({
         /* Tactical main display window on right */
         .hud-display-window {
           position: relative;
-          background-image: linear-gradient(135deg, #3B82F6, #1D4ED8);
+          background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+          padding: 3px;
           clip-path: polygon(36px 0, calc(100% - 36px) 0, 100% 36px, 100% calc(100% - 36px), calc(100% - 36px) 100%, 36px 100%, 0 calc(100% - 36px), 0 36px);
           box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
-          transition: background-image 0.3s ease, box-shadow 0.3s ease;
+          transition: background 0.3s ease, box-shadow 0.3s ease;
         }
         .hud-display-window:hover {
-          background-image: linear-gradient(135deg, #7C3AED, #3B82F6, #EC4899);
+          background: linear-gradient(135deg, #7C3AED, #3B82F6, #EC4899);
           box-shadow: 0 20px 45px rgba(124, 58, 237, 0.25);
         }
         .hud-display-inner {
-          position: absolute;
-          inset: 3px;
+          position: relative;
+          width: 100%;
+          height: 100%;
           background: #090A0F;
-          clip-path: polygon(35px 0, calc(100% - 35px) 0, 100% 35px, 100% calc(100% - 35px), calc(100% - 35px) 100%, 35px 100%, 0 calc(100% - 35px), 0 35px);
+          clip-path: polygon(34.5px 0, calc(100% - 34.5px) 0, 100% 34.5px, 100% calc(100% - 34.5px), calc(100% - 34.5px) 100%, 34.5px 100%, 0 calc(100% - 34.5px), 0 34.5px);
           overflow: hidden;
           z-index: 2;
         }
@@ -139,9 +159,7 @@ export default function NextDropSection({
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #000000;
-          cursor: pointer;
-          transition: all 0.2s ease;
+          color: #1E293B;
           box-shadow: 0 4px 10px rgba(0,0,0,0.08);
         }
         .hud-btn-circle:hover {
@@ -154,7 +172,8 @@ export default function NextDropSection({
         /* Smaller preview thumbnails styling */
         .hud-thumb-btn {
           position: relative;
-          background-image: linear-gradient(135deg, #1F2937, #11131E);
+          padding: 1.5px;
+          background: rgba(255, 255, 255, 0.12);
           clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px);
           transition: all 0.3s ease;
         }
@@ -163,14 +182,14 @@ export default function NextDropSection({
           z-index: 5;
         }
         .hud-thumb-btn.active {
-          background-image: linear-gradient(135deg, #7C3AED, #3B82F6, #EC4899);
+          background: linear-gradient(135deg, #7C3AED, #3B82F6, #EC4899);
         }
         .hud-thumb-inner {
-          position: absolute;
-          inset: 2px;
+          position: relative;
+          width: 100%;
+          height: 100%;
           background: #090A0F;
           clip-path: polygon(11px 0, calc(100% - 11px) 0, 100% 11px, 100% calc(100% - 11px), calc(100% - 11px) 100%, 11px 100%, 0 calc(100% - 11px), 0 11px);
-          z-index: 2;
         }
 
         /* Submit alert notifications box styling */
@@ -184,31 +203,38 @@ export default function NextDropSection({
           clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px);
           box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
         }
-        .hud-notify-input {
-          background: #FFFFFF;
-          border: 1.5px solid #E2E8F0;
-          color: #000000;
-          font-family: 'Space Grotesk', sans-serif;
+        .hud-notify-input-border-outer {
+          background: #E2E8F0;
+          padding: 1.5px;
           clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px);
+          transition: background 0.3s ease;
+        }
+        .hud-notify-input-border-outer:focus-within {
+          background: #7C3AED;
+        }
+        .hud-notify-input-inner {
+          background: #FFFFFF;
+          clip-path: polygon(11.5px 0, calc(100% - 11.5px) 0, 100% 11.5px, 100% calc(100% - 11.5px), calc(100% - 11.5px) 100%, 11.5px 100%, 0 calc(100% - 11.5px), 0 11.5px);
+          display: flex;
+          align-items: center;
+          position: relative;
+          width: 100%;
         }
       ` }} />
 
-      {/* Grid crosshair decals on background */}
-      <div className="hud-grid-deco">
-        + -- HUD_ONLINE -- +<br />
-        | SENSORS: ACTIVE  |<br />
-        | GRID_COORDS: 497 |<br />
-        + ---------------- +
-      </div>
+
+      {/* Glow Backing Aura */}
+      <div className="absolute right-[-10%] bottom-[-5%] w-[450px] h-[450px] bg-[radial-gradient(circle_at_center,rgba(124,58,237,0.06),transparent_70%)] pointer-events-none z-0" />
+      <div className="absolute left-[-10%] top-[-5%] w-[400px] h-[400px] bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.04),transparent_70%)] pointer-events-none z-0" />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         {/* Left Info & Countdown */}
         <div className="lg:col-span-6 text-left flex flex-col justify-center w-full relative z-10">
           {/* Next Drop Tag */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/10 border border-purple-500/35 text-purple-600 font-mono uppercase tracking-[0.25em] text-[10px] font-black rounded-lg mb-6 w-fit">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/10 border border-purple-500/35 text-purple-600 font-mono uppercase tracking-[0.25em] text-[12.5px] lg:text-[14px] font-black rounded-lg mb-6 w-fit">
             <Zap className="w-3.5 h-3.5 fill-purple-600 text-purple-600 animate-pulse" />
             {comingSoonSubtitle || 'NEXT DROP • SNEAK PEEK'}
-            <div className="hud-arrows-deco">»</div>
+            <div className="hud-arrows-deco animate-arrows-slide">»</div>
           </div>
 
           {/* Bold Header */}
@@ -255,18 +281,20 @@ export default function NextDropSection({
           <div className="w-full max-w-md">
             {!notified ? (
               <form onSubmit={handleNotifyMe} className="flex gap-2.5 w-full">
-                <div className="relative flex-grow">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input
-                    type="email"
-                    required
-                    placeholder="Enter email for drop alert"
-                    value={notifyEmail}
-                    onChange={(e) => setNotifyEmail(e.target.value)}
-                    className="w-full pl-11 pr-4 py-4 hud-notify-input focus:outline-none focus:border-purple-600 text-xs sm:text-sm"
-                  />
+                <div className="relative flex-grow hud-notify-input-border-outer">
+                  <div className="hud-notify-input-inner w-full">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 z-20" />
+                    <input
+                      type="email"
+                      required
+                      placeholder="Enter email for drop alert"
+                      value={notifyEmail}
+                      onChange={(e) => setNotifyEmail(e.target.value)}
+                      className="w-full pl-11 pr-4 py-4 bg-transparent focus:outline-none text-xs sm:text-sm text-dark relative z-10 border-none"
+                    />
+                  </div>
                 </div>
-                <button type="submit" className="px-8 py-4 hud-notify-btn shrink-0 flex items-center gap-1.5 cursor-pointer">
+                <button type="submit" className="px-8 py-4 hud-notify-btn shrink-0 flex items-center gap-1.5 cursor-pointer border-none">
                   <Bell className="w-4 h-4" />
                   <span>Notify Me</span>
                 </button>
@@ -288,13 +316,24 @@ export default function NextDropSection({
           {/* Main Visual Frame */}
           <div className="aspect-[4/4.3] w-full max-w-md hud-display-window overflow-hidden">
             <div className="hud-display-inner absolute inset-[3px]">
-              {/* Top Micro tag */}
-              <div className="absolute top-6 left-6 z-20 bg-black text-white px-3 py-1.5 font-mono text-[9px] font-black uppercase tracking-widest rounded flex items-center gap-2 border border-purple-500/40">
-                <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-ping" />
-                SNEAK PEEK
+              
+              {/* Telemetry HUD overlays */}
+              <div className="absolute top-3 left-3 text-[9px] font-mono text-white/30 z-20 pointer-events-none">[+]</div>
+              <div className="absolute top-3 right-3 text-[9px] font-mono text-white/30 z-20 pointer-events-none">[+]</div>
+              <div className="absolute bottom-3 left-3 text-[9px] font-mono text-white/30 z-20 pointer-events-none">[+]</div>
+              <div className="absolute bottom-3 right-3 text-[9px] font-mono text-white/30 z-20 pointer-events-none">[+]</div>
+
+              <div className="absolute top-6 left-6 z-20 bg-black text-[#D6FF40] px-3 py-1.5 font-mono text-[9px] font-black uppercase tracking-widest rounded flex items-center gap-2 border border-[#D6FF40]/30 bg-black/85 backdrop-blur-xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#D6FF40] animate-ping" />
+                CAM_ACTIVE // 01
               </div>
 
+              <div className="absolute top-6 right-6 z-20 bg-black/85 backdrop-blur-xs text-white/80 px-2.5 py-1.5 font-mono text-[8px] tracking-widest rounded border border-white/10">
+                REC ● 1080P_60FPS
+              </div>
 
+              {/* High Tech Scanner Sweep Laser Line */}
+              <div className="absolute left-0 w-full h-[3px] bg-[#D6FF40] shadow-[0_0_12px_#D6FF40,0_0_2px_#FFFFFF] opacity-55 animate-scanner z-20 pointer-events-none" />
 
               <AnimatePresence mode="wait">
                 <motion.img

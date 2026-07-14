@@ -162,9 +162,9 @@ export default function FeaturedCollection({
           gap: 6px;
           background: #0F172A;
           color: #FFFFFF;
-          padding: 6px 14px;
-          font-family: 'Space Grotesk', sans-serif;
-          font-size: 10px;
+           padding: 6.5px 15px;
+           font-family: 'Space Grotesk', sans-serif;
+           font-size: 11px;
           font-weight: 800;
           letter-spacing: 0.08em;
           text-transform: uppercase;
@@ -247,7 +247,7 @@ export default function FeaturedCollection({
           text-transform: uppercase;
           letter-spacing: 0.02em;
           line-height: 1.3;
-          min-height: 54px;
+          min-height: 36px;
         }
         .hud-card-price-pill {
           background: #7C3AED;
@@ -334,7 +334,7 @@ export default function FeaturedCollection({
             font-size: 11.5px !important;
             letter-spacing: 0.01em !important;
             line-height: 1.2 !important;
-            min-height: 38px !important;
+            min-height: 26px !important;
           }
           .hud-card-price-pill {
             font-size: 11px !important;
@@ -396,9 +396,11 @@ export default function FeaturedCollection({
           const colorMap = { Black: '#000000', White: '#FFFFFF', Charcoal: '#3F3F46', Lime: '#84CC16', Beige: '#D97706', Cream: '#FAF5FF', Blue: '#3B82F6', Purple: '#8B5CF6' }
           const prodImage = product.imageFront || product.image || '/images/Regular-T.png'
 
-          const badgeType = pi === 0 ? 'limited' : pi === 1 ? 'sale' : 'trending'
-          const badgeText = pi === 0 ? 'Limited' : pi === 1 ? 'On Sale' : 'Trending'
-          const statusText = pi === 0 ? 'Coming Soon' : pi === 1 ? 'Sale' : 'New Arrivals'
+          const badgeText = product.tag ? product.tag : (pi === 0 ? 'Limited' : pi === 1 ? 'On Sale' : 'Trending')
+          const badgeType = product.tag 
+            ? (product.tag.toLowerCase().includes('sale') || product.tag.toLowerCase().includes('off') ? 'sale' : product.tag.toLowerCase().includes('limit') ? 'limited' : 'trending') 
+            : (pi === 0 ? 'limited' : pi === 1 ? 'sale' : 'trending')
+          const statusText = product.tag ? product.tag : (pi === 0 ? 'Coming Soon' : pi === 1 ? 'Sale' : 'New Arrivals')
 
           return (
             <motion.div
@@ -458,10 +460,12 @@ export default function FeaturedCollection({
                 </button>
 
                 {/* Rating Badge */}
-                <div className="hud-card-rating">
-                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
-                  <span>{getProductRating(product.name) ? getProductRating(product.name).toFixed(1) : '0.0'}</span>
-                </div>
+                {getProductRating(product.name) > 0 && (
+                  <div className="hud-card-rating">
+                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
+                    <span>{getProductRating(product.name).toFixed(1)}</span>
+                  </div>
+                )}
               </div>
 
               {/* Info and action area */}
@@ -487,57 +491,116 @@ export default function FeaturedCollection({
                   </div>
 
                   {/* Color Dot Swatches */}
-                  <div className="flex items-center gap-2 mb-4">
-                    {prodColors.length > 0 ? (
-                      prodColors.slice(0, 5).map((col, ci) => {
-                        const cName = col.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim()
-                        const hexMatch = col.match(/#([0-9a-fA-F]{3,6})/)
-                        const bg = hexMatch ? `#${hexMatch[1]}` : (colorMap[cName] || '#94A3B8')
+                  <div className="flex items-center gap-1.5 mb-4">
+                    {(() => {
+                      const resolveColorHex = (colorName) => {
+                        if (!colorName) return '#94A3B8'
+                        const clean = colorName.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim().toLowerCase()
+                        const hexMatch = colorName.match(/#([0-9a-fA-F]{3,6})/)
+                        if (hexMatch) return `#${hexMatch[1]}`
+                        
+                        const COLOR_MAP = {
+                          'black': '#0B0B0B',
+                          'white': '#FFFFFF',
+                          'off-white': '#FAF9F6',
+                          'off white': '#FAF9F6',
+                          'sand': '#E4D3C2',
+                          'beige': '#E6D9C5',
+                          'cream': '#FDFBF7',
+                          'charcoal': '#2D2D2D',
+                          'grey': '#888888',
+                          'gray': '#888888',
+                          'lime': '#D6FF40',
+                          'cyber lime': '#D6FF40',
+                          'purple': '#8B5CF6',
+                          'blue': '#3B82F6',
+                          'red': '#EF4444',
+                          'olive': '#556B2F',
+                          'navy': '#000080',
+                          'brown': '#8B4513',
+                          'stone': '#A8A29E',
+                          'mint': '#A7F3D0',
+                          'lavender': '#E9D5FF'
+                        }
+                        if (COLOR_MAP[clean]) return COLOR_MAP[clean]
+                        for (const key in COLOR_MAP) {
+                          if (clean.includes(key)) return COLOR_MAP[key]
+                        }
+                        return '#94A3B8'
+                      }
+
+                      let colorsList = Array.isArray(prodColors)
+                        ? [...prodColors]
+                        : (prodColors ? String(prodColors).split(',').map(c => c.trim()) : []);
+                      const cleanColor = (c) => c ? c.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim().toLowerCase() : '';
+
+                      if (product.is_combo && colorsList.length === 2) {
+                        const hex1 = resolveColorHex(colorsList[0]);
+                        const hex2 = resolveColorHex(colorsList[1]);
+                        const c1Name = colorsList[0].replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim();
+                        const c2Name = colorsList[1].replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim();
+                        return (
+                          <span
+                            title={`${c1Name} + ${c2Name} Combo`}
+                            style={{ background: `linear-gradient(135deg, ${hex1} 50%, ${hex2} 50%)` }}
+                            className="w-4 h-4 sm:w-5 sm:h-5 rounded-full border border-neutral-300 shrink-0 inline-block shadow-inner hover:scale-110 transition-transform"
+                          />
+                        );
+                      }
+
+                      if (product.default_color) {
+                        const defClean = product.default_color.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim().toLowerCase();
+                        const matchedIndex = colorsList.findIndex(c => cleanColor(c) === defClean);
+                        if (matchedIndex > -1) {
+                          const [matchedColor] = colorsList.splice(matchedIndex, 1);
+                          colorsList = [matchedColor, ...colorsList];
+                        }
+                      }
+
+                      return colorsList.slice(0, 5).map((col, ci) => {
+                        const cName = col.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim();
+                        const bgStyle = { backgroundColor: resolveColorHex(col) };
                         return (
                           <span
                             key={ci}
                             title={cName}
-                            style={{ backgroundColor: bg }}
-                            className={`hud-color-dot ${ci === 0 ? 'active' : ''}`}
+                            style={bgStyle}
+                            className="w-4 h-4 sm:w-5 sm:h-5 rounded-full border border-neutral-300 shrink-0 inline-block shadow-inner hover:scale-110 transition-transform"
                           />
-                        )
-                      })
-                    ) : (
-                      ['#000000', '#38BDF8', '#F5E6C9', '#F87171'].map((bg, ci) => (
-                        <span
-                          key={ci}
-                          style={{ backgroundColor: bg }}
-                          className={`hud-color-dot ${ci === 0 ? 'active' : ''}`}
-                        />
-                      ))
-                    )}
+                        );
+                      });
+                    })()}
                   </div>
                 </div>
 
                 {/* Add to Bag Action CTA */}
                 <div className="min-h-[42px]">
                   {selectingSizeForFeatured === product.id ? (
-                    <div className="space-y-2 text-center animate-fadeIn">
-                      <span className="text-[10px] text-slate-400 font-mono uppercase tracking-widest block font-bold">Select Size</span>
-                      <div className="flex flex-wrap gap-1 justify-center">
+                    <div className="space-y-2 text-center animate-fadeIn select-none">
+                      <span className="text-[10px] text-purple-600 font-sans uppercase font-black tracking-widest block">Select Size</span>
+                      <div className="flex flex-wrap gap-1.5 justify-center items-center">
                         {prodSizes.map(sz => (
                           <button
                             key={sz}
                             onClick={() => {
-                              addToCart({ ...product, image: prodImage }, sz)
-                              toast.success(`${product.name} [Size ${sz}] added to bag!`, {
-                                style: { background: '#0B0B0B', color: '#FFFFFF', fontFamily: "'Space Grotesk', sans-serif" }
-                              })
+                              let finalColor = product.default_color || (prodColors && prodColors[0]) || 'Standard'
+                              if (product.is_combo && prodColors && prodColors.length === 2) {
+                                const c1 = prodColors[0].replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim()
+                                const c2 = prodColors[1].replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim()
+                                finalColor = `${c1} + ${c2}`
+                              }
+                              addToCart({ ...product, image: prodImage }, sz, finalColor)
+                              toast.success(`${product.name} [Size ${sz} / Color ${finalColor}] added!`, { style: { background: '#161616', color: '#FAF9F6' } })
                               setSelectingSizeForFeatured(null)
                             }}
-                            className="h-8 w-8 border border-slate-200 text-slate-800 hover:bg-slate-900 hover:text-lime-400 hover:border-slate-900 transition-all text-xs font-bold rounded-lg cursor-pointer bg-white"
+                            className="h-8 min-w-[34px] px-2 bg-white border border-[#E8E5DC] text-dark hover:bg-dark hover:text-[#D6FF40] hover:border-dark transition-all duration-200 text-[11px] font-sans font-black rounded-xl cursor-pointer shadow-3xs flex items-center justify-center"
                           >
                             {sz}
                           </button>
                         ))}
                         <button
                           onClick={() => setSelectingSizeForFeatured(null)}
-                          className="h-8 w-8 border border-rose-200 text-rose-500 hover:bg-rose-50 transition-all text-xs font-bold rounded-lg cursor-pointer bg-white"
+                          className="h-8 w-8 bg-red-50 border border-red-100 text-red-500 hover:bg-red-500 hover:text-white hover:border-transparent transition-all duration-200 text-[9px] rounded-xl cursor-pointer flex items-center justify-center"
                         >
                           ✕
                         </button>
@@ -554,10 +617,14 @@ export default function FeaturedCollection({
                     <button
                       onClick={() => {
                         if (prodSizes.length === 0) {
-                          addToCart({ ...product, image: prodImage }, 'M')
-                          toast.success(`${product.name} added to bag!`, {
-                            style: { background: '#0B0B0B', color: '#FFFFFF', fontFamily: "'Space Grotesk', sans-serif" }
-                          })
+                          let finalColor = product.default_color || (prodColors && prodColors[0]) || 'Standard'
+                          if (product.is_combo && prodColors && prodColors.length === 2) {
+                            const c1 = prodColors[0].replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim()
+                            const c2 = prodColors[1].replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim()
+                            finalColor = `${c1} + ${c2}`
+                          }
+                          addToCart({ ...product, image: prodImage }, 'M', finalColor)
+                          toast.success(`${product.name} added to bag!`, { style: { background: '#161616', color: '#FAF9F6' } })
                         } else {
                           setSelectingSizeForFeatured(product.id)
                         }

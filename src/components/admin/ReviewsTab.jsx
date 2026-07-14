@@ -5,10 +5,30 @@ import { motion, AnimatePresence } from 'framer-motion'
 export default function ReviewsTab({
   reviews = [],
   products = [],
+  orders = [],
   handleApproveReview,
   handleDeleteReview
 }) {
   const [activeReviewModal, setActiveReviewModal] = useState(null)
+
+  const findOrderedProductImage = (rev) => {
+    if (!rev) return null
+    if (orders && orders.length > 0) {
+      const reviewerOrders = orders.filter(o => 
+        (o.email && rev.email && o.email.toLowerCase().trim() === rev.email.toLowerCase().trim()) ||
+        (o.customer_name && rev.name && o.customer_name.toLowerCase().trim() === rev.name.toLowerCase().trim())
+      )
+      for (const order of reviewerOrders) {
+        const item = order.items?.find(it => 
+          it.name?.toLowerCase().trim() === rev.product_name?.toLowerCase().trim()
+        )
+        if (item?.image) {
+          return item.image
+        }
+      }
+    }
+    return null
+  }
 
   const formatReviewDate = (dateStr) => {
     if (!dateStr) return 'N/A'
@@ -27,8 +47,9 @@ export default function ReviewsTab({
   const totalReviews = reviews.length
   const pendingReviews = reviews.filter(r => !r.approved).length
   const approvedReviews = reviews.filter(r => r.approved).length
-  const avgRating = totalReviews > 0 
-    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(1)
+  const approvedReviewsList = reviews.filter(r => r.approved)
+  const avgRating = approvedReviewsList.length > 0 
+    ? (approvedReviewsList.reduce((sum, r) => sum + r.rating, 0) / approvedReviewsList.length).toFixed(1)
     : '0.0'
 
   return (
@@ -132,32 +153,40 @@ export default function ReviewsTab({
           <>
             {/* Desktop / Laptop Table View */}
             <div className="hidden lg:block overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs lg:text-sm font-sans">
+              <table className="w-full table-fixed text-left border-collapse text-xs lg:text-sm font-sans">
                 <thead>
                   <tr className="bg-cream/40 border-b border-cream3 text-[10px] lg:text-xs uppercase font-black text-dark2/50 tracking-wider">
-                    <th className="p-4 lg:p-4.5 pl-6">Product Details</th>
-                    <th className="p-4 lg:p-4.5">Customer</th>
-                    <th className="p-4 lg:p-4.5">Rating</th>
-                    <th className="p-4 lg:p-4.5 max-w-[280px] lg:max-w-[340px]">Review Comment</th>
-                    <th className="p-4 lg:p-4.5">Date</th>
-                    <th className="p-4 lg:p-4.5">Status</th>
-                    <th className="p-4 lg:p-4.5 text-right pr-6">Actions</th>
+                    <th className="p-4 lg:p-4.5 pl-6 w-[22%]">Product Details</th>
+                    <th className="p-4 lg:p-4.5 w-[15%]">Customer</th>
+                    <th className="p-4 lg:p-4.5 w-[12%]">Rating</th>
+                    <th className="p-4 lg:p-4.5 w-[25%]">Review Comment</th>
+                    <th className="p-4 lg:p-4.5 w-[10%]">Date</th>
+                    <th className="p-4 lg:p-4.5 w-[10%] text-center">Status</th>
+                    <th className="p-4 lg:p-4.5 text-right pr-6 w-[16%]">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-cream3">
                   {reviews.map(rev => {
                     const matchedProduct = products.find(
-                      p => p.name?.toLowerCase() === rev.product_name?.toLowerCase()
+                      p => {
+                        if (!p.name || !rev.product_name) return false
+                        const pNameClean = p.name.toLowerCase().trim()
+                        const rNameClean = rev.product_name.toLowerCase().trim()
+                        return pNameClean === rNameClean || rNameClean.includes(pNameClean) || pNameClean.includes(rNameClean)
+                      }
                     )
+
+                    const orderedImg = findOrderedProductImage(rev)
+                    const displayImg = orderedImg || matchedProduct?.image
 
                     return (
                       <tr key={rev.id} className="hover:bg-cream/20 transition-colors group text-dark font-sans">
                         {/* Product Info */}
                         <td className="p-4 lg:p-4.5 pl-6">
                           <div className="flex items-center gap-3">
-                            {matchedProduct?.image ? (
+                            {displayImg ? (
                               <img 
-                                src={matchedProduct.image} 
+                                src={displayImg} 
                                 alt={rev.product_name} 
                                 className="w-10 h-12 lg:w-11 lg:h-13 object-cover rounded-lg border border-cream3 shrink-0 bg-cream"
                               />
@@ -167,7 +196,7 @@ export default function ReviewsTab({
                               </div>
                             )}
                             <div className="min-w-0">
-                              <p className="font-extrabold uppercase text-[11px] lg:text-xs xl:text-sm text-dark leading-tight truncate max-w-[150px] lg:max-w-[190px]" title={rev.product_name}>
+                              <p className="font-extrabold uppercase text-[11px] lg:text-xs xl:text-sm text-dark leading-tight whitespace-normal break-words" title={rev.product_name}>
                                 {rev.product_name}
                               </p>
                               {matchedProduct && (
@@ -187,11 +216,11 @@ export default function ReviewsTab({
 
                         {/* Rating Stars */}
                         <td className="p-4 lg:p-4.5">
-                          <div className="flex gap-0.5 text-accent shrink-0">
+                          <div className="flex gap-0.5 text-amber-400 shrink-0">
                             {Array.from({ length: 5 }).map((_, i) => (
                               <Star 
                                 key={i} 
-                                className={`w-3.5 h-3.5 lg:w-4 lg:h-4 ${i < rev.rating ? 'fill-accent text-accent' : 'text-cream3'}`} 
+                                className={`w-3.5 h-3.5 lg:w-4 lg:h-4 ${i < rev.rating ? 'fill-amber-400 text-amber-400' : 'text-cream3'}`} 
                               />
                             ))}
                           </div>
@@ -218,7 +247,7 @@ export default function ReviewsTab({
                         <td className="p-4 lg:p-4.5 text-dark2/50 font-sans text-[10px] lg:text-xs">{formatReviewDate(rev.created_at)}</td>
 
                         {/* Status Badge */}
-                        <td className="p-4 lg:p-4.5">
+                        <td className="p-4 lg:p-4.5 text-center">
                           <span className={`text-[8.5px] lg:text-[10px] font-black uppercase px-2.5 py-1 rounded-md border inline-flex items-center ${
                             rev.approved 
                               ? 'bg-emerald-550/10 text-emerald-700 border-emerald-150' 
@@ -259,43 +288,51 @@ export default function ReviewsTab({
             <div className="lg:hidden divide-y divide-cream3 bg-cream2/10">
               {reviews.map(rev => {
                 const matchedProduct = products.find(
-                  p => p.name?.toLowerCase() === rev.product_name?.toLowerCase()
+                  p => {
+                    if (!p.name || !rev.product_name) return false
+                    const pNameClean = p.name.toLowerCase().trim()
+                    const rNameClean = rev.product_name.toLowerCase().trim()
+                    return pNameClean === rNameClean || rNameClean.includes(pNameClean) || pNameClean.includes(rNameClean)
+                  }
                 )
 
-                return (
-                  <div key={rev.id} className="p-4 sm:p-5 space-y-4 hover:bg-cream/15 transition-all text-dark font-sans">
-                    {/* Header Row */}
-                    <div className="flex justify-between items-start gap-4">
-                      <div>
-                        <span className="font-extrabold text-dark text-xs uppercase block">{rev.name}</span>
-                        <div className="flex items-center gap-1 text-dark2/40 text-[9px] font-sans mt-0.5">
-                          <Calendar className="w-3 h-3" />
-                          <span>{formatReviewDate(rev.created_at)}</span>
-                        </div>
-                      </div>
-                      <div className="flex gap-0.5 text-accent shrink-0">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <Star 
-                            key={i} 
-                            className={`w-3.5 h-3.5 ${i < rev.rating ? 'fill-accent text-accent' : 'text-cream3'}`} 
-                          />
-                        ))}
-                      </div>
-                    </div>
+                    const orderedImg = findOrderedProductImage(rev)
+                    const displayImg = orderedImg || matchedProduct?.image
 
-                    {/* Product Subcard */}
-                    <div className="flex items-center gap-3 bg-white border border-cream3 p-3 rounded-xl shadow-xs text-[10px]">
-                      {matchedProduct?.image ? (
-                        <img 
-                          src={matchedProduct.image} 
-                          alt={rev.product_name} 
-                          className="w-8 h-10 object-cover rounded-lg border border-cream3 shrink-0 bg-cream"
-                        />
-                      ) : (
-                        <div className="w-8 h-10 rounded-lg border border-cream3 bg-cream3/50 flex items-center justify-center shrink-0">
-                          <ShoppingBag className="w-3.5 h-3.5 text-dark2/30" />
+                    return (
+                      <div key={rev.id} className="p-4 sm:p-5 space-y-4 hover:bg-cream/15 transition-all text-dark font-sans">
+                        {/* Header Row */}
+                        <div className="flex justify-between items-start gap-4">
+                          <div>
+                            <span className="font-extrabold text-dark text-xs uppercase block">{rev.name}</span>
+                            <div className="flex items-center gap-1 text-dark2/40 text-[9px] font-sans mt-0.5">
+                              <Calendar className="w-3 h-3" />
+                              <span>{formatReviewDate(rev.created_at)}</span>
+                            </div>
+                          </div>
+                          <div className="flex gap-0.5 text-amber-400 shrink-0">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <Star 
+                                key={i} 
+                                className={`w-3.5 h-3.5 ${i < rev.rating ? 'fill-amber-400 text-amber-400' : 'text-cream3'}`} 
+                              />
+                            ))}
+                          </div>
                         </div>
-                      )}
+
+                        {/* Product Subcard */}
+                        <div className="flex items-center gap-3 bg-white border border-cream3 p-3 rounded-xl shadow-xs text-[10px]">
+                          {displayImg ? (
+                            <img 
+                              src={displayImg} 
+                              alt={rev.product_name} 
+                              className="w-8 h-10 object-cover rounded-lg border border-cream3 shrink-0 bg-cream"
+                            />
+                          ) : (
+                            <div className="w-8 h-10 rounded-lg border border-cream3 bg-cream3/50 flex items-center justify-center shrink-0">
+                              <ShoppingBag className="w-3.5 h-3.5 text-dark2/30" />
+                            </div>
+                          )}
                       <div className="min-w-0">
                         <span className="font-extrabold text-dark uppercase block leading-none truncate">{rev.product_name}</span>
                         {matchedProduct && (
@@ -362,7 +399,12 @@ export default function ReviewsTab({
         {activeReviewModal && (() => {
           const rev = activeReviewModal
           const matchedProduct = products.find(
-            p => p.name?.toLowerCase() === rev.product_name?.toLowerCase()
+            p => {
+              if (!p.name || !rev.product_name) return false
+              const pNameClean = p.name.toLowerCase().trim()
+              const rNameClean = rev.product_name.toLowerCase().trim()
+              return pNameClean === rNameClean || rNameClean.includes(pNameClean) || pNameClean.includes(rNameClean)
+            }
           )
 
           return (
@@ -378,15 +420,17 @@ export default function ReviewsTab({
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-cream border border-cream3 w-full max-w-md lg:max-w-lg p-5 sm:p-7 lg:p-8 rounded-[32px] shadow-2xl relative z-10 font-sans text-dark max-h-[85vh] overflow-y-auto"
+                className="bg-cream border border-cream3 w-full max-w-md lg:max-w-lg rounded-[32px] shadow-2xl relative z-10 font-sans text-dark overflow-hidden flex flex-col max-h-[92vh]"
               >
                 {/* Close Button */}
                 <button
                   onClick={() => setActiveReviewModal(null)}
-                  className="absolute top-5 right-5 p-2 rounded-full hover:bg-cream3 transition-colors bg-white/70 border border-cream3 cursor-pointer z-10 shadow-xs"
+                  className="absolute top-5 right-5 p-2 rounded-full hover:bg-cream3 transition-colors bg-white/70 border border-cream3 cursor-pointer z-20 shadow-xs"
                 >
                   <X className="w-4 h-4 lg:w-5 lg:h-5 text-dark" />
                 </button>
+
+                <div className="overflow-y-auto p-5 sm:p-7 lg:p-8 modal-purple-scrollbar flex-grow">
 
                 {/* Modal Header */}
                 <div className="border-b border-cream3 pb-4 mb-5 pr-10">
@@ -408,11 +452,11 @@ export default function ReviewsTab({
                   {/* Rating Stars */}
                   <div>
                     <span className="text-[9px] lg:text-xs font-mono text-dark2/45 uppercase font-black tracking-widest block mb-1.5">Rating Score</span>
-                    <div className="flex gap-1.5 text-accent">
+                    <div className="flex gap-1.5 text-amber-400">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Star 
                           key={i} 
-                          className={`w-5.5 h-5.5 lg:w-6 lg:h-6 ${i < rev.rating ? 'fill-accent text-accent' : 'text-cream3'}`} 
+                          className={`w-5.5 h-5.5 lg:w-6 lg:h-6 ${i < rev.rating ? 'fill-amber-400 text-amber-400' : 'text-cream3'}`} 
                         />
                       ))}
                     </div>
@@ -421,17 +465,17 @@ export default function ReviewsTab({
                   {/* Customer Information */}
                   <div className="bg-white border border-cream3 rounded-2xl p-4 sm:p-5 space-y-2 shadow-xs">
                     <span className="text-[9px] lg:text-xs font-mono text-dark2/45 uppercase font-black block">Reviewer</span>
-                    <p className="font-extrabold text-dark uppercase text-xs lg:text-sm">{rev.name}</p>
-                    {rev.email && <p className="font-mono text-[10px] lg:text-xs text-dark2/50 break-all">{rev.email}</p>}
+                    <p className="font-black text-dark uppercase text-sm lg:text-[15px]">{rev.name}</p>
+                    {rev.email && <p className="font-mono font-black text-xs lg:text-sm text-dark break-all">{rev.email}</p>}
                   </div>
 
                   {/* Product Details */}
                   <div className="bg-white border border-cream3 rounded-2xl p-4 sm:p-5 space-y-2.5 shadow-xs">
                     <span className="text-[9px] lg:text-xs font-mono text-dark2/45 uppercase font-black block">Product Item</span>
                     <div className="flex items-center gap-3.5">
-                      {matchedProduct?.image ? (
+                      {displayImg ? (
                         <img 
-                          src={matchedProduct.image} 
+                          src={displayImg} 
                           alt={rev.product_name} 
                           className="w-11 h-13 lg:w-12 lg:h-14 object-cover rounded-xl border border-cream3 shrink-0 bg-cream"
                         />
@@ -460,20 +504,21 @@ export default function ReviewsTab({
                   </div>
                 </div>
 
-                {/* Approve Button in Modal */}
-                {!rev.approved && (
-                  <div className="mt-6">
-                    <button
-                      onClick={() => {
-                        handleApproveReview(rev.id)
-                        setActiveReviewModal(null)
-                      }}
-                      className="w-full py-3.5 bg-dark text-primary hover:bg-accent hover:text-dark text-xs lg:text-sm font-mono font-black uppercase tracking-widest rounded-2xl cursor-pointer transition-colors border-none shadow-md"
-                    >
-                      Approve Review
-                    </button>
-                  </div>
-                )}
+                  {/* Approve Button in Modal */}
+                  {!rev.approved && (
+                    <div className="mt-6">
+                      <button
+                        onClick={() => {
+                          handleApproveReview(rev.id)
+                          setActiveReviewModal(null)
+                        }}
+                        className="w-full py-3.5 bg-dark text-primary hover:bg-accent hover:text-dark text-xs lg:text-sm font-mono font-black uppercase tracking-widest rounded-2xl cursor-pointer transition-colors border-none shadow-md"
+                      >
+                        Approve Review
+                      </button>
+                    </div>
+                  )}
+                </div>
               </motion.div>
             </div>
           )

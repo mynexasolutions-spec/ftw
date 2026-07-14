@@ -48,7 +48,9 @@ function sanitizeProduct(product) {
     size_guide: product.size_guide,
     size_chart: product.size_chart,
     variants: product.variants || [],
-    default_color: product.default_color
+    default_color: product.default_color,
+    customizable: product.customizable ?? false,
+    is_combo: product.is_combo ?? false
   }
 }
 
@@ -314,9 +316,17 @@ export async function deleteCategory(categoryId) {
 
 export async function updateCategory(categoryId, categoryUpdates) {
   try {
+    const updates = { ...categoryUpdates }
+    if (updates.name) {
+      updates.slug = updates.name
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')
+    }
     const { error } = await supabase
       .from('categories')
-      .update(categoryUpdates)
+      .update(updates)
       .eq('id', categoryId)
     if (error) throw error
     return true
@@ -344,10 +354,31 @@ export async function preloadRatingsCache() {
 }
 
 export function getProductRating(productName) {
-  const ratings = ratingsCache[productName];
-  if (!ratings || ratings.length === 0) return 0;
-  const total = ratings.reduce((sum, r) => sum + r, 0);
-  return Number((total / ratings.length).toFixed(1));
+  if (!productName) return 0;
+  const cleanName = productName.toLowerCase().trim().replace(/\s+combo$/, '');
+  let matchedRatings = [];
+  for (const name in ratingsCache) {
+    const cleanKey = name.toLowerCase().trim().replace(/\s+combo$/, '');
+    if (cleanKey === cleanName) {
+      matchedRatings = ratingsCache[name];
+      break;
+    }
+  }
+  if (!matchedRatings || matchedRatings.length === 0) return 0;
+  const total = matchedRatings.reduce((sum, r) => sum + r, 0);
+  return Number((total / matchedRatings.length).toFixed(1));
+}
+
+export function getProductReviewCount(productName) {
+  if (!productName) return 0;
+  const cleanName = productName.toLowerCase().trim().replace(/\s+combo$/, '');
+  for (const name in ratingsCache) {
+    const cleanKey = name.toLowerCase().trim().replace(/\s+combo$/, '');
+    if (cleanKey === cleanName) {
+      return ratingsCache[name]?.length || 0;
+    }
+  }
+  return 0;
 }
 
 // ─── NEW DB ENDPOINTS: COUPONS, REVIEWS, SETTINGS ───────────────────────────

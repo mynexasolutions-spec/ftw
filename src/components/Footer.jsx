@@ -159,7 +159,7 @@ export default function Footer() {
         .hud-top-right { top: 16px; right: 16px; border-width: 2px 2px 0 0; }
 
         .footer-brand-desc {
-          font-size: 13px;
+          font-size: 15px;
           color: #4A4D55;
           line-height: 1.8;
           border-left: 2.5px solid #8B5CF6;
@@ -286,8 +286,8 @@ export default function Footer() {
 
         /* Link list styling */
         .footer-link-item {
-          font-size: 11px;
-          font-weight: 700;
+          font-size: 13px;
+          font-weight: 800;
           color: #4A4D55;
           text-transform: uppercase;
           letter-spacing: 0.08em;
@@ -363,7 +363,7 @@ export default function Footer() {
           background: rgba(255, 255, 255, 0.04);
           border-radius: 6px;
           padding: 5px 12px;
-          font-size: 10px;
+          font-size: 11.5px;
           font-weight: 900;
           letter-spacing: 0.05em;
           text-transform: uppercase;
@@ -419,20 +419,7 @@ export default function Footer() {
       <div className="footer-hud-corner hud-top-left"></div>
       <div className="footer-hud-corner hud-top-right"></div>
 
-      {/* Stats Ticker Bar */}
-      <div className="ftw-stats-bar">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-center md:justify-between gap-4">
-          {stats.map(({ icon: Icon, label, value }) => (
-            <div key={label} className="ftw-stat-item">
-              <div className="ftw-stat-icon"><Icon className="w-3.5 h-3.5" /></div>
-              <div>
-                <div className="text-white font-black text-[14px] leading-none font-mono">{value}</div>
-                <div className="text-gray-500 text-[8px] uppercase tracking-widest font-bold mt-0.5">{label}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+
 
       <div className="max-w-7xl mx-auto px-6 pt-12 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-y-12 gap-x-8 pb-10">
@@ -447,7 +434,7 @@ export default function Footer() {
                   <span className="text-purple-600 italic transform -skew-x-6 inline-block">WIN</span>
                 </span>
               </Link>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-500/10 border border-dashed border-purple-500/30 text-purple-600 font-mono uppercase tracking-[0.2em] text-[7.5px] font-black rounded mb-3">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-500/10 border border-dashed border-purple-500/30 text-purple-600 font-mono uppercase tracking-[0.2em] text-[10px] lg:text-[11px] font-black rounded mb-3">
                 <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse" />
                 FTW_BRAND // EST. 2024
               </span>
@@ -463,8 +450,8 @@ export default function Footer() {
                   <Mail className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-[11px] font-black tracking-widest text-white uppercase leading-tight">Get Drop Alerts</h4>
-                  <p className="text-[8.5px] text-gray-400 mt-0.5 leading-tight">First access to drops, restocks &amp; exclusive offers.</p>
+                  <h4 className="text-[13.5px] font-black tracking-widest text-white uppercase leading-tight">Get Drop Alerts</h4>
+                  <p className="text-[11px] text-gray-400 mt-1.5 leading-tight">First access to drops, restocks &amp; exclusive offers.</p>
                 </div>
               </div>
               <form onSubmit={handleSubscribe}>
@@ -475,20 +462,20 @@ export default function Footer() {
                     placeholder="your@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="flex-grow px-3 py-2.5 text-xs bg-transparent focus:outline-none text-white placeholder:text-gray-600 font-mono"
+                    className="flex-grow px-3 py-2.5 text-[13.5px] bg-transparent focus:outline-none text-white placeholder:text-gray-600 font-mono"
                   />
-                  <button type="submit" className="alert-join-btn flex items-center gap-1.5">
-                    <ArrowRight className="w-3 h-3" />
+                  <button type="submit" className="alert-join-btn flex items-center gap-1.5 text-[12.5px] font-black uppercase">
+                    <ArrowRight className="w-3.5 h-3.5" />
                     Join
                   </button>
                 </div>
-                <p className="text-[7px] text-gray-600 mt-2 pl-1 font-mono tracking-widest uppercase">No spam · Unsubscribe anytime</p>
+                <p className="text-[9.5px] text-gray-600 mt-2.5 pl-1 font-mono font-black tracking-widest uppercase">No spam · Unsubscribe anytime</p>
               </form>
             </div>
 
             {/* Social icons */}
             <div>
-              <p className="text-[8.5px] font-black uppercase tracking-[0.2em] text-gray-700 mb-3 font-mono">[ Follow Us ]</p>
+              <p className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-700 mb-3.5 font-mono">[ Follow Us ]</p>
               <div className="flex items-center gap-2.5">
                 <a href={`https://instagram.com/${settings.support_instagram}`} target="_blank" rel="noopener noreferrer" className="social-pill" title="Instagram">
                   <Instagram className="w-4 h-4" />
@@ -563,7 +550,6 @@ export default function Footer() {
             >
               <div className="ftw-bag-glow" />
               <Interactive3DBag />
-              <p className="ftw-bag-tagline">drag · click to open cart</p>
             </div>
           </div>
 
@@ -581,7 +567,7 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-5 relative z-10 pt-1">
           {/* Payment badges */}
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-            <span className="text-[8.5px] font-bold text-gray-500 uppercase tracking-widest mr-1 font-mono">Pay via</span>
+            <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mr-1 font-mono">Pay via</span>
             <span className="pay-frame pay-visa">Visa</span>
             <span className="pay-frame pay-mc">Mastercard</span>
             <span className="pay-frame pay-rupay">Rupay</span>
@@ -590,7 +576,7 @@ export default function Footer() {
           </div>
 
           {/* Copyright */}
-          <p className="text-[9px] text-gray-500 uppercase tracking-[0.22em] text-center font-mono">
+          <p className="text-[11.5px] text-gray-500 uppercase tracking-[0.22em] text-center font-mono">
             © 2026 <span className="font-extrabold text-white">FOR THE <span className="text-purple-400 italic -skew-x-3 inline-block">WIN</span></span> · All Rights Reserved
           </p>
         </div>

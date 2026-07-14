@@ -5,6 +5,7 @@ import { getOrders, insertReview, getReviews, getCustomDesign, getCustomizerConf
 import { motion, AnimatePresence } from 'framer-motion'
 import { ShoppingBag, ChevronDown, ChevronUp, Loader2, MapPin, CreditCard, Download, Star, X, CheckCircle, Eye, Tag, Edit, Type, Image as ImageIcon, Sparkles, Layers } from 'lucide-react'
 import { toast } from 'react-hot-toast'
+import Loader from '../components/Loader'
 
 const MOCKUPS = {
   front: '/images/media__1782208425084.png',
@@ -518,7 +519,7 @@ export default function MyOrders() {
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-cream text-dark py-32 px-6 flex flex-col items-center justify-center font-sans">
-        <Loader2 className="w-8 h-8 text-accent animate-spin mb-4" />
+        <Loader size="medium" className="mb-4" />
         <p className="text-xs text-dark2/50 uppercase tracking-widest font-mono">Retrieving your order history...</p>
       </div>
     )
@@ -721,20 +722,20 @@ export default function MyOrders() {
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 flex-grow">
                         <div>
-                          <span className="text-[10px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Order ID</span>
-                          <span className="font-mono text-[13px] font-black text-dark block mt-1">{order.id}</span>
+                          <span className="text-[11px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Order ID</span>
+                          <span className="font-mono text-[15px] font-black text-dark block mt-1">{order.id}</span>
                         </div>
                         <div>
-                          <span className="text-[10px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Placed On</span>
-                          <span className="text-[13px] font-bold text-dark block mt-1">{formatOrderDate(order.created_at)}</span>
+                          <span className="text-[11px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Placed On</span>
+                          <span className="text-[14.5px] font-extrabold text-dark block mt-1">{formatOrderDate(order.created_at)}</span>
                         </div>
                         <div>
-                          <span className="text-[10px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Grand Total</span>
-                          <span className="text-[15px] font-black font-mono text-dark block mt-1">₹{order.total.toLocaleString('en-IN')}</span>
+                          <span className="text-[11px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Grand Total</span>
+                          <span className="text-[17px] font-black font-mono text-dark block mt-1">₹{order.total.toLocaleString('en-IN')}</span>
                         </div>
                         <div>
-                          <span className="text-[10px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Status</span>
-                          <span className={`inline-block px-3 py-1 rounded-lg text-[11px] font-black uppercase mt-1 border tracking-wider ${isDelivered ? 'bg-green-50 text-green-700 border-green-200' :
+                          <span className="text-[11px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Status</span>
+                          <span className={`inline-block px-3 py-1 rounded-lg text-[12.5px] font-black uppercase mt-1 border tracking-wider ${isDelivered ? 'bg-green-50 text-green-700 border-green-200' :
                               isShipped ? 'bg-blue-50 text-blue-700 border-blue-200' :
                                 isProcessing ? 'bg-purple-50 text-purple-700 border-purple-200' :
                                   isCancelled ? 'bg-red-50 text-red-700 border-red-200' :
@@ -775,11 +776,11 @@ export default function MyOrders() {
                                   </div>
                                 )}
                                 <div className="min-w-0">
-                                  <p className="text-[12px] font-extrabold uppercase text-dark leading-tight group-hover:text-purple-600 transition-colors">{item.name}</p>
-                                  <p className="text-[11px] font-mono text-purple-600 font-black uppercase mt-0.5">
+                                  <p className="text-[13.5px] font-black uppercase text-dark leading-tight group-hover:text-purple-600 transition-colors">{item.name}</p>
+                                  <p className="text-[12px] font-mono text-purple-600 font-black uppercase mt-0.5">
                                     {item.size && `Sz ${item.size}`}{item.qty > 1 ? ` × ${item.qty}` : ''}
                                   </p>
-                                  <p className="text-[11px] font-mono text-dark2/60 mt-0.5">₹{((item.price || 0) * (item.qty || 1)).toLocaleString('en-IN')}</p>
+                                  <p className="text-[12px] font-mono text-dark2/60 mt-0.5">₹{((item.price || 0) * (item.qty || 1)).toLocaleString('en-IN')}</p>
                                 </div>
                               </>
                             )
@@ -811,21 +812,21 @@ export default function MyOrders() {
                           {/* Info pills */}
                           <div className="flex flex-wrap gap-2 md:justify-end">
                             <div className="flex items-center gap-1.5 bg-purple-50 border border-purple-100 rounded-xl px-3 py-1.5">
-                              <ShoppingBag className="w-3 h-3 text-purple-500 shrink-0" />
-                              <span className="text-[11px] font-black text-dark font-mono whitespace-nowrap">
+                              <ShoppingBag className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                              <span className="text-[12.5px] font-black text-dark font-mono whitespace-nowrap">
                                 {order.items.reduce((s, i) => s + (i.qty || 1), 0)} item{order.items.reduce((s, i) => s + (i.qty || 1), 0) > 1 ? 's' : ''}
                               </span>
                             </div>
                             {order.payment_method && (
                               <div className="flex items-center gap-1.5 bg-purple-50 border border-purple-100 rounded-xl px-3 py-1.5">
-                                <CreditCard className="w-3 h-3 text-purple-500 shrink-0" />
-                                <span className="text-[11px] font-black text-dark font-mono whitespace-nowrap uppercase">{order.payment_method}</span>
+                                <CreditCard className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                                <span className="text-[12.5px] font-black text-dark font-mono whitespace-nowrap uppercase">{order.payment_method}</span>
                               </div>
                             )}
                             {order.address && (
                               <div className="flex items-center gap-1.5 bg-purple-50 border border-purple-100 rounded-xl px-3 py-1.5">
-                                <MapPin className="w-3 h-3 text-purple-500 shrink-0" />
-                                <span className="text-[11px] font-black text-dark font-mono whitespace-nowrap">
+                                <MapPin className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                                <span className="text-[12.5px] font-black text-dark font-mono whitespace-nowrap">
                                   {order.address.split(',').slice(-2, -1)[0]?.trim() || order.address.substring(0, 18)}
                                 </span>
                               </div>
@@ -837,14 +838,14 @@ export default function MyOrders() {
                             <div className="flex items-center gap-2">
                               <button
                                 onClick={(e) => { e.stopPropagation(); generateInvoice(order) }}
-                                className="flex items-center gap-1.5 px-4 py-2 bg-purple-600 text-white text-[11px] font-mono font-black uppercase tracking-widest rounded-xl hover:bg-purple-700 transition-colors duration-200 border-none cursor-pointer whitespace-nowrap shadow-sm"
+                                className="flex items-center gap-1.5 px-4 py-2 bg-purple-600 text-white text-[12.5px] font-mono font-black uppercase tracking-wider rounded-xl hover:bg-purple-700 transition-colors duration-200 border-none cursor-pointer whitespace-nowrap shadow-sm"
                               >
                                 <Download className="w-3.5 h-3.5" /> Invoice
                               </button>
                               {order.items && (
                                 <button
                                   onClick={(e) => { e.stopPropagation(); setRatingModal({ order, itemIdx: 0 }) }}
-                                  className={`flex items-center gap-1.5 px-4 py-2 border text-[11px] font-mono font-black uppercase tracking-widest rounded-xl transition-colors duration-200 cursor-pointer whitespace-nowrap ${order.items.every(item => userReviews.some(ur => ur.product_name === item.name))
+                                  className={`flex items-center gap-1.5 px-4 py-2 border text-[12.5px] font-mono font-black uppercase tracking-wider rounded-xl transition-colors duration-200 cursor-pointer whitespace-nowrap ${order.items.every(item => userReviews.some(ur => ur.product_name === item.name))
                                       ? 'bg-cream border-cream3 text-dark2/50 hover:text-purple-600 hover:border-purple-400'
                                       : 'bg-cream2 border-cream3 text-dark hover:border-purple-600 hover:text-purple-600'
                                     }`}
@@ -1048,8 +1049,8 @@ export default function MyOrders() {
                 {/* Modal Header */}
                 <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-cream3">
                   <div>
-                    <span className="text-[9px] font-mono font-black uppercase tracking-widest text-dark2/45 block">FEEDBACK LOOPS</span>
-                    <h3 className="font-display font-black uppercase text-dark text-lg tracking-tight mt-0.5">
+                    <span className="text-[11px] font-mono font-black uppercase tracking-widest text-dark2/45 block">FEEDBACK LOOPS</span>
+                    <h3 className="font-display font-black uppercase text-dark text-xl sm:text-2xl tracking-tight mt-0.5">
                       {submitted ? 'YOUR FEEDBACK' : 'RATE THIS ARTIFACT'}
                     </h3>
                   </div>
@@ -1089,20 +1090,20 @@ export default function MyOrders() {
                     </div>
                   )}
                   <div className="min-w-0">
-                    <p className="text-sm font-black uppercase text-dark leading-tight truncate">{item?.name}</p>
-                    <p className="text-[9px] font-mono text-accent font-black uppercase mt-1.5">{item?.size && `Size ${item.size}`}</p>
+                    <p className="text-[16px] font-black uppercase text-dark leading-tight truncate">{item?.name}</p>
+                    <p className="text-[11.5px] font-mono text-accent font-black uppercase mt-1.5">{item?.size && `Size ${item.size}`}</p>
                   </div>
                 </div>
 
                 {/* Star selector */}
                 <div className="px-6 pt-5">
-                  <p className="text-[9px] font-mono font-black uppercase tracking-widest text-dark2/45 mb-3">Your Rating</p>
+                  <p className="text-[11px] font-mono font-black uppercase tracking-widest text-dark2/45 mb-3">Your Rating</p>
                   {submitted ? (
                     <div className="flex items-center gap-2 mb-4">
                       {[1, 2, 3, 4, 5].map(s => (
-                        <Star key={s} className={`w-7 h-7 ${s <= submitted.stars ? 'text-accent fill-accent' : 'text-cream3'}`} />
+                        <Star key={s} className={`w-7 h-7 ${s <= submitted.stars ? 'text-amber-400 fill-amber-400' : 'text-cream3'}`} />
                       ))}
-                      <span className="text-xs font-mono font-black text-dark ml-2">{submitted.stars}/5 Stars</span>
+                      <span className="text-[13px] font-mono font-black text-dark ml-2">{submitted.stars}/5 Stars</span>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 mb-4">
@@ -1115,7 +1116,7 @@ export default function MyOrders() {
                           className="border-none bg-transparent p-0.5 transition-transform hover:scale-110 cursor-pointer"
                         >
                           <Star className={`w-8 h-8 transition-colors ${s <= (hoveredStar || currentRating.stars)
-                              ? 'text-accent fill-accent'
+                              ? 'text-amber-400 fill-amber-400'
                               : 'text-cream3'
                             }`} />
                         </button>
@@ -1136,7 +1137,7 @@ export default function MyOrders() {
                       placeholder="TELL US WHAT YOU LOVED..."
                       value={currentRating.review}
                       onChange={(e) => setRatings(prev => ({ ...prev, [key]: { ...currentRating, review: e.target.value } }))}
-                      className="w-full px-4 py-3 bg-cream2 border border-cream3 rounded-2xl text-xs font-mono focus:outline-none focus:border-dark text-dark placeholder:text-dark2/25 uppercase resize-none mb-5 transition-colors tracking-wider"
+                      className="w-full px-4 py-3 bg-cream2 border border-cream3 rounded-2xl text-[13px] font-mono font-black focus:outline-none focus:border-dark text-dark placeholder:text-dark2/30 placeholder:font-black uppercase resize-none mb-5 transition-colors tracking-wider"
                     />
                   )}
                 </div>
@@ -1152,13 +1153,13 @@ export default function MyOrders() {
                     <>
                       <button
                         onClick={() => setRatingModal(null)}
-                        className="px-5 py-3.5 bg-cream2 border border-cream3 text-dark text-[10px] font-mono font-black uppercase tracking-widest rounded-2xl hover:border-dark/20 transition-all cursor-pointer border-solid"
+                        className="px-5 py-3.5 bg-cream2 border border-cream3 text-dark text-[12px] font-mono font-black uppercase tracking-widest rounded-2xl hover:border-dark/20 transition-all cursor-pointer border-solid"
                       >
                         Skip
                       </button>
                       <button
                         onClick={() => handleSubmitRating(order.id, currentItemIdx)}
-                        className="flex-grow py-3.5 bg-dark text-cream text-[10px] font-mono font-black uppercase tracking-widest rounded-2xl hover:bg-primary hover:text-dark transition-all border-none cursor-pointer"
+                        className="flex-grow py-3.5 bg-dark text-cream text-[12.5px] font-mono font-black uppercase tracking-widest rounded-2xl hover:bg-primary hover:text-dark transition-all border-none cursor-pointer"
                       >
                         Submit Rating
                       </button>

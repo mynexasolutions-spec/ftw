@@ -687,7 +687,7 @@ export default function Customizer() {
     <div className="space-y-5">
       {/* Colors */}
       <div>
-        <p className="text-[10px] font-mono uppercase text-dark/40 font-bold mb-3 tracking-widest">Base Color</p>
+        <p className="text-[12px] font-sans uppercase text-dark2/60 font-black mb-3 tracking-wider block">Base Color</p>
         <div className="flex flex-wrap gap-2.5">
           {colorPalette.map(col => {
             const isSel = selectedColor.name === col.name
@@ -712,7 +712,7 @@ export default function Customizer() {
           })}
         </div>
         <div className="mt-4 flex justify-center">
-          <span className="bg-dark text-white px-3.5 py-1 rounded-full text-[9px] font-mono uppercase tracking-widest font-bold shadow-sm">
+          <span className="bg-dark text-white px-3.5 py-1.5 rounded-full text-[10.5px] font-sans uppercase tracking-wider font-bold shadow-sm">
             {selectedColor.name}
           </span>
         </div>
@@ -723,7 +723,7 @@ export default function Customizer() {
   const TextPanel = () => (
     <div className="space-y-5">
       <div>
-        <label className="text-[10px] font-mono uppercase text-dark/40 font-bold block mb-2 tracking-widest">Your Text</label>
+        <label className="text-[12px] font-sans uppercase text-dark2/60 font-black block mb-2 tracking-wider">Your Text</label>
         <input
           type="text"
           value={textInput}
@@ -734,14 +734,14 @@ export default function Customizer() {
             }
           }}
           onKeyDown={e => { if (e.key === 'Enter') handleAddText() }}
-          className="w-full px-4 py-3.5 border border-cream3 bg-cream2 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:bg-white text-dark transition-all duration-200 placeholder-dark/30 font-semibold"
+          className="w-full px-4 py-3.5 border border-cream3 bg-cream2 rounded-xl text-sm focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20 focus:bg-white text-dark transition-all duration-200 placeholder-dark/30 font-semibold"
           placeholder="e.g. FOR THE WIN"
           autoFocus
         />
       </div>
 
       <div>
-        <label className="text-[10px] font-mono uppercase text-dark/40 font-bold block mb-2 tracking-widest">Font Family</label>
+        <label className="text-[12px] font-sans uppercase text-dark2/60 font-black block mb-2 tracking-wider">Font Family</label>
         <div className="relative">
           <button
             type="button"
@@ -811,8 +811,8 @@ export default function Customizer() {
           >{f.label}</button>
         ))}
         <div className="flex-1 ml-1.5">
-          <div className="flex justify-between text-[9px] font-mono text-dark/40 mb-1.5 tracking-wider uppercase font-bold">
-            <span>Size</span><span className="font-bold text-dark">{textSize}px</span>
+          <div className="flex justify-between text-[10.5px] font-sans text-dark2/60 mb-1.5 tracking-wider uppercase font-black">
+            <span>Size</span><span className="font-black text-dark">{textSize}px</span>
           </div>
           <input type="range" min="12" max="72" value={textSize} onChange={e => {
             const val = +e.target.value
@@ -826,7 +826,7 @@ export default function Customizer() {
       </div>
 
       <div>
-        <label className="text-[10px] font-mono uppercase text-dark/40 font-bold block mb-2.5 tracking-widest">Text Color</label>
+        <label className="text-[12px] font-sans uppercase text-dark2/60 font-black block mb-2.5 tracking-wider">Text Color</label>
         <div className="flex gap-2 flex-wrap">
           {TEXT_COLORS.map(c => {
             const isSel = textColor === c
@@ -899,7 +899,7 @@ export default function Customizer() {
             <p className="text-sm font-bold text-dark mb-1">
               {imageUploading ? 'Uploading to Cloudinary...' : 'Upload Your Design'}
             </p>
-            <p className="text-[10px] text-dark/40 font-mono uppercase tracking-wider">
+            <p className="text-[11.5px] text-dark2/50 font-sans font-bold uppercase tracking-wider">
               {imageUploading ? 'Please wait' : 'PNG with transparent bg works best'}
             </p>
           </div>
@@ -1218,7 +1218,7 @@ export default function Customizer() {
 
     return (
       <div className="space-y-4">
-        <p className="text-[10px] font-mono uppercase text-dark/40 font-bold tracking-widest">
+        <p className="text-[12px] font-sans uppercase text-dark2/60 font-black tracking-wider block">
           {user ? `${user.email}'s Saved Designs` : "Temporary Saved Designs"}
         </p>
 
@@ -1242,8 +1242,8 @@ export default function Customizer() {
                   key={design.id}
                   onClick={() => handleLoadDesign(design)}
                   className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center justify-between gap-4 group ${isCurrentlyLoaded
-                    ? 'border-accent bg-orange-50/20'
-                    : 'border-cream3 bg-white hover:border-neutral-400 hover:shadow-md'
+                    ? 'border-purple-600 bg-purple-500/5 shadow-xs'
+                    : 'border-purple-100 bg-white hover:border-purple-500 hover:shadow-md'
                     }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
@@ -1254,10 +1254,10 @@ export default function Customizer() {
                       <img src={matchedStyle?.image || MOCKUPS.front} alt="" className="w-8 h-8 object-contain mix-blend-multiply select-none pointer-events-none" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-extrabold text-dark truncate uppercase tracking-tight">
+                      <p className="text-sm font-black text-dark truncate uppercase tracking-tight">
                         Design {idx + 1}
                       </p>
-                      <p className="text-[9px] font-mono text-dark/40 uppercase tracking-widest mt-0.5">
+                      <p className="text-[11.5px] font-sans text-dark2/50 font-bold mt-0.5 normal-case">
                         {matchedStyle?.name || "Custom Tee"} • {design.color_name} • {printZonesCount} Zone(s)
                       </p>
                     </div>
@@ -1328,10 +1328,14 @@ export default function Customizer() {
         }}>
           {canvasElements[activeZone].map(el => renderElement(el))}
         </div>
-        {/* Print-zone boundary border */}
+        {/* Dual black & white contrast borders for universal visibility on all backgrounds */}
         <div className="absolute z-50 pointer-events-none" style={{
           top: printBox.top, left: printBox.left, width: printBox.width, height: printBox.height,
-          border: '1.5px solid rgba(210,40,40,0.65)', borderRadius: 2,
+          border: '2.5px solid rgba(0, 0, 0, 0.85)', borderRadius: 2,
+        }} />
+        <div className="absolute z-55 pointer-events-none" style={{
+          top: printBox.top, left: printBox.left, width: printBox.width, height: printBox.height,
+          border: '2.5px dashed rgba(255, 255, 255, 0.95)', borderRadius: 2,
         }} />
       </div>
     )
@@ -1395,11 +1399,6 @@ export default function Customizer() {
 
       <div className="customizer-scanlines" />
 
-      {/* Decorative margin decals */}
-      <div className="absolute left-6 top-[38%] rotate-[-90deg] origin-left text-[8px] font-mono text-gray-400 tracking-[0.3em] uppercase select-none pointer-events-none z-10 hidden xl:block">
-        FTW // GRAPHIC_DESIGN // STUDIO_V2.0
-      </div>
-
       {/* ────────── SHARED TOPBAR ────────── */}
       <div className="shrink-0 flex items-center justify-between px-6 py-4 bg-white/70 backdrop-blur-xl border-b border-[#E8E5DC] shadow-sm relative z-10">
         {/* Left */}
@@ -1409,7 +1408,7 @@ export default function Customizer() {
           ><ArrowLeft className="w-5 h-5 text-dark" /></button>
           <div className="hidden sm:block">
             <h1 className="text-[16px] font-black uppercase tracking-tight text-dark leading-none font-sans">Studio Customizer</h1>
-            <span className="text-[11px] font-mono text-purple-600 uppercase tracking-widest font-black block mt-1">FOR THE WIN • DTF Studio</span>
+            <span className="text-[13px] font-sans text-purple-600 uppercase tracking-widest font-black block mt-1">FOR THE WIN • DTF Studio</span>
           </div>
         </div>
 
@@ -1430,8 +1429,8 @@ export default function Customizer() {
         {/* Right: price + Add-to-bag (desktop only) */}
         <div className="flex items-center gap-3">
           <div className="hidden lg:block text-right">
-            <span className="text-[9px] font-mono uppercase text-dark/50 block font-bold">Estimated Total</span>
-            <span className="text-base font-black font-mono text-dark">₹{totalPrice}</span>
+            <span className="text-[11px] font-sans uppercase text-dark2/50 block font-bold">Estimated Total</span>
+            <span className="text-lg font-black font-mono text-dark">₹{totalPrice}</span>
           </div>
           {(!isReadOnly || isOwner) && (
             <button onClick={handleSaveAndContinue}
@@ -1577,7 +1576,7 @@ export default function Customizer() {
               className="w-10 h-10 bg-white rounded-xl flex items-center justify-center cursor-pointer hover:bg-neutral-50 text-dark shadow-md"
               style={{ border: '1px solid #e5e7eb' }}><Minus className="w-4 h-4" /></button>
             <div className="text-center mt-1">
-              <span className="text-[9px] font-mono text-dark/40">{Math.round(zoom * 100)}%</span>
+              <span className="text-[12px] font-sans font-black text-dark2/60">{Math.round(zoom * 100)}%</span>
             </div>
           </div>
 
@@ -1606,10 +1605,14 @@ export default function Customizer() {
               }}>
                 {canvasElements[activeZone].map(el => renderElement(el))}
               </div>
-              {/* Print-zone boundary border */}
+              {/* Print-zone boundary border (dual black & white contrast borders) */}
               <div className="absolute z-50 pointer-events-none" style={{
                 top: printBox.top, left: printBox.left, width: printBox.width, height: printBox.height,
-                border: '2px dashed rgba(210,40,40,0.60)', borderRadius: 4,
+                border: '3px solid rgba(0, 0, 0, 0.85)', borderRadius: 4,
+              }} />
+              <div className="absolute z-55 pointer-events-none" style={{
+                top: printBox.top, left: printBox.left, width: printBox.width, height: printBox.height,
+                border: '3px dashed rgba(255, 255, 255, 0.95)', borderRadius: 4,
               }} />
             </div>
           </div>
@@ -1643,7 +1646,7 @@ export default function Customizer() {
                       }`}>
                       <img src={selectedColor?.mockups?.[zone.id] || zone.thumb} alt="" className="w-full h-full object-contain select-none pointer-events-none" />
                     </div>
-                    <span className="whitespace-nowrap font-sans font-bold uppercase tracking-wider text-[10px]">{zone.name}</span>
+                    <span className="whitespace-nowrap font-sans font-black uppercase tracking-wider text-[12px]">{zone.name}</span>
                     {cnt > 0 && (
                       <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black flex items-center justify-center min-w-[16px] h-4 transition-all duration-300 ${isA ? 'bg-purple-600 text-white shadow-[0_0_10px_rgba(139,92,246,0.5)]' : 'bg-neutral-900 text-white'
                         }`}>
@@ -1678,7 +1681,7 @@ export default function Customizer() {
                   <div className={`transition-colors duration-200 ${isA ? 'text-purple-600' : 'text-current'}`}>
                     {tab.icon}
                   </div>
-                  <span className="text-[9.5px] tracking-wider uppercase font-mono font-black">{tab.label}</span>
+                  <span className="text-[11px] tracking-wider uppercase font-sans font-black whitespace-nowrap">{tab.label}</span>
                   {isA && (
                     <div className="absolute bottom-0 left-1/3 right-1/3 h-[2.5px] bg-purple-600 rounded-full" />
                   )}
@@ -1707,7 +1710,7 @@ export default function Customizer() {
               >
                 <div className="flex items-center gap-2">
                   {desktopSubtotalOpen ? <ChevronUp className="w-4 h-4 text-dark" /> : <ChevronDown className="w-4 h-4 text-dark" />}
-                  <span className="text-[10px] font-mono uppercase text-dark/40 font-bold tracking-widest">Pricing Estimate</span>
+                  <span className="text-[12px] font-sans uppercase text-dark2/60 font-black tracking-wider">Pricing Estimate</span>
                 </div>
                 <span className="text-sm font-black text-dark">₹{totalPrice}</span>
               </button>
@@ -1815,7 +1818,7 @@ export default function Customizer() {
             <div className="shrink-0 flex items-center justify-between px-6 py-4 bg-white border-b border-cream3 shadow-xs sticky top-0 z-50">
               <button
                 onClick={() => setShowSummary(false)}
-                className="flex items-center gap-2 px-4 py-2 bg-transparent text-dark hover:bg-neutral-100 rounded-xl border-none cursor-pointer text-xs font-mono font-bold uppercase tracking-wider transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-transparent text-purple-600 hover:bg-purple-50 rounded-xl border-none cursor-pointer text-[13px] font-sans font-black uppercase tracking-wider transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to Design
@@ -1823,7 +1826,7 @@ export default function Customizer() {
 
               <div className="text-center">
                 <h2 className="text-sm font-black uppercase tracking-tight text-dark leading-none">Review Your Tee</h2>
-                <span className="text-[9px] font-mono text-dark/40 uppercase tracking-widest">FOR THE WIN • checkout studio</span>
+                <span className="text-[12px] font-sans text-dark2/50 font-black uppercase tracking-wider block mt-1">FOR THE WIN • checkout studio</span>
               </div>
 
               <div className="w-20 hidden sm:block" /> {/* Spacer */}
@@ -1835,13 +1838,13 @@ export default function Customizer() {
               {/* Left Side: Large Mockup Slideshow */}
               <div className="flex-1 flex flex-col justify-between space-y-6">
                 <div className="flex justify-between items-center shrink-0">
-                  <h3 className="text-[10px] font-mono uppercase text-dark/40 font-bold tracking-widest">
+                  <h3 className="text-[12px] font-sans uppercase text-dark2/60 font-black tracking-wider block">
                     Previewing: {PRINT_ZONES[previewZoneIdx].name} ({previewZoneIdx + 1}/{PRINT_ZONES.length})
                   </h3>
 
                   {/* Status Badges */}
                   {canvasElements[PRINT_ZONES[previewZoneIdx].id]?.length > 0 ? (
-                    <span className="bg-accent/15 text-accent px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider">
+                    <span className="bg-purple-100 text-purple-600 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider">
                       {canvasElements[PRINT_ZONES[previewZoneIdx].id].length} Applied Print(s)
                     </span>
                   ) : (
@@ -1944,7 +1947,7 @@ export default function Customizer() {
                     <button
                       key={zone.id}
                       onClick={() => setPreviewZoneIdx(idx)}
-                      className={`h-2 rounded-full transition-all duration-300 cursor-pointer border-none ${previewZoneIdx === idx ? 'w-6 bg-accent' : 'w-2 bg-cream3 hover:bg-neutral-300'
+                      className={`h-2 rounded-full transition-all duration-300 cursor-pointer border-none ${previewZoneIdx === idx ? 'w-6 bg-purple-600' : 'w-2 bg-cream3 hover:bg-neutral-300'
                         }`}
                       title={zone.name}
                     />
@@ -1966,10 +1969,10 @@ export default function Customizer() {
                   {/* Size Selection */}
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <label className="text-[10px] font-mono uppercase text-dark/40 font-bold tracking-widest">Select Size(s)</label>
+                      <label className="text-[12px] font-sans uppercase text-dark2/60 font-black tracking-wider block">Select Size(s)</label>
                       <button
                         onClick={() => setShowSizeChart(true)}
-                        className="text-[10px] font-mono uppercase text-accent hover:text-dark font-black tracking-widest border-none bg-transparent cursor-pointer underline"
+                        className="text-[12px] font-sans uppercase text-purple-600 hover:text-purple-800 font-black tracking-wider border-none bg-transparent cursor-pointer underline"
                       >
                         Size Chart
                       </button>
@@ -1992,8 +1995,8 @@ export default function Customizer() {
                               })
                             }}
                             className={`py-3 rounded-xl text-xs font-black border cursor-pointer transition-all duration-200 ${isS
-                              ? 'bg-dark text-white border-dark shadow-md scale-102 font-bold'
-                              : 'bg-transparent text-dark/70 border-cream3 hover:border-neutral-400'
+                              ? 'bg-purple-600 text-white border-purple-600 shadow-md scale-102 font-bold'
+                              : 'bg-transparent text-dark/70 border-cream3 hover:border-neutral-400 hover:border-purple-300'
                               }`}
                           >
                             {size}
@@ -2005,7 +2008,7 @@ export default function Customizer() {
                     {/* Quantities per Size */}
                     {Object.keys(selectedSizes).length > 0 && (
                       <div className="space-y-2 mt-3 bg-cream2/60 p-3.5 rounded-2xl border border-cream3/50">
-                        <span className="text-[9px] font-mono uppercase text-dark/40 font-bold tracking-widest block mb-1">Quantities per Size</span>
+                        <span className="text-[11.5px] font-sans uppercase text-dark2/60 font-black tracking-wider block mb-1">Quantities per Size</span>
                         {Object.entries(selectedSizes).map(([size, qty]) => (
                           <div key={size} className="flex items-center justify-between text-xs py-0.5">
                             <span className="font-bold text-dark">Size {size}</span>
@@ -2046,7 +2049,7 @@ export default function Customizer() {
 
                   {/* Price Summary */}
                   <div className="space-y-3 bg-cream2/60 rounded-2xl p-4 border border-cream3/50">
-                    <h4 className="text-[10px] font-mono uppercase text-dark/40 font-bold tracking-widest">Pricing Summary</h4>
+                    <h4 className="text-[12px] font-sans uppercase text-dark2/60 font-black tracking-wider block">Pricing Summary</h4>
                     <div className="space-y-2 text-xs font-sans text-dark/60">
                       <div className="flex justify-between">
                         <span>T-shirt blank</span>
@@ -2068,7 +2071,7 @@ export default function Customizer() {
                       </div>
                       <div className="flex justify-between pt-2.5 border-t border-dark/20 text-base font-black text-dark">
                         <span>Total Price</span>
-                        <span className="font-mono text-accent">₹{totalPrice * Object.values(selectedSizes).reduce((sum, q) => sum + q, 0)}</span>
+                        <span className="font-mono text-purple-600">₹{totalPrice * Object.values(selectedSizes).reduce((sum, q) => sum + q, 0)}</span>
                       </div>
                     </div>
                   </div>
@@ -2077,7 +2080,7 @@ export default function Customizer() {
                 {/* Final Add to Cart Button */}
                 <button
                   onClick={handleConfirmAddToCart}
-                  className="w-full py-4 bg-accent hover:bg-dark text-white rounded-2xl font-bold text-xs uppercase tracking-widest cursor-pointer transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-glow hover:scale-[1.01] active:scale-[0.99] mt-6 border-none"
+                  className="w-full py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest cursor-pointer transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-glow hover:scale-[1.01] active:scale-[0.99] mt-6 border-none"
                 >
                   <ShoppingBag className="w-4.5 h-4.5" />
                   Confirm & Add to Bag

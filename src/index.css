@@ -309,3 +309,43 @@ div[role="status"] > div {
   font-family: 'Space Grotesk', sans-serif !important;
   box-shadow: 0 10px 30px rgba(139, 92, 246, 0.08) !important;
 }
+
+/* Add Product Modal specific scrollbar style */
+.modal-purple-scrollbar,
+.modal-purple-scrollbar * {
+  scrollbar-width: thin !important;
+  scrollbar-color: #8B5CF6 #FAFAF7 !important; /* Force purple scrollbar for Firefox & modern Chrome */
+}
+
+/* Webkit scrollbar overrides for modal container and nested scrolling elements */
+.modal-purple-scrollbar::-webkit-scrollbar,
+.modal-purple-scrollbar *::-webkit-scrollbar {
+  width: 4.5px !important;
+  height: 4.5px !important;
+}
+
+.modal-purple-scrollbar::-webkit-scrollbar-track,
+.modal-purple-scrollbar *::-webkit-scrollbar-track {
+  background: #FAFAF7 !important;
+  border-radius: 32px !important;
+  border-top: 16px solid transparent !important;
+  border-bottom: 16px solid transparent !important;
+  background-clip: padding-box !important; /* Reduces vertical height from top and bottom */
+}
+
+.modal-purple-scrollbar::-webkit-scrollbar-thumb,
+.modal-purple-scrollbar *::-webkit-scrollbar-thumb {
+  background: #8B5CF6 !important;
+  border-radius: 9999px !important;
+  border: 1px solid #FAFAF7 !important;
+}
+
+.modal-purple-scrollbar::-webkit-scrollbar-thumb:hover,
+.modal-purple-scrollbar *::-webkit-scrollbar-thumb:hover {
+  background: #7C3AED !important;
+}
+
+/* Globally Hide HUD corner arrows from all boxes */
+.hud-corner {
+  display: none !important;
+}
