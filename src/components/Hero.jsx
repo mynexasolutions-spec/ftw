@@ -418,7 +418,7 @@ export default function Hero({ heroImages, heroBgBanner, heroBgBannerMobile, all
         .card-hero-inner {
           position: absolute;
           inset: 2.5px; /* Border line thickness */
-          background: #ffffff;
+          background: #000000;
           clip-path: polygon(13px 0, calc(100% - 13px) 0, 100% 13px, 100% calc(100% - 13px), calc(100% - 13px) 100%, 13px 100%, 0 calc(100% - 13px), 0 13px);
           overflow: hidden;
           display: flex;
@@ -861,7 +861,7 @@ export default function Hero({ heroImages, heroBgBanner, heroBgBannerMobile, all
                         height: '100%',
                         objectFit: 'cover',
                         objectPosition: 'center center',
-                        backgroundColor: '#ffffff',
+                        backgroundColor: '#000000',
                       }}
                     />
                   </AnimatePresence>

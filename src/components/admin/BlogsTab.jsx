@@ -181,41 +181,41 @@ export default function BlogsTab({
           </div>
 
           {/* Stats Cards Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-3 gap-2.5 sm:gap-6">
             {/* Total Posts */}
             <motion.div
               whileHover={{ y: -4 }}
-              className="bg-neutral-55/40 border border-neutral-200/60 p-5 rounded-2xl flex flex-col justify-between min-h-[110px]"
+              className="bg-neutral-55/40 border border-neutral-200/60 p-3 sm:p-5 rounded-2xl flex flex-col justify-between min-h-[100px] sm:min-h-[110px]"
             >
               <div>
-                <span className="text-[9px] sm:text-[10px] lg:text-xs xl:text-sm font-sans font-black text-dark2/50 uppercase tracking-widest block">Total Posts</span>
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-dark mt-1 font-sans">{totalPosts}</p>
+                <span className="text-[8.5px] xs:text-[9.5px] sm:text-[10px] lg:text-xs xl:text-sm font-sans font-black text-dark2/50 uppercase tracking-widest block">Total Posts</span>
+                <p className="text-lg xs:text-xl sm:text-3xl lg:text-4xl font-black text-dark mt-0.5 sm:mt-1 font-sans">{totalPosts}</p>
               </div>
-              <span className="text-[8px] sm:text-[9px] lg:text-[10px] xl:text-xs font-sans text-dark/30 mt-2">All Drop Stories</span>
+              <span className="text-[7.5px] xs:text-[8.5px] sm:text-[9px] lg:text-[10px] xl:text-xs font-sans text-dark/30 mt-1.5 sm:mt-2">All Drop Stories</span>
             </motion.div>
 
             {/* Published */}
             <motion.div
               whileHover={{ y: -4 }}
-              className="bg-purple-50/50 border border-purple-100 p-5 rounded-2xl flex flex-col justify-between min-h-[110px]"
+              className="bg-purple-50/50 border border-purple-100 p-3 sm:p-5 rounded-2xl flex flex-col justify-between min-h-[100px] sm:min-h-[110px]"
             >
               <div>
-                <span className="text-[9px] sm:text-[10px] lg:text-xs xl:text-sm font-sans font-black text-accent uppercase tracking-widest block">Published</span>
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-dark mt-1 font-sans">{publishedPosts}</p>
+                <span className="text-[8.5px] xs:text-[9.5px] sm:text-[10px] lg:text-xs xl:text-sm font-sans font-black text-accent uppercase tracking-widest block">Published</span>
+                <p className="text-lg xs:text-xl sm:text-3xl lg:text-4xl font-black text-dark mt-0.5 sm:mt-1 font-sans">{publishedPosts}</p>
               </div>
-              <span className="text-[8px] sm:text-[9px] lg:text-[10px] xl:text-xs font-sans text-purple-600 mt-2">Live on Shop Portal</span>
+              <span className="text-[7.5px] xs:text-[8.5px] sm:text-[9px] lg:text-[10px] xl:text-xs font-sans text-purple-600 mt-1.5 sm:mt-2">Live on Shop</span>
             </motion.div>
 
             {/* Drafts */}
             <motion.div
               whileHover={{ y: -4 }}
-              className="bg-neutral-55/50 border border-neutral-200/40 p-5 rounded-2xl flex flex-col justify-between min-h-[110px]"
+              className="bg-neutral-55/50 border border-neutral-200/40 p-3 sm:p-5 rounded-2xl flex flex-col justify-between min-h-[100px] sm:min-h-[110px]"
             >
               <div>
-                <span className="text-[9px] sm:text-[10px] lg:text-xs xl:text-sm font-sans font-black text-dark2/40 uppercase tracking-widest block">Drafts</span>
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-dark mt-1 font-sans">{draftPosts}</p>
+                <span className="text-[8.5px] xs:text-[9.5px] sm:text-[10px] lg:text-xs xl:text-sm font-sans font-black text-dark2/40 uppercase tracking-widest block">Drafts</span>
+                <p className="text-lg xs:text-xl sm:text-3xl lg:text-4xl font-black text-dark mt-0.5 sm:mt-1 font-sans">{draftPosts}</p>
               </div>
-              <span className="text-[8px] sm:text-[9px] lg:text-[10px] xl:text-xs font-sans text-neutral-400 mt-2">Private offline notes</span>
+              <span className="text-[7.5px] xs:text-[8.5px] sm:text-[9px] lg:text-[10px] xl:text-xs font-sans text-neutral-400 mt-1.5 sm:mt-2">Offline Drafts</span>
             </motion.div>
           </div>
 
@@ -241,82 +241,144 @@ export default function BlogsTab({
               <p className="text-[10px] lg:text-xs text-dark2/40 mt-1 font-sans">Create your first update drop, or clear search queries.</p>
             </div>
           ) : (
-            <div className="bg-white border border-cream3 rounded-[28px] overflow-hidden shadow-xs">
-              <table className="w-full text-left border-collapse text-xs lg:text-[14px] xl:text-[15px]">
-                <thead>
-                  <tr className="bg-cream2/30 border-b border-cream3 select-none text-[10px] lg:text-xs font-sans font-black uppercase tracking-wider text-dark2/50">
-                    <th className="p-4 lg:p-5">Story Details</th>
-                    <th className="hidden md:table-cell p-4 lg:p-5">Author</th>
-                    <th className="hidden sm:table-cell p-4 lg:p-5">Tag</th>
-                    <th className="hidden sm:table-cell p-4 lg:p-5">Status</th>
-                    <th className="p-4 lg:p-5 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-cream2 font-medium">
-                  {filteredBlogs.map((blog) => (
-                    <tr key={blog.id} className="hover:bg-cream2/15 transition-colors">
-                      <td className="p-4 lg:p-5">
-                        <div className="flex gap-4 items-center">
-                          <div className="w-16 h-10 rounded-lg overflow-hidden bg-cream border border-cream3 shrink-0 select-none">
-                            {blog.image ? (
-                              <img src={blog.image} alt={blog.title} className="w-full h-full object-cover" />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-dark2/30">
-                                <FileText className="w-4 h-4" />
-                              </div>
-                            )}
-                          </div>
-                          <div>
-                            <span className="font-sans font-semibold text-xs lg:text-[16px] xl:text-[18px] text-dark block leading-snug">{blog.title}</span>
-                            <span className="text-[10px] lg:text-xs text-dark2/45 font-sans hidden sm:block mt-1">{blog.slug}</span>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="hidden md:table-cell p-4 lg:p-5 text-dark2/70 font-sans font-bold">{blog.author}</td>
-                      <td className="hidden sm:table-cell p-4 lg:p-5 font-sans text-[10px]">
-                        {blog.tag ? (
-                          <span className="bg-dark text-cream font-black px-2 py-1 rounded-md text-[9px] select-none tracking-widest uppercase">{blog.tag}</span>
-                        ) : (
-                          <span className="text-dark2/30 italic">—</span>
-                        )}
-                      </td>
-                      <td className="hidden sm:table-cell p-4 lg:p-5">
-                        {blog.published ? (
-                          <span className="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-200/50 px-3 py-1 rounded-xl text-[9px] font-sans font-black uppercase tracking-wider select-none">
-                            <Globe className="w-3 h-3" /> Live
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1.5 text-neutral-500 bg-neutral-100 border border-neutral-200/50 px-3 py-1 rounded-xl text-[9px] font-sans font-black uppercase tracking-wider select-none">
-                            <Eye className="w-3 h-3 text-neutral-450" /> Draft
-                          </span>
-                        )}
-                      </td>
-                      <td className="p-4 lg:p-5 text-right">
-                        <div className="flex gap-2 justify-end">
-                          <button
-                            onClick={() => handleOpenEdit(blog)}
-                            className="p-2 border border-cream3 rounded-xl hover:bg-cream hover:border-dark text-dark transition-all cursor-pointer bg-white shadow-xs"
-                            title="Edit Post"
-                          >
-                            <Edit2 className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => {
-                              if (confirm("Delete this story permanently?")) {
-                                onDeleteBlog(blog.id)
-                              }
-                            }}
-                            className="p-2 border border-cream3 rounded-xl hover:bg-red-50 hover:border-red-300 text-red-600 transition-all cursor-pointer bg-white shadow-xs"
-                            title="Delete Post"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </td>
+            <div className="space-y-4">
+              {/* Desktop Table View */}
+              <div className="hidden md:block bg-white border border-cream3 rounded-[28px] overflow-hidden shadow-xs">
+                <table className="w-full text-left border-collapse text-xs lg:text-[14px] xl:text-[15px]">
+                  <thead>
+                    <tr className="bg-cream2/30 border-b border-cream3 select-none text-[10px] lg:text-xs font-sans font-black uppercase tracking-wider text-dark2/50">
+                      <th className="p-4 lg:p-5">Story Details</th>
+                      <th className="p-4 lg:p-5">Author</th>
+                      <th className="p-4 lg:p-5">Tag</th>
+                      <th className="p-4 lg:p-5">Status</th>
+                      <th className="p-4 lg:p-5 text-right">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-cream2 font-medium">
+                    {filteredBlogs.map((blog) => (
+                      <tr key={blog.id} className="hover:bg-cream2/15 transition-colors">
+                        <td className="p-4 lg:p-5">
+                          <div className="flex gap-4 items-center">
+                            <div className="w-16 h-10 rounded-lg overflow-hidden bg-cream border border-cream3 shrink-0 select-none">
+                              {blog.image ? (
+                                <img src={blog.image} alt={blog.title} className="w-full h-full object-cover" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-dark2/30">
+                                  <FileText className="w-4 h-4" />
+                                </div>
+                              )}
+                            </div>
+                            <div>
+                              <span className="font-sans font-semibold text-xs lg:text-[16px] xl:text-[18px] text-dark block leading-snug">{blog.title}</span>
+                              <span className="text-[10px] lg:text-xs text-dark2/45 font-sans block mt-1">{blog.slug}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-4 lg:p-5 text-dark2/70 font-sans font-bold">{blog.author}</td>
+                        <td className="p-4 lg:p-5 font-sans text-[10px]">
+                          {blog.tag ? (
+                            <span className="bg-dark text-cream font-black px-2 py-1 rounded-md text-[9px] select-none tracking-widest uppercase">{blog.tag}</span>
+                          ) : (
+                            <span className="text-dark2/30 italic">—</span>
+                          )}
+                        </td>
+                        <td className="p-4 lg:p-5">
+                          {blog.published ? (
+                            <span className="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-200/50 px-3 py-1 rounded-xl text-[9px] font-sans font-black uppercase tracking-wider select-none">
+                              <Globe className="w-3 h-3" /> Live
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 text-neutral-500 bg-neutral-100 border border-neutral-200/50 px-3 py-1 rounded-xl text-[9px] font-sans font-black uppercase tracking-wider select-none">
+                              <Eye className="w-3 h-3 text-neutral-450" /> Draft
+                            </span>
+                          )}
+                        </td>
+                        <td className="p-4 lg:p-5 text-right">
+                          <div className="flex gap-2 justify-end">
+                            <button
+                              onClick={() => handleOpenEdit(blog)}
+                              className="p-2 border border-cream3 rounded-xl hover:bg-cream hover:border-dark text-dark transition-all cursor-pointer bg-white shadow-xs"
+                              title="Edit Post"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (confirm("Delete this story permanently?")) {
+                                  onDeleteBlog(blog.id)
+                                }
+                              }}
+                              className="p-2 border border-cream3 rounded-xl hover:bg-red-50 hover:border-red-300 text-red-600 transition-all cursor-pointer bg-white shadow-xs"
+                              title="Delete Post"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Card-based List View */}
+              <div className="md:hidden divide-y divide-cream3 bg-cream2/10 border border-cream3 rounded-2xl overflow-hidden shadow-xs">
+                {filteredBlogs.map((blog) => (
+                  <div key={blog.id} className="p-4 space-y-3 hover:bg-cream/15 transition-all text-dark font-sans bg-white">
+                    <div className="flex gap-3 items-start">
+                      {/* Image Thumbnail */}
+                      <div className="w-16 h-12 rounded-lg overflow-hidden bg-cream border border-cream3 shrink-0 select-none">
+                        {blog.image ? (
+                          <img src={blog.image} alt={blog.title} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-dark2/30">
+                            <FileText className="w-4 h-4" />
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Details */}
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <span className="font-sans font-bold text-xs sm:text-sm text-dark block leading-snug">{blog.title}</span>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {blog.tag && (
+                            <span className="bg-dark text-cream font-black px-1.5 py-0.5 rounded text-[8px] tracking-wider uppercase">{blog.tag}</span>
+                          )}
+                          {blog.published ? (
+                            <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 border border-emerald-250 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider">Live</span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 text-neutral-500 bg-neutral-105 border border-neutral-250 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider">Draft</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Footer Actions */}
+                    <div className="flex justify-between items-center pt-2 border-t border-dashed border-cream3/50">
+                      <span className="text-[9px] font-mono text-dark2/45 font-bold uppercase tracking-wider">By: {blog.author}</span>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleOpenEdit(blog)}
+                          className="px-3 py-1.5 border border-cream3 rounded-xl hover:bg-cream hover:border-dark text-[10px] font-bold uppercase tracking-wider text-dark transition-all cursor-pointer bg-white shadow-3xs flex items-center gap-1"
+                        >
+                          <Edit2 className="w-3 h-3" />
+                          <span>Edit</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (confirm("Delete this story permanently?")) {
+                              onDeleteBlog(blog.id)
+                            }
+                          }}
+                          className="p-1.5 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-xl border-none transition-all cursor-pointer shadow-3xs"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getProducts, getOrders, getInquiries, insertProduct, updateProduct, deleteProduct, updateOrderStatus, insertInquiry, getCategories, insertCategory, deleteCategory, getUsers, updateCategory, getAdminCustomDesigns, deleteCustomDesign, getCoupons, insertCoupon, deleteCoupon, getReviews, approveReview, deleteReview, getStoreSettings, saveStoreSettings, deleteInquiry, getCustomizerConfig, getHomepageConfig, saveHomepageConfig, getCustomDesign, getBlogs, insertBlog, updateBlog, deleteBlog } from '../lib/supabase'
+import { supabase, getProducts, getOrders, getInquiries, insertProduct, updateProduct, deleteProduct, updateOrderStatus, insertInquiry, getCategories, insertCategory, deleteCategory, getUsers, updateCategory, getAdminCustomDesigns, deleteCustomDesign, getCoupons, insertCoupon, deleteCoupon, getReviews, approveReview, deleteReview, getStoreSettings, saveStoreSettings, deleteInquiry, getCustomizerConfig, getHomepageConfig, saveHomepageConfig, getCustomDesign, getBlogs, insertBlog, updateBlog, deleteBlog } from '../lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-hot-toast'
 import ProductFormModal from '../components/ProductFormModal'
@@ -143,6 +143,31 @@ export default function Admin() {
       loadAdminData()
     }
   }, [isAdmin, activeTab])
+
+  // Live orders: new orders and Shiprocket/status updates reflect instantly without a manual refresh.
+  useEffect(() => {
+    if (!isAdmin) return
+
+    const channel = supabase
+      .channel('admin-orders-live')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload) => {
+        setOrders(prev => prev.some(o => o.id === payload.new.id) ? prev : [payload.new, ...prev])
+        toast.success(`New order received: ${payload.new.id}`, {
+          style: { background: '#161616', color: '#D6FF40' }
+        })
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, (payload) => {
+        setOrders(prev => prev.map(o => o.id === payload.new.id ? payload.new : o))
+      })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'orders' }, (payload) => {
+        setOrders(prev => prev.filter(o => o.id !== payload.old.id))
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [isAdmin])
 
   const loadAdminData = async () => {
     setLoading(true)
@@ -297,7 +322,7 @@ export default function Admin() {
       sku: '',
       mrp: '',
       price: '',
-      category: 'Men',
+      category: '',
       subcategory: '',
       collection: '',
       brand: 'FTW',
@@ -420,6 +445,26 @@ export default function Admin() {
   const handleStatusChange = async (orderId, newStatus) => {
     await updateOrderStatus(orderId, newStatus)
     toast.success(`Status updated to ${newStatus}`)
+
+    if (newStatus === 'Cancelled') {
+      const order = orders.find(o => o.id === orderId)
+      if (order?.shiprocket_order_id) {
+        try {
+          const response = await fetch('/api/shiprocket-cancel', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId })
+          })
+          const data = await response.json()
+          if (!response.ok) throw new Error(data.error || 'Failed to cancel Shiprocket shipment')
+          toast.success('Shiprocket shipment cancelled')
+        } catch (err) {
+          console.error('Shiprocket cancel error:', err)
+          toast.error(`Order cancelled, but Shiprocket cancellation failed: ${err.message}`)
+        }
+      }
+    }
+
     loadAdminData()
   }
 
@@ -845,7 +890,8 @@ export default function Admin() {
   // Filter lists based on search
   const filteredProducts = products.filter(p =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.id.toLowerCase().includes(searchQuery.toLowerCase())
+    p.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (p.sku || '').toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   const filteredOrders = orders.filter(o =>
@@ -912,21 +958,21 @@ export default function Admin() {
 
   const tabs = [
     { id: 'dashboard', label: 'Sales Overview', icon: TrendingUp },
-    { id: 'homepage', label: 'Homepage Customizer', icon: Globe },
+    { id: 'orders', label: 'Orders', icon: ShoppingBag },
     { id: 'products', label: 'Products & Stock', icon: Package },
     { id: 'categories', label: 'Categories', icon: Layers },
-    { id: 'blogs', label: 'Blog Posts', icon: BookOpen },
-    { id: 'orders', label: 'Orders', icon: ShoppingBag },
-    { id: 'reviews', label: 'Reviews', icon: Star },
-    { id: 'users', label: 'Accounts', icon: Users },
     { id: 'coupons', label: 'Coupons', icon: Tag },
+    { id: 'reviews', label: 'Reviews', icon: Star },
+    { id: 'blogs', label: 'Blog Posts', icon: BookOpen },
     { id: 'contacts', label: 'Inquiries', icon: Mail },
+    { id: 'users', label: 'Accounts', icon: Users },
+    { id: 'homepage', label: 'Homepage Customizer', icon: Globe },
     { id: 'customizer', label: 'Customizer Mockups', icon: Palette },
     { id: 'settings', label: 'Store Settings', icon: Settings },
   ]
 
   return (
-    <div className="admin-theme bg-cream text-dark font-sans min-h-screen relative selection:bg-purple-600 selection:text-cream pt-28 pb-12 px-4 sm:px-6 md:px-12 max-w-[1600px] mx-auto">
+    <div className="admin-theme bg-cream text-dark font-sans min-h-screen relative selection:bg-purple-600 selection:text-cream pt-20 sm:pt-28 pb-12 px-2 sm:px-6 md:px-12 max-w-[1600px] mx-auto">
 
       {/* Top Navigation Bar */}
       <nav className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md border-b border-cream3 z-40 px-4 sm:px-6 md:px-12 py-4">
@@ -980,7 +1026,7 @@ export default function Admin() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 bg-dark/40 backdrop-blur-sm z-50 lg:hidden"
+              className="fixed inset-0 bg-dark/40 backdrop-blur-sm z-[100] lg:hidden"
             />
             {/* Sidebar Drawer */}
             <motion.aside
@@ -988,9 +1034,9 @@ export default function Admin() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 26, stiffness: 220 }}
-              className="fixed top-0 right-0 bottom-0 w-[320px] max-w-[85vw] bg-white border-l border-cream3 p-6 z-50 shadow-2xl flex flex-col justify-between font-sans lg:hidden"
+              className="fixed top-0 right-0 bottom-0 w-[320px] max-w-[85vw] bg-white border-l border-cream3 p-6 z-[100] shadow-2xl flex flex-col justify-between font-sans lg:hidden"
             >
-              <div className="flex flex-col gap-6 overflow-y-auto max-h-[calc(100vh-140px)] pr-1">
+              <div className="flex flex-col gap-6 overflow-y-auto max-h-[calc(100vh-140px)] pr-1 scrollbar-none">
                 {/* Header Badge */}
                 <div className="flex justify-between items-center pb-3 border-b border-cream3">
                   <span className="text-[13px] font-mono uppercase tracking-[0.2em] text-purple-600 font-black">Admin Panel</span>
@@ -1126,7 +1172,7 @@ export default function Admin() {
         </aside>
 
         {/* Dynamic Display Panel */}
-        <main className="flex-1 w-full bg-white border border-cream3 p-4 sm:p-8 lg:p-10 rounded-3xl shadow-sm min-h-[500px]">
+        <main className="flex-1 w-full bg-white border border-cream3 p-3 sm:p-8 lg:p-10 rounded-3xl shadow-sm min-h-[500px]">
 
           {loading ? (
             <div className="text-center py-24 font-sans text-dark2/60 text-sm">
@@ -1319,7 +1365,7 @@ export default function Admin() {
 
       <AnimatePresence>
         {showCategoryModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div onClick={() => setShowCategoryModal(false)} className="absolute inset-0 bg-dark/70 backdrop-blur-md" />
             <motion.div
               initial={{ opacity: 0, y: 20, scale: 0.96 }}

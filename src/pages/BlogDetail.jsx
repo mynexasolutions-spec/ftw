@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { Calendar, User, ArrowLeft, ArrowRight, Share2, BookOpen, Zap } from 'lucide-react'
 import { getBlogBySlug } from '../lib/supabase'
 import { toast } from 'react-hot-toast'
+import DOMPurify from 'dompurify'
 
 const stagger = {
   hidden: { opacity: 0 },
@@ -95,7 +96,7 @@ export default function BlogDetail() {
   if (!blog) return null
 
   return (
-    <div className="bg-[#FAF9F6] text-[#161616] font-sans min-h-screen pt-16 sm:pt-24 pb-20 relative selection:bg-dark selection:text-[#D6FF40] bg-grain">
+    <div className="bg-[#FAF9F6] text-[#161616] font-sans min-h-screen pt-8 sm:pt-24 pb-20 relative selection:bg-dark selection:text-[#D6FF40] bg-grain">
 
       {/* Gaming UI grid lines and glowing effects in light theme */}
       <style dangerouslySetInnerHTML={{
@@ -195,10 +196,6 @@ export default function BlogDetail() {
       {/* Background accents */}
       <div className="absolute top-0 left-0 w-full h-[500px] bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,rgba(139,92,246,0.06),transparent)] pointer-events-none" />
 
-      {/* Decorative vertical text */}
-      <div className="absolute left-6 top-[25%] rotate-[-90deg] origin-left text-[9px] font-mono text-gray-400 tracking-[0.3em] uppercase select-none pointer-events-none">
-        FTW // DOSSIER // LOG
-      </div>
 
       <motion.div
         variants={stagger}
@@ -332,7 +329,7 @@ export default function BlogDetail() {
                       box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08) !important;
                     }
                   `}</style>
-                  <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+                  <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(blog.content || '') }} />
                 </div>
               </motion.div>
             </div>

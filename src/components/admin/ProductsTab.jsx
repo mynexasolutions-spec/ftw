@@ -231,7 +231,7 @@ export default function ProductsTab({
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 lg:w-4.5 lg:h-4.5 text-dark/30 group-focus-within:text-dark transition-colors" />
           <input
             type="text"
-            placeholder="Search catalog products by name or ID..."
+            placeholder="Search catalog products by name, SKU or ID..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-11 pr-4 py-3 sm:py-3.5 rounded-2xl border border-cream3 bg-white hover:border-neutral-300 focus:border-dark focus:bg-white text-xs lg:text-sm text-dark focus:outline-none font-sans transition-all duration-300 shadow-xs focus:shadow-md placeholder-dark/30 font-semibold"

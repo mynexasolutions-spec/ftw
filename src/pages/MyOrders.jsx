@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { getOrders, insertReview, getReviews, getCustomDesign, getCustomizerConfig } from '../lib/supabase'
+import { supabase, getOrders, insertReview, getReviews, getCustomDesign, getCustomizerConfig } from '../lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ShoppingBag, ChevronDown, ChevronUp, Loader2, MapPin, CreditCard, Download, Star, X, CheckCircle, Eye, Tag, Edit, Type, Image as ImageIcon, Sparkles, Layers } from 'lucide-react'
+import { ShoppingBag, ChevronDown, ChevronUp, Loader2, MapPin, CreditCard, Download, Star, X, CheckCircle, Eye, Tag, Edit, Type, Image as ImageIcon, Sparkles, Layers, ExternalLink, Check } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import Loader from '../components/Loader'
 
@@ -47,6 +47,7 @@ export default function MyOrders() {
   const [expandedOrderId, setExpandedOrderId] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedStatus, setSelectedStatus] = useState('All')
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   // Rating modal state
   const [ratingModal, setRatingModal] = useState(null) // { order, item }
@@ -98,6 +99,40 @@ export default function MyOrders() {
       loadUserOrders()
     }
   }, [user, authLoading])
+
+  // Live order status: Shiprocket webhook / admin status changes reflect instantly without a refresh.
+  useEffect(() => {
+    if (!user) return
+
+    const belongsToUser = (order) => {
+      if (order.user_id && user.id) return order.user_id === user.id
+      return order.email?.toLowerCase() === user.email?.toLowerCase()
+    }
+
+    const channel = supabase
+      .channel(`my-orders-live-${user.id}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload) => {
+        if (!belongsToUser(payload.new)) return
+        setOrders(prev => prev.some(o => o.id === payload.new.id) ? prev : [payload.new, ...prev])
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, (payload) => {
+        if (!belongsToUser(payload.new)) return
+        setOrders(prev => {
+          const existing = prev.find(o => o.id === payload.new.id)
+          if (existing && existing.status !== payload.new.status) {
+            toast.success(`Order ${payload.new.id} is now ${payload.new.status}!`, {
+              style: { background: '#161616', color: '#D6FF40' }
+            })
+          }
+          return prev.map(o => o.id === payload.new.id ? payload.new : o)
+        })
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [user])
 
   const handleViewOrderItemDesign = async (item) => {
     let customDesignObj = item.customDesign
@@ -471,14 +506,22 @@ export default function MyOrders() {
     }
   }
 
-  const formatOrderDate = (dateStr) => {
+  const formatOrderDate = (dateStr, showTime = false) => {
     if (!dateStr) return 'N/A'
     try {
-      return new Date(dateStr).toLocaleDateString('en-IN', {
+      const d = new Date(dateStr)
+      const datePart = d.toLocaleDateString('en-IN', {
         day: '2-digit',
         month: 'short',
         year: 'numeric'
       })
+      if (!showTime) return datePart
+      const timePart = d.toLocaleTimeString('en-IN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      })
+      return `${datePart}, ${timePart}`
     } catch (e) {
       return dateStr
     }
@@ -501,6 +544,16 @@ export default function MyOrders() {
     if (s === 'shipped' || s === 'dispatched') return 2
     if (s === 'processing') return 1
     return 0 // Pending
+  }
+
+  const getStatusTimeLabel = (stepIndex, order) => {
+    const timeStr = formatOrderDate(order.updated_at || order.created_at, true)
+    switch(stepIndex) {
+      case 1: return `Processing Started: ${timeStr}`
+      case 2: return `Dispatched / Shipped: ${timeStr}`
+      case 3: return `Delivered: ${timeStr}`
+      default: return `Order Placed: ${formatOrderDate(order.created_at, true)}`
+    }
   }
 
   const filteredOrders = orders.filter(order => {
@@ -605,7 +658,7 @@ export default function MyOrders() {
         FTW // CUSTOMER_PORTAL // DATABASE_SECURE
       </div>
 
-      <div className="min-h-screen pt-16 pb-24 px-6 md:px-12 max-w-5xl mx-auto text-dark relative selection:bg-purple-600 selection:text-white">
+      <div className="min-h-screen pt-16 pb-24 px-3 sm:px-6 md:px-12 max-w-5xl mx-auto text-dark relative selection:bg-purple-600 selection:text-white">
         {/* Title Header: Matches Shop/Helpline/About page titles */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
@@ -635,20 +688,56 @@ export default function MyOrders() {
             />
           </div>
 
-          {/* Status filter tabs */}
-          <div className="flex flex-wrap gap-2 overflow-x-auto pb-1 md:pb-0">
-            {['All', 'Custom Designs', 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'].map(status => (
-              <button
-                key={status}
-                onClick={() => setSelectedStatus(status)}
-                className={`px-4 py-2.5 text-[11px] font-mono font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer border ${selectedStatus === status
-                    ? 'bg-purple-600 border-purple-600 text-white shadow-sm'
-                    : 'bg-white border-cream3 text-dark2/70 hover:border-purple-600/35'
-                  }`}
-              >
-                {status}
-              </button>
-            ))}
+          {/* Status filter dropdown */}
+          <div className="relative shrink-0 w-full md:w-64 z-30">
+            <button
+              type="button"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="w-full flex items-center justify-between px-5 py-3.5 border border-cream3 rounded-2xl bg-white text-xs font-mono font-black uppercase tracking-wider text-dark hover:border-purple-650 focus:outline-none transition-colors cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-purple-600/60 font-bold">Filter:</span>
+                <span>{selectedStatus}</span>
+              </div>
+              <ChevronDown className={`w-4 h-4 text-purple-600 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            <AnimatePresence>
+              {isDropdownOpen && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setIsDropdownOpen(false)} />
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 left-0 mt-2 bg-white border border-cream3 rounded-2xl shadow-xl overflow-hidden z-20 p-1.5"
+                  >
+                    {['All', 'Custom Designs', 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'].map(status => {
+                      const isSelected = selectedStatus === status
+                      return (
+                        <button
+                          key={status}
+                          type="button"
+                          onClick={() => {
+                            setSelectedStatus(status)
+                            setIsDropdownOpen(false)
+                          }}
+                          className={`w-full text-left px-4 py-3 text-[11px] font-mono font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-between border-none ${
+                            isSelected
+                              ? 'bg-purple-600 text-white shadow-xs'
+                              : 'bg-transparent text-dark2 hover:bg-cream/40 hover:text-dark'
+                          }`}
+                        >
+                          <span>{status}</span>
+                          {isSelected && <Check className="w-3.5 h-3.5" />}
+                        </button>
+                      )
+                    })}
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       )}
@@ -716,26 +805,26 @@ export default function MyOrders() {
                   {/* Collapsed Header Info / Card Trigger */}
                   <div
                     onClick={() => toggleExpand(order.id)}
-                    className="p-6 md:p-8 cursor-pointer hover:bg-cream/10 transition-colors"
+                    className="p-4 sm:p-6 md:p-8 cursor-pointer hover:bg-cream/10 transition-colors"
                   >
                     {/* Top row: Order meta + status + chevron */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 flex-grow">
                         <div>
-                          <span className="text-[11px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Order ID</span>
-                          <span className="font-mono text-[15px] font-black text-dark block mt-1">{order.id}</span>
+                          <span className="text-[12px] sm:text-[13px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Order ID</span>
+                          <span className="font-mono text-[16px] sm:text-[17px] font-black text-dark block mt-1">{order.id}</span>
                         </div>
                         <div>
-                          <span className="text-[11px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Placed On</span>
-                          <span className="text-[14.5px] font-extrabold text-dark block mt-1">{formatOrderDate(order.created_at)}</span>
+                          <span className="text-[12px] sm:text-[13px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Placed On</span>
+                          <span className="text-[13.5px] sm:text-[14.5px] font-extrabold text-dark block mt-1">{formatOrderDate(order.created_at, true)}</span>
                         </div>
                         <div>
-                          <span className="text-[11px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Grand Total</span>
-                          <span className="text-[17px] font-black font-mono text-dark block mt-1">₹{order.total.toLocaleString('en-IN')}</span>
+                          <span className="text-[12px] sm:text-[13px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Grand Total</span>
+                          <span className="text-[18.5px] sm:text-[20px] font-black font-mono text-dark block mt-1">₹{order.total.toLocaleString('en-IN')}</span>
                         </div>
                         <div>
-                          <span className="text-[11px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Status</span>
-                          <span className={`inline-block px-3 py-1 rounded-lg text-[12.5px] font-black uppercase mt-1 border tracking-wider ${isDelivered ? 'bg-green-50 text-green-700 border-green-200' :
+                          <span className="text-[12px] sm:text-[13px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Status</span>
+                          <span className={`inline-block px-3.5 py-1 rounded-lg text-[13.5px] sm:text-[14.5px] font-black uppercase mt-1 border tracking-wider ${isDelivered ? 'bg-green-50 text-green-700 border-green-200' :
                               isShipped ? 'bg-blue-50 text-blue-700 border-blue-200' :
                                 isProcessing ? 'bg-purple-50 text-purple-700 border-purple-200' :
                                   isCancelled ? 'bg-red-50 text-red-700 border-red-200' :
@@ -747,12 +836,114 @@ export default function MyOrders() {
                       </div>
 
                       <div className="flex items-center justify-end gap-3 shrink-0">
-                        <span className="text-[11px] font-mono text-dark2/45 font-bold md:hidden uppercase tracking-widest">Tap to View</span>
+                        <span className="text-[9.5px] font-mono text-dark2/45 font-bold md:hidden uppercase tracking-wider">Tap to See Details</span>
                         <button className="p-2 rounded-full bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white transition-all border border-purple-200 cursor-pointer">
                           {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                         </button>
                       </div>
                     </div>
+
+                    {/* Visual Status Progress Bar */}
+                    {!isCancelled ? (
+                      <div className="mt-5 pt-4 border-t border-cream3/60 font-sans">
+                        <div className="relative flex items-center justify-between px-2 sm:px-6">
+                          {/* Connecting Line background */}
+                          <div className="absolute left-[30px] right-[30px] top-[14px] h-[3px] bg-cream3 rounded-full z-0" />
+                          
+                          {/* Connecting Line active fill */}
+                          <div 
+                            className="absolute left-[30px] top-[14px] h-[3px] bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full z-0 transition-all duration-500 ease-out" 
+                            style={{ width: `calc(${(currentStep / 3) * 100}% - ${(currentStep / 3) * 8}px)` }}
+                          />
+
+                          {steps.map((step, idx) => {
+                            const isCompleted = idx <= currentStep
+                            const isActive = idx === currentStep
+                            return (
+                              <div key={step} className="flex flex-col items-center z-10 relative select-none">
+                                {/* Dot */}
+                                <div 
+                                  className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 font-sans ${
+                                    isCompleted 
+                                      ? 'bg-purple-600 text-white shadow-[0_0_10px_rgba(139,92,246,0.35)]' 
+                                      : 'bg-white text-dark2/40 border-2 border-cream3'
+                                  }`}
+                                >
+                                  <span className="text-[10px] font-mono font-black">{idx + 1}</span>
+                                </div>
+                                {/* Label */}
+                                <span 
+                                  className={`text-[8.5px] xs:text-[9.5px] sm:text-[10.5px] font-mono uppercase tracking-wider mt-1.5 transition-all ${
+                                    isActive 
+                                      ? 'text-purple-650 font-black' 
+                                      : isCompleted 
+                                        ? 'text-dark/80 font-bold' 
+                                        : 'text-dark2/40 font-semibold'
+                                  }`}
+                                >
+                                  {step}
+                                </span>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="mt-5 pt-4 border-t border-red-200 px-2 sm:px-6">
+                        <div className="bg-red-50 border border-red-150 rounded-2xl p-3 flex items-center gap-3">
+                          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse shrink-0" />
+                          <div className="space-y-0.5 font-sans">
+                            <span className="text-[10px] font-mono text-red-650 uppercase font-black tracking-wider block leading-none">Order Terminated</span>
+                            <span className="text-[12px] font-semibold text-red-700/85 block leading-tight mt-0.5">This shipment has been cancelled.</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Collapsed view tracking banner (when AWB is available) */}
+                    {order.shiprocket_awb_code && (
+                      <div className="mt-5 mx-2 sm:mx-6 bg-gradient-to-r from-purple-50 via-[#FAF9F6]/40 to-transparent border border-purple-500/25 p-3.5 sm:p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-sans shadow-2xs relative overflow-hidden group select-none">
+                        {/* Decorative background blur */}
+                        <div className="absolute -right-10 -top-10 w-24 h-24 bg-purple-250/10 rounded-full blur-xl pointer-events-none group-hover:scale-150 transition-transform duration-700" />
+                        
+                        <div className="flex flex-wrap items-center gap-3">
+                          {/* Live Transit Ping Badge */}
+                          <div className="flex items-center gap-2 bg-green-50 text-green-700 border border-green-150/60 px-3 py-1.5 rounded-xl text-[11px] font-mono font-black uppercase tracking-wider select-none shrink-0 shadow-3xs">
+                            <span className="relative flex h-2 w-2">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                            </span>
+                            Transit Active
+                          </div>
+
+                          {/* Courier Details Pill */}
+                          <div className="bg-white border border-cream3 rounded-xl px-3.5 py-2 flex items-center gap-2.5 shadow-3xs">
+                            <span className="text-[10px] font-mono text-purple-650/70 uppercase font-black tracking-wider block leading-none">Courier</span>
+                            <span className="w-px h-3.5 bg-cream3" />
+                            <span className="text-[13px] font-black text-dark uppercase block leading-none">{order.shiprocket_courier || 'Delhivery'}</span>
+                          </div>
+
+                          {/* AWB Code Pill */}
+                          <div className="bg-white border border-cream3 rounded-xl px-3.5 py-2 flex items-center gap-2.5 shadow-3xs">
+                            <span className="text-[10px] font-mono text-purple-650/70 uppercase font-black tracking-wider block leading-none">AWB Code</span>
+                            <span className="w-px h-3.5 bg-cream3" />
+                            <span className="text-[12.5px] font-mono font-black text-dark block leading-none tracking-wide select-all">{order.shiprocket_awb_code}</span>
+                          </div>
+                        </div>
+
+                        {/* Tracking CTA Button */}
+                        <a
+                          href={`https://shiprocket.co/tracking/${order.shiprocket_awb_code}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="px-5 py-2.5 bg-dark hover:bg-purple-600 text-white text-[12px] font-mono font-black uppercase tracking-widest rounded-xl transition-all duration-300 flex items-center gap-2 border border-dark hover:border-purple-600 shadow-md hover:scale-105 active:scale-95 cursor-pointer decoration-none shrink-0 self-start sm:self-auto"
+                        >
+                          <span>Track Order</span>
+                          <ExternalLink className="w-3.5 h-3.5 text-accent shrink-0" />
+                        </a>
+                      </div>
+                    )}
 
                     {/* Product Preview Strip + Quick Info — always visible */}
                     {order.items && order.items.length > 0 && (
@@ -876,13 +1067,14 @@ export default function MyOrders() {
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
-                        className="border-t border-cream3 p-6 md:p-8 bg-cream/10 space-y-8"
+                        className="border-t border-cream3 p-4 sm:p-6 md:p-8 bg-cream/10 space-y-6"
                       >
                         {/* Customer, Address & Payment Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-dark font-sans">
-                          <div className="bg-white border border-purple-100 rounded-2xl p-5 space-y-2">
+                          <div className="bg-white border border-purple-100 rounded-2xl p-5 space-y-3">
                             <span className="text-[11px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Delivery Details</span>
-                            <p className="text-[13px] font-semibold leading-relaxed whitespace-pre-line text-dark2/80">{order.address}</p>
+                            <p className="text-[13px] font-semibold leading-relaxed whitespace-pre-line text-dark2/80 mb-2">{order.address}</p>
+
                           </div>
                           <div className="bg-white border border-purple-100 rounded-2xl p-5 space-y-2">
                             <span className="text-[11px] font-mono text-purple-600/70 uppercase font-black block tracking-wider">Payment Information</span>

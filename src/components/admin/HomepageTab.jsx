@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Globe, Save, Plus, Trash, Image, Link, Clock, Sparkles, Upload, Search, X, Check, Link2, Pencil } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { toast } from 'react-hot-toast'
+import { getPlainTshirtCombo, savePlainTshirtCombo } from '../../lib/supabase'
 
 export default function HomepageTab({
   products,
@@ -40,7 +41,9 @@ export default function HomepageTab({
       { url: '', label: '' }
     ],
     hero_bg_banner: homepageConfig?.hero_bg_banner || '',
-    hero_bg_banner_mobile: homepageConfig?.hero_bg_banner_mobile || ''
+    hero_bg_banner_mobile: homepageConfig?.hero_bg_banner_mobile || '',
+    dtf_video_url: homepageConfig?.dtf_video_url || '',
+    dtf_video_caption: homepageConfig?.dtf_video_caption || ''
   })
 
   React.useEffect(() => {
@@ -59,10 +62,39 @@ export default function HomepageTab({
           { url: '', label: '' }
         ],
         hero_bg_banner: homepageConfig.hero_bg_banner || '',
-        hero_bg_banner_mobile: homepageConfig.hero_bg_banner_mobile || ''
+        hero_bg_banner_mobile: homepageConfig.hero_bg_banner_mobile || '',
+        dtf_video_url: homepageConfig.dtf_video_url || '',
+        dtf_video_caption: homepageConfig.dtf_video_caption || ''
       })
     }
   }, [homepageConfig])
+
+  const [plainTshirtComboIds, setPlainTshirtComboIds] = useState([])
+
+  React.useEffect(() => {
+    async function loadCombo() {
+      const ids = await getPlainTshirtCombo()
+      setPlainTshirtComboIds(ids || [])
+    }
+    loadCombo()
+  }, [])
+
+  const togglePlainTshirtComboProduct = (id) => {
+    setPlainTshirtComboIds(prev => {
+      const exists = prev.includes(id)
+      return exists ? prev.filter(x => x !== id) : [...prev, id]
+    })
+  }
+
+  const handleSavePlainTshirtCombo = async (e) => {
+    e.preventDefault()
+    try {
+      await savePlainTshirtCombo(plainTshirtComboIds)
+      toast.success('Plain T-shirt Combo saved successfully!')
+    } catch (err) {
+      toast.error(`Save failed: ${err.message}`)
+    }
+  }
 
   const [pickerModalOpen, setPickerModalOpen] = useState(false)
   const [pickerBannerIdx, setPickerBannerIdx] = useState(null)
@@ -72,6 +104,61 @@ export default function HomepageTab({
   const [uploadingBg, setUploadingBg] = useState(false)
   const [uploadingBgMobile, setUploadingBgMobile] = useState(false)
   const [uploadingTeasers, setUploadingTeasers] = useState([false, false, false])
+  const [uploadingDtfVideo, setUploadingDtfVideo] = useState(false)
+
+  // Reads a video file's natural dimensions off-DOM, without ever adding it to the page.
+  const getVideoDimensions = (file) => {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement('video')
+      video.preload = 'metadata'
+      video.onloadedmetadata = () => {
+        URL.revokeObjectURL(video.src)
+        resolve({ width: video.videoWidth, height: video.videoHeight })
+      }
+      video.onerror = () => {
+        URL.revokeObjectURL(video.src)
+        reject(new Error('Could not read video metadata. File may be corrupt or unsupported.'))
+      }
+      video.src = URL.createObjectURL(file)
+    })
+  }
+
+  // Uploads directly to Cloudinary from the browser (unsigned preset) so large video
+  // files skip the Netlify function's ~6MB payload ceiling entirely.
+  const uploadVideoToCloudinary = async (file) => {
+    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
+    const uploadPreset = import.meta.env.VITE_CLOUDINARY_DTF_UPLOAD_PRESET
+    if (!cloudName || !uploadPreset) {
+      throw new Error('Cloudinary video upload is not configured (missing VITE_CLOUDINARY_CLOUD_NAME/VITE_CLOUDINARY_DTF_UPLOAD_PRESET).')
+    }
+
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('upload_preset', uploadPreset)
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/video/upload`, {
+      method: 'POST',
+      body: formData
+    })
+    const data = await res.json()
+    if (!res.ok) {
+      throw new Error(data?.error?.message || 'Video upload failed.')
+    }
+    return data.secure_url
+  }
+
+  const handleDtfVideoUpload = async (file) => {
+    setUploadingDtfVideo(true)
+    try {
+      const url = await uploadVideoToCloudinary(file)
+      setConfig(prev => ({ ...prev, dtf_video_url: url }))
+      toast.success('DTF promo video uploaded successfully!')
+    } catch (err) {
+      toast.error(`Upload failed: ${err.message}`)
+    } finally {
+      setUploadingDtfVideo(false)
+    }
+  }
 
   const uploadFile = (file) => {
     return new Promise((resolve, reject) => {
@@ -435,7 +522,7 @@ export default function HomepageTab({
               <Sparkles className="w-5 h-5 lg:w-6 lg:h-6 text-accent" />
             </div>
             <div>
-              <h3 className="text-sm lg:text-base font-black uppercase text-dark tracking-wider">2. Featured Collection Products</h3>
+              <h3 className="text-sm lg:text-base font-black uppercase text-dark tracking-wider">2. New Collection Products</h3>
               <p className="text-[9px] lg:text-xs text-dark2/45 uppercase mt-0.5 font-bold font-sans">Select products to render in the CATALOG SERIES 01 catalog grid</p>
             </div>
           </div>
@@ -456,7 +543,7 @@ export default function HomepageTab({
                   </div>
                   <div className="min-w-0 flex-grow">
                     <span className="font-bold text-dark text-xs block truncate uppercase">{prod.name}</span>
-                    <span className="text-[9px] lg:text-[10px] text-dark/50 block font-sans">₹{prod.price} • ID: {prod.id}</span>
+                    <span className="text-[9px] lg:text-[10px] text-dark/50 block font-sans">₹{prod.price} • {prod.category || 'No Category'} • ID: {prod.id}</span>
                   </div>
                   <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${checked ? 'bg-accent border-accent text-white' : 'border-cream3'
                     }`}>
@@ -476,7 +563,7 @@ export default function HomepageTab({
               type="submit"
               className="px-6 py-2.5 bg-dark text-cream hover:bg-accent hover:text-dark font-sans font-bold uppercase tracking-wider text-[10px] lg:text-xs rounded-xl shadow-sm transition-all flex items-center gap-1.5 cursor-pointer border-none"
             >
-              <Save className="w-3.5 h-3.5 lg:w-4 lg:h-4" /> Save Featured Collection
+              <Save className="w-3.5 h-3.5 lg:w-4 lg:h-4" /> Save New Collection
             </button>
           </div>
         </form>
@@ -488,8 +575,8 @@ export default function HomepageTab({
               <Globe className="w-5 h-5 lg:w-6 lg:h-6 text-accent" />
             </div>
             <div>
-              <h3 className="text-sm lg:text-base font-black uppercase text-dark tracking-wider">3. Sale Archive Products</h3>
-              <p className="text-[9px] lg:text-xs text-dark2/45 uppercase mt-0.5 font-bold font-sans">Select products to show inside the exclusive SALE ARCHIVE grid</p>
+              <h3 className="text-sm lg:text-base font-black uppercase text-dark tracking-wider">3. OP Combo Products</h3>
+              <p className="text-[9px] lg:text-xs text-dark2/45 uppercase mt-0.5 font-bold font-sans">Select products to show inside the exclusive OP COMBO grid</p>
             </div>
           </div>
 
@@ -509,7 +596,7 @@ export default function HomepageTab({
                   </div>
                   <div className="min-w-0 flex-grow">
                     <span className="font-bold text-dark text-xs block truncate uppercase">{prod.name}</span>
-                    <span className="text-[9px] lg:text-[10px] text-dark/50 block font-sans">₹{prod.price} {prod.originalPrice ? `(Was: ₹${prod.originalPrice})` : ''}</span>
+                    <span className="text-[9px] lg:text-[10px] text-dark/50 block font-sans">₹{prod.price} {prod.originalPrice ? `(Was: ₹${prod.originalPrice})` : ''} • {prod.category || 'No Category'}</span>
                   </div>
                   <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${checked ? 'bg-accent border-accent text-white' : 'border-cream3'
                     }`}>
@@ -524,19 +611,67 @@ export default function HomepageTab({
               type="submit"
               className="px-6 py-2.5 bg-dark text-cream hover:bg-accent hover:text-dark font-sans font-bold uppercase tracking-wider text-[10px] lg:text-xs rounded-xl shadow-sm transition-all flex items-center gap-1.5 cursor-pointer border-none"
             >
-              <Save className="w-3.5 h-3.5 lg:w-4 lg:h-4" /> Save Sale Archive
+              <Save className="w-3.5 h-3.5 lg:w-4 lg:h-4" /> Save OP Combo
             </button>
           </div>
         </form>
 
-        {/* Section 4: Coming Soon & Countdown Section */}
+        {/* Section 4: Plain Tshirt Combo Selection */}
+        <form onSubmit={handleSavePlainTshirtCombo} className="bg-white border border-cream3 p-5 sm:p-6 rounded-3xl space-y-5 hover:border-dark/25 hover:shadow-md transition-all duration-300 shadow-sm">
+          <div className="flex items-center gap-3 border-b border-cream3 pb-3">
+            <div className="p-2.5 bg-dark/5 text-dark rounded-xl">
+              <Sparkles className="w-5 h-5 lg:w-6 lg:h-6 text-accent" />
+            </div>
+            <div>
+              <h3 className="text-sm lg:text-base font-black uppercase text-dark tracking-wider">4. Plain Tshirt Combo Products</h3>
+              <p className="text-[9px] lg:text-xs text-dark2/45 uppercase mt-0.5 font-bold font-sans">Select products to show inside the PLAIN TSHIRT COMBO grid</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 max-h-[300px] overflow-y-auto pr-1 scrollbar-none">
+            {products.map(prod => {
+              const checked = plainTshirtComboIds.includes(prod.id)
+              return (
+                <button
+                  type="button"
+                  key={prod.id}
+                  onClick={() => togglePlainTshirtComboProduct(prod.id)}
+                  className={`flex items-center gap-3 p-3 bg-cream/15 border rounded-2xl text-left transition-all cursor-pointer hover:shadow-sm ${checked ? 'border-accent bg-accent/5' : 'border-cream3 hover:border-dark/20'
+                    }`}
+                >
+                  <div className="w-12 h-12 rounded-xl bg-cream3 overflow-hidden shrink-0">
+                    <img src={prod.image} alt={prod.name} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="min-w-0 flex-grow">
+                    <span className="font-bold text-dark text-xs block truncate uppercase">{prod.name}</span>
+                    <span className="text-[9px] lg:text-[10px] text-dark/50 block font-sans">₹{prod.price} {prod.originalPrice ? `(Was: ₹${prod.originalPrice})` : ''} • {prod.category || 'No Category'}</span>
+                  </div>
+                  <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${checked ? 'bg-accent border-accent text-white' : 'border-cream3'
+                    }`}>
+                    {checked && <span className="text-[10px] font-black">✓</span>}
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+          <div className="flex justify-end pt-2 border-t border-cream3 mt-4">
+            <button
+              type="submit"
+              className="px-6 py-2.5 bg-dark text-cream hover:bg-accent hover:text-dark font-sans font-bold uppercase tracking-wider text-[10px] lg:text-xs rounded-xl shadow-sm transition-all flex items-center gap-1.5 cursor-pointer border-none"
+            >
+              <Save className="w-3.5 h-3.5 lg:w-4 lg:h-4" /> Save Plain Tshirt Combo
+            </button>
+          </div>
+        </form>
+
+        {/* Section 5: Coming Soon & Countdown Section */}
         <form onSubmit={handleSubmit} className="bg-white border border-cream3 p-5 sm:p-6 rounded-3xl space-y-6 hover:border-dark/25 hover:shadow-md transition-all duration-300 shadow-sm">
           <div className="flex items-center gap-3 border-b border-cream3 pb-3">
             <div className="p-2.5 bg-dark/5 text-dark rounded-xl">
               <Clock className="w-5 h-5 lg:w-6 lg:h-6 text-accent" />
             </div>
             <div>
-              <h3 className="text-sm lg:text-base font-black uppercase text-dark tracking-wider">4. Next Drop Teaser & Countdown</h3>
+              <h3 className="text-sm lg:text-base font-black uppercase text-dark tracking-wider">5. Next Drop Teaser & Countdown</h3>
               <p className="text-[9px] lg:text-xs text-dark2/45 uppercase mt-0.5 font-bold font-sans">Update the next drop name, description, date countdown, and teaser images</p>
             </div>
           </div>
@@ -672,11 +807,94 @@ export default function HomepageTab({
             </button>
           </div>
         </form>
+
+        {/* Section 5: DTF Custom Studio Video */}
+        <form onSubmit={handleSubmit} className="bg-white border border-cream3 p-5 sm:p-6 rounded-3xl space-y-5 hover:border-dark/25 hover:shadow-md transition-all duration-300 shadow-sm">
+          <div className="flex items-center gap-3 border-b border-cream3 pb-3">
+            <div className="p-2.5 bg-dark/5 text-dark rounded-xl">
+              <Upload className="w-5 h-5 lg:w-6 lg:h-6 text-accent" />
+            </div>
+            <div>
+              <h3 className="text-sm lg:text-base font-black uppercase text-dark tracking-wider">5. DTF Custom Studio Video</h3>
+              <p className="text-[9px] lg:text-xs text-dark2/45 uppercase mt-0.5 font-bold font-sans">Vertical 9:16 video shown in the homepage Custom Studio (DTF) section</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-5">
+            <div className="w-full sm:w-48 shrink-0">
+              <div className="aspect-[9/16] w-full bg-cream3 relative overflow-hidden rounded-2xl border border-cream3">
+                {config.dtf_video_url ? (
+                  <video
+                    src={config.dtf_video_url}
+                    className="w-full h-full object-cover"
+                    controls
+                    muted
+                    loop
+                    playsInline
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-dark/30 font-sans text-[9px] lg:text-xs uppercase text-center px-3">No Video</div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex-1 space-y-3">
+              <p className="text-[10px] lg:text-xs text-dark2/50 leading-relaxed font-medium">
+                Upload a vertical (9:16) MP4/MOV/WebM promo video of the DTF printing process. It uploads directly to Cloudinary, so large files are fine.
+              </p>
+              <label className="inline-flex w-full sm:w-auto px-5 py-3 bg-dark/10 hover:bg-dark hover:text-white transition-colors font-bold uppercase rounded-xl cursor-pointer text-[10px] lg:text-xs items-center justify-center gap-2 select-none">
+                <Upload className="w-4 h-4" />
+                <span>{uploadingDtfVideo ? 'Uploading...' : 'Upload DTF Video'}</span>
+                <input
+                  type="file"
+                  accept="video/*"
+                  className="hidden"
+                  disabled={uploadingDtfVideo}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0]
+                    if (!file) return
+                    await handleDtfVideoUpload(file)
+                    e.target.value = ''
+                  }}
+                />
+              </label>
+              {config.dtf_video_url && (
+                <button
+                  type="button"
+                  onClick={() => setConfig(prev => ({ ...prev, dtf_video_url: '' }))}
+                  className="text-[10px] lg:text-xs font-bold uppercase text-red-600 hover:text-red-700 flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Trash className="w-3.5 h-3.5" /> Remove Video
+                </button>
+              )}
+
+              <div className="space-y-1.5 pt-2">
+                <label className="text-[10px] lg:text-xs xl:text-sm uppercase tracking-wider font-bold block text-dark2/60">Video Caption</label>
+                <textarea
+                  rows={2}
+                  placeholder="Send Us Your Design & Get a Premium DTF Printed Tee from starting Rs 599."
+                  value={config.dtf_video_caption}
+                  onChange={(e) => setConfig({ ...config, dtf_video_caption: e.target.value })}
+                  className="w-full px-4 py-2.5 bg-cream/35 border border-cream3 rounded-xl focus:outline-none focus:bg-white focus:border-dark font-sans text-xs lg:text-sm font-bold transition-all resize-none"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-2 border-t border-cream3 mt-4">
+            <button
+              type="submit"
+              className="px-6 py-2.5 bg-dark text-cream hover:bg-accent hover:text-dark font-sans font-bold uppercase tracking-wider text-[10px] lg:text-xs rounded-xl shadow-sm transition-all flex items-center gap-1.5 cursor-pointer border-none"
+            >
+              <Save className="w-3.5 h-3.5 lg:w-4 lg:h-4" /> Save DTF Video
+            </button>
+          </div>
+        </form>
       </div>
 
       {/* Searchable Product Picker Modal */}
       {pickerModalOpen && (
-        <div className="fixed inset-0 bg-dark/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div className="fixed bg-dark/60 backdrop-blur-xs flex items-center justify-center p-4" style={{ top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', zIndex: 999999 }}>
           <div className="bg-white border border-cream3 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl space-y-4 p-5 sm:p-6 animate-scale-in">
             <div className="flex justify-between items-center border-b border-cream3 pb-3">
               <div>

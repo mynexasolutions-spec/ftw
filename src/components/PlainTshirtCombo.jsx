@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ShoppingBag, Heart, Star, Flame, Sparkles, Gamepad2, Zap } from 'lucide-react'
+import { ShoppingBag, Heart, Star, Sparkles, Gamepad2 } from 'lucide-react'
 
-export default function FeaturedCollection({
-  featuredProducts,
+export default function PlainTshirtCombo({
+  plainTshirtComboProducts,
   activeFeaturedImageIndexes,
   toggleWishlist,
   isInWishlist,
@@ -23,15 +23,15 @@ export default function FeaturedCollection({
       transition={{ duration: 0.8 }}
       className="max-w-7xl mx-auto px-6 py-14 sm:py-24 border-b border-neutral-200/60 z-10 relative"
     >
-      {/* Style block for gaming HUD featured cards */}
+      {/* Style block for gaming HUD sale cards */}
       <style dangerouslySetInnerHTML={{
         __html: `
-        .hud-featured-title {
+        .hud-sale-title {
           text-align: center;
           margin-bottom: 3.5rem;
           position: relative;
         }
-        .hud-featured-title .catalog-series {
+        .hud-sale-title .catalog-series {
           font-family: 'Space Grotesk', sans-serif;
           font-size: 11px;
           font-weight: 800;
@@ -46,7 +46,7 @@ export default function FeaturedCollection({
           border-radius: 6px;
           border: 1px dashed rgba(139, 92, 246, 0.3);
         }
-        .hud-featured-title h2 {
+        .hud-sale-title h2 {
           font-family: 'Orbitron', 'Space Grotesk', sans-serif;
           font-size: clamp(34px, 5.5vw, 64px);
           font-weight: 1000;
@@ -57,13 +57,13 @@ export default function FeaturedCollection({
           margin-top: 10px;
           font-style: italic;
         }
-        .hud-featured-title h2 span {
+        .hud-sale-title h2 span {
           background: linear-gradient(90deg, #3B82F6 0%, #7C3AED 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
         }
-        .hud-featured-title .hud-tagline {
+        .hud-sale-title .hud-tagline {
           display: inline-flex;
           align-items: center;
           gap: 8px;
@@ -89,6 +89,23 @@ export default function FeaturedCollection({
           position: relative;
           padding: 12px;
           /* cut all 4 outer corners of the card precisely */
+          clip-path: polygon(24px 0, calc(100% - 24px) 0, 100% 24px, 100% calc(100% - 24px), calc(100% - 24px) 100%, 24px 100%, 0 calc(100% - 24px), 0 24px);
+        }
+        
+        /* Sci-fi Scanline animation overlay */
+        .hud-card::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          z-index: 2;
+          background: repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(139,92,246,0.012) 2px,
+            rgba(139,92,246,0.012) 4px
+          );
+          pointer-events: none;
           clip-path: polygon(24px 0, calc(100% - 24px) 0, 100% 24px, 100% calc(100% - 24px), calc(100% - 24px) 100%, 24px 100%, 0 calc(100% - 24px), 0 24px);
         }
         /* Double-layered border effect specifically for the clipped shape */
@@ -371,36 +388,31 @@ export default function FeaturedCollection({
       ` }} />
 
       {/* Custom Header Section */}
-      <div className="hud-featured-title">
+      <div className="hud-sale-title">
         <div>
           <span className="catalog-series">
-            <Sparkles className="w-3.5 h-3.5" /> Catalog Series 01
+            <Sparkles className="w-3.5 h-3.5" /> BASIC COMBO
           </span>
         </div>
-        <h2>New <span>Collection</span></h2>
+        <h2>Plain Tshirt <span>Combo</span></h2>
         <div className="hud-tagline">
-          <Gamepad2 className="w-4 h-4 text-slate-500" />
-          Gear Up. Level Up.
-          <Gamepad2 className="w-4 h-4 text-slate-500" />
+          <Gamepad2 className="w-4 h-4 text-purple-600" />
+          Basic Fit. Premium Drape.
+          <Gamepad2 className="w-4 h-4 text-purple-600" />
         </div>
       </div>
+
       {/* Product Cards Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 lg:gap-8">
-        {featuredProducts.map((product, pi) => {
+        {plainTshirtComboProducts.map((product, pi) => {
           const prodSizes = Array.isArray(product.sizes)
             ? product.sizes
             : (product.sizes ? String(product.sizes).split(',').map(s => s.trim()) : [])
           const prodColors = Array.isArray(product.colors)
             ? product.colors
             : (product.colors ? String(product.colors).split(',').map(c => c.trim()) : [])
-          const colorMap = { Black: '#000000', White: '#FFFFFF', Charcoal: '#3F3F46', Lime: '#84CC16', Beige: '#D97706', Cream: '#FAF5FF', Blue: '#3B82F6', Purple: '#8B5CF6' }
           const prodImage = product.imageFront || product.image || '/images/Regular-T.png'
-
-          const badgeText = product.tag ? product.tag : (pi === 0 ? 'Limited' : pi === 1 ? 'On Sale' : 'Trending')
-          const badgeType = product.tag 
-            ? (product.tag.toLowerCase().includes('sale') || product.tag.toLowerCase().includes('off') ? 'sale' : product.tag.toLowerCase().includes('limit') ? 'limited' : 'trending') 
-            : (pi === 0 ? 'limited' : pi === 1 ? 'sale' : 'trending')
-          const statusText = product.tag ? product.tag : (pi === 0 ? 'Coming Soon' : pi === 1 ? 'Sale' : 'New Arrivals')
+          const discountTagText = product.originalPrice ? `-${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF` : 'BASIC'
 
           return (
             <motion.div
@@ -437,9 +449,9 @@ export default function FeaturedCollection({
                 </Link>
 
                 {/* Left Badge */}
-                <div className={`hud-card-badge ${badgeType}`}>
-                  {pi === 0 ? <Sparkles className="w-3 h-3 text-[#EC4899] fill-[#EC4899]" /> : pi === 1 ? <Zap className="w-3 h-3 text-[#84CC16] fill-[#84CC16]" /> : <Flame className="w-3 h-3 text-[#8B5CF6] fill-[#8B5CF6]" />}
-                  <span className="ml-1.5">{badgeText}</span>
+                <div className="hud-card-badge">
+                  <Sparkles className="w-3.5 h-3.5 text-purple-500" />
+                  <span className="ml-1.5">{product.tag || discountTagText}</span>
                 </div>
 
                 {/* Wishlist Button */}
@@ -476,7 +488,7 @@ export default function FeaturedCollection({
                   <div className="flex justify-between items-start gap-4 mb-3">
                     <h3 className="hud-card-title font-black">{product.name}</h3>
                     <div className="flex flex-col items-end shrink-0">
-                      <div className="hud-card-price-pill purple">
+                      <div className="hud-card-price-pill">
                         ₹{product.price}
                       </div>
                       {product.originalPrice && (
@@ -597,7 +609,7 @@ export default function FeaturedCollection({
                         ))}
                         <button
                           onClick={() => setSelectingSizeForFeatured(null)}
-                          className="h-8 w-8 bg-red-50 border border-red-100 text-red-500 hover:bg-red-500 hover:text-white hover:border-transparent transition-all duration-200 text-[9px] rounded-xl cursor-pointer flex items-center justify-center"
+                          className="h-8 w-8 bg-red-50 border border-red-100 text-red-500 hover:bg-red-550 hover:text-white hover:border-transparent transition-all duration-200 text-[9px] rounded-xl cursor-pointer flex items-center justify-center"
                         >
                           ✕
                         </button>

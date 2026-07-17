@@ -1286,8 +1286,9 @@ export default function Customizer() {
     { key: 'color', label: 'Color', icon: <Palette className="w-4 h-4" /> },
     { key: 'text', label: 'Text', icon: <Type className="w-4 h-4" /> },
     { key: 'image', label: 'Image', icon: <ImageIcon className="w-4 h-4" /> },
+    { key: 'presets', label: 'Graphics', icon: <Sparkles className="w-4 h-4" /> },
     { key: 'layers', label: 'Layers', icon: <Layers className="w-4 h-4" /> },
-    { key: 'designs', label: 'My Designs', icon: <Sparkles className="w-4 h-4" /> },
+    { key: 'designs', label: 'Saved', icon: <Grid3X3 className="w-4 h-4" /> },
   ]
 
   /* ─────────────── The T-shirt Canvas ─────────────── */
@@ -1394,6 +1395,11 @@ export default function Customizer() {
           .hud-br { bottom: 4px; right: 4px; border-width: 0 2px 2px 0; }
 
           .hud-hex { font-family: monospace; font-size: 7px; color: rgba(139,92,246,0.5); letter-spacing: 0.05em; font-weight: bold; }
+          .studio-canvas-bg {
+            background-color: #F4F4F2;
+            background-image: radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1px);
+            background-size: 20px 20px;
+          }
         `
       }} />
 
@@ -1546,8 +1552,9 @@ export default function Customizer() {
               { key: 'color', label: 'Color', icon: <Palette className="w-6 h-6" /> },
               { key: 'text', label: 'Text', icon: <Type className="w-6 h-6" /> },
               { key: 'image', label: 'Image', icon: <ImageIcon className="w-6 h-6" /> },
+              { key: 'presets', label: 'Graphics', icon: <Sparkles className="w-6 h-6" /> },
               { key: 'layers', label: 'Layers', icon: <Layers className="w-6 h-6" /> },
-              { key: 'designs', label: 'Designs', icon: <Sparkles className="w-6 h-6" /> },
+              { key: 'designs', label: 'Saved', icon: <Grid3X3 className="w-6 h-6" /> },
             ].map(item => (
               <button key={item.key}
                 onClick={() => setMobileDrawer(d => d === item.key ? null : item.key)}
@@ -1566,7 +1573,7 @@ export default function Customizer() {
       <div className="hidden lg:flex flex-1 overflow-hidden">
 
         {/* LEFT: Canvas area */}
-        <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden bg-[#EFEFEF]">
+        <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden studio-canvas-bg">
           {/* Zoom controls */}
           <div className="absolute top-6 right-6 z-10 flex flex-col gap-1.5">
             <button onClick={() => setZoom(z => Math.min(2, +(z + 0.15).toFixed(2)))}

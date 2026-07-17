@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Mail, Instagram, Gamepad2, Shield, Package, Zap, Facebook, ArrowRight, Star, Trophy, Target, Flame } from 'lucide-react'
+import { Mail, Instagram, Gamepad2, Shield, Package, Zap, Facebook, ArrowRight, Star, Trophy, Target, Flame, CreditCard, QrCode, Banknote } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { useCart } from '../context/CartContext'
 import Interactive3DBag from './Interactive3DBag'
@@ -357,61 +357,80 @@ export default function Footer() {
           box-shadow: 0 0 10px rgba(124, 58, 237, 0.6);
         }
 
-        /* Payment badges stylized as real logos */
+        /* Futuristic Cyber Payment Badges */
         .pay-frame {
-          border: 1.2px solid rgba(255, 255, 255, 0.12);
-          background: rgba(255, 255, 255, 0.04);
-          border-radius: 6px;
-          padding: 5px 12px;
-          font-size: 11.5px;
+          border: 1.5px solid rgba(139, 92, 246, 0.15);
+          background: rgba(9, 11, 17, 0.6);
+          border-radius: 8px;
+          padding: 6px 14px;
+          font-size: 11px;
           font-weight: 900;
           letter-spacing: 0.05em;
           text-transform: uppercase;
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          height: 24px;
+          height: 28px;
+          transition: all 0.3s ease;
+          box-shadow: inset 0 1px 4px rgba(255, 255, 255, 0.02);
+          cursor: default;
+        }
+        .pay-frame:hover {
+          border-color: rgba(139, 92, 246, 0.5);
+          transform: translateY(-1.5px);
+          box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
         }
         .pay-visa {
           color: #2563EB;
           font-style: italic;
-          font-family: 'Outfit', sans-serif;
+          font-family: 'Space Grotesk', sans-serif;
+          font-weight: 1000;
+          text-shadow: 0 0 8px rgba(37, 99, 235, 0.3);
         }
         .pay-mc {
-          position: relative;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
           color: #FFFFFF;
-          padding-left: 26px !important;
+          font-weight: 850;
         }
-        .pay-mc::before {
-          content: '';
-          position: absolute;
-          left: 6px; top: 7px;
-          width: 10px; height: 10px;
-          background: #EF4444;
-          border-radius: 50%;
+        .pay-mc-circles {
+          display: inline-flex;
+          position: relative;
+          width: 18px;
+          height: 10px;
         }
-        .pay-mc::after {
-          content: '';
-          position: absolute;
-          left: 12px; top: 7px;
+        .pay-mc-c1 {
           width: 10px; height: 10px;
-          background: #F59E0B;
+          background: #FF5F00;
           border-radius: 50%;
-          opacity: 0.85;
+          position: absolute; left: 0;
+        }
+        .pay-mc-c2 {
+          width: 10px; height: 10px;
+          background: #F79E1B;
+          border-radius: 50%;
+          position: absolute; left: 6px;
+          opacity: 0.9;
         }
         .pay-rupay {
-          color: #FFFFFF;
-          font-weight: 800;
+          font-weight: 900;
           font-style: italic;
+          background: linear-gradient(135deg, #FF9933 0%, #FFFFFF 50%, #138808 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
         .pay-upi {
           color: #00E5FF;
-          font-family: sans-serif;
-          font-weight: 900;
+          font-weight: 1000;
+          text-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+          letter-spacing: 0.1em;
         }
         .pay-cod {
-          color: #10B981;
-          border-color: rgba(16, 185, 129, 0.25);
+          color: #D6FF40;
+          border-color: rgba(214, 255, 64, 0.2);
+          text-shadow: 0 0 8px rgba(214, 255, 64, 0.3);
         }
       ` }} />
 
@@ -566,13 +585,31 @@ export default function Footer() {
 
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-5 relative z-10 pt-1">
           {/* Payment badges */}
-          <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-            <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mr-1 font-mono">Pay via</span>
-            <span className="pay-frame pay-visa">Visa</span>
-            <span className="pay-frame pay-mc">Mastercard</span>
-            <span className="pay-frame pay-rupay">Rupay</span>
-            <span className="pay-frame pay-upi">UPI</span>
-            <span className="pay-frame pay-cod">COD</span>
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5">
+            <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mr-1.5 font-mono">PAYMENT_SECURE //</span>
+            <span className="pay-frame pay-visa">
+              <CreditCard className="w-3.5 h-3.5 mr-1.5 text-blue-500" />
+              Visa
+            </span>
+            <span className="pay-frame pay-mc">
+              <div className="pay-mc-circles">
+                <div className="pay-mc-c1"></div>
+                <div className="pay-mc-c2"></div>
+              </div>
+              <span className="text-[10px] pl-1 font-mono">MC</span>
+            </span>
+            <span className="pay-frame pay-rupay">
+              <CreditCard className="w-3.5 h-3.5 mr-1.5 text-orange-500" />
+              RuPay
+            </span>
+            <span className="pay-frame pay-upi">
+              <QrCode className="w-3.5 h-3.5 mr-1.5 text-[#00E5FF]" />
+              UPI
+            </span>
+            <span className="pay-frame pay-cod">
+              <Banknote className="w-3.5 h-3.5 mr-1.5 text-[#D6FF40]" />
+              COD
+            </span>
           </div>
 
           {/* Copyright */}

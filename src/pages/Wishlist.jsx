@@ -39,7 +39,7 @@ export default function Wishlist() {
   }
 
   return (
-    <div className="min-h-[80vh] bg-[#FAF9F6] py-16 px-6 font-sans bg-grain relative">
+    <div className="min-h-[80vh] bg-[#FAF9F6] pt-8 sm:pt-16 pb-16 px-6 font-sans bg-grain relative">
       
       {/* Gaming UI grid lines and glowing effects in light theme */}
       <style dangerouslySetInnerHTML={{
@@ -152,11 +152,6 @@ export default function Wishlist() {
       }} />
 
       <div className="wishlist-scanlines" />
-
-      {/* Decorative vertical texts */}
-      <div className="absolute left-6 top-[30%] rotate-[-90deg] origin-left text-[9px] font-mono text-gray-400 tracking-[0.3em] uppercase select-none pointer-events-none">
-        FTW // SECURED_VAULT // PROFILE
-      </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}

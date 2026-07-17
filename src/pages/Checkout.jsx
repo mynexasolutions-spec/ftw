@@ -6,22 +6,22 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-hot-toast'
 import Loader from '../components/Loader'
 import { openRazorpayCheckout } from '../lib/razorpay'
-import { insertOrder, getCoupons, getStoreSettings, getProducts, decrementProductStock } from '../lib/supabase'
+import { supabase, getCoupons, getStoreSettings } from '../lib/supabase'
 import {
   ArrowLeft, CreditCard, ShieldCheck, ShoppingBag,
-  Trash2, Plus, Minus, Tag, Check, Sparkles, Zap, ArrowRight, Lock
+  Trash2, Plus, Minus, Tag, Check, Sparkles, Zap, ArrowRight, Lock, MapPin, Info
 } from 'lucide-react'
 
 const getColorHex = (colorName) => {
   if (!colorName) return '#0F0F0F'
   if (typeof colorName !== 'string') return '#0F0F0F'
   if (colorName.startsWith('#')) return colorName
-  
+
   const hexMatch = colorName.match(/#([0-9a-fA-F]{3,6})/)
   if (hexMatch) return `#${hexMatch[1]}`
-  
+
   const clean = colorName.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '').trim().toLowerCase()
-  
+
   const COLOR_MAP = {
     'black': '#0F0F0F',
     'white': '#FFFFFF',
@@ -225,7 +225,8 @@ export default function Checkout() {
       })
       return false
     }
-    if (formData.phone.replace(/[^0-9]/g, '').length < 10) {
+    const cleanPhone = formData.phone.replace(/[^0-9]/g, '')
+    if (cleanPhone.length !== 10) {
       toast.error('Please enter a valid 10-digit phone number.', {
         style: { background: '#161616', color: '#FFFFFF' }
       })
@@ -293,9 +294,18 @@ export default function Checkout() {
     }
   }, [orderCompleted])
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [currentStep])
+
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    if (name === 'phone') {
+      const cleanValue = value.replace(/[^0-9]/g, '').substring(0, 10)
+      setFormData(prev => ({ ...prev, [name]: cleanValue }))
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }))
+    }
   }
 
   const handleApplyPromo = (e) => {
@@ -330,75 +340,84 @@ export default function Checkout() {
 
   const shippingFee = subtotal >= dbSettings.shipping_threshold ? 0 : dbSettings.shipping_flat_rate
   const finalTotal = Math.round(subtotal - discountAmount + shippingFee)
-  const finalTotalPaise = finalTotal * 100 // Razorpay uses paise
 
-  const saveOrderToDB = async (id, payStatus) => {
-    const orderData = {
-      id,
-      customer_name: `${formData.firstName} ${formData.lastName}`.trim(),
-      email: formData.email,
-      user_id: user?.id || null,
-      phone: formData.phone,
-      address: `${formData.address}, ${formData.apartment ? formData.apartment + ', ' : ''}${formData.city}, ${formData.state} - ${formData.zip}`,
-      payment_method: paymentMethod,
-      payment_status: payStatus,
-      items: items,
-      total: finalTotal,
-      discount: Math.round(discountAmount),
-      shipping: shippingFee,
-      status: 'Pending'
+  // All pricing (item prices, coupon discount, shipping, total) is recomputed
+  // server-side in /api/create-order — the values here are for UI display only.
+  const createOrderOnServer = async (method) => {
+    const { data: { session } } = await supabase.auth.getSession()
+    const token = session?.access_token
+
+    const response = await fetch('/api/create-order', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
+      },
+      body: JSON.stringify({
+        customer: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: formData.phone,
+          address: formData.address,
+          apartment: formData.apartment,
+          city: formData.city,
+          state: formData.state,
+          zip: formData.zip
+        },
+        items,
+        promoCode: appliedPromo?.code || '',
+        paymentMethod: method
+      })
+    })
+
+    const data = await response.json()
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to create order.')
     }
-    try {
-      await insertOrder(orderData)
-      try {
-        const allProducts = await getProducts()
-        for (const item of items) {
-          const foundProd = allProducts.find(p => item.id.startsWith(p.id))
-          if (foundProd) {
-            await decrementProductStock(foundProd.id, item.qty || 1, item.size, item.color)
-          }
-        }
-      } catch (stockErr) {
-        console.error("Failed to update product stock counts after ordering:", stockErr)
-      }
-    } catch (err) {
-      console.error("Order sync to Supabase failed:", err)
-    }
+    return data
   }
 
   const handleCODOrder = async () => {
-    const randomId = `FTW-${Math.floor(100000 + Math.random() * 900000)}`
-    setOrderId(randomId)
     setIsPlacing(true)
     setPlaceStep(0)
-    await saveOrderToDB(randomId, 'COD - Unpaid')
-    setTimeout(() => {
-      setPlaceStep(1)
+    try {
+      const data = await createOrderOnServer('cod')
+      setOrderId(data.orderId)
       setTimeout(() => {
-        setPlaceStep(2)
+        setPlaceStep(1)
         setTimeout(() => {
-          setIsPlacing(false)
-          setOrderCompleted(true)
-          clearCart()
+          setPlaceStep(2)
+          setTimeout(() => {
+            setIsPlacing(false)
+            setOrderCompleted(true)
+            clearCart()
+          }, 1200)
         }, 1200)
       }, 1200)
-    }, 1200)
+    } catch (err) {
+      setIsPlacing(false)
+      toast.error(err.message || 'Failed to place order.', {
+        style: { background: '#161616', color: '#FFFFFF' }
+      })
+    }
   }
 
   const handleRazorpayPayment = async () => {
-    const randomOrderId = `FTW-${Math.floor(100000 + Math.random() * 900000)}`
-
-    // Pre-save order as Unpaid to capture user checkout details securely
+    let orderData
     try {
-      await saveOrderToDB(randomOrderId, 'Unpaid')
+      orderData = await createOrderOnServer('razorpay')
     } catch (err) {
-      console.error('Failed to pre-save checkout session order:', err)
+      toast.error(err.message || 'Failed to start payment.', {
+        style: { background: '#161616', color: '#FFFFFF' }
+      })
+      return
     }
 
     openRazorpayCheckout({
       keyId: RAZORPAY_KEY_ID,
-      amount: finalTotalPaise,
-      currency: 'INR',
+      razorpayOrderId: orderData.razorpayOrderId,
+      amount: orderData.amount,
+      currency: orderData.currency,
       name: 'FOR THE WIN',
       description: `FTW Drop 01 — ${items.length} item(s)`,
       image: logoBase64 || (window.location.origin + '/images/ftw-logo.webp'),
@@ -407,11 +426,6 @@ export default function Checkout() {
         email: formData.email,
         contact: formData.phone,
       },
-      notes: {
-        db_order_id: randomOrderId,
-        address: `${formData.address}, ${formData.city}, ${formData.state} - ${formData.zip}`,
-        promo_code: appliedPromo?.code || 'none',
-      },
       theme: {
         color: '#8B5CF6',
         backdrop_color: '#0B0B0B',
@@ -419,7 +433,7 @@ export default function Checkout() {
       onSuccess: async (response) => {
         setIsPlacing(true)
         setPlaceStep(2)
-        
+
         try {
           const verifyRes = await fetch('/api/razorpay-verify', {
             method: 'POST',
@@ -427,22 +441,17 @@ export default function Checkout() {
             body: JSON.stringify({
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature
+              razorpay_signature: response.razorpay_signature,
+              orderId: orderData.orderId
             })
           })
 
-          if (!verifyRes.ok) {
-            throw new Error('Payment signature verification failed.')
-          }
-
           const verifyData = await verifyRes.json()
-          if (!verifyData.verified) {
-            throw new Error('Spoofed payment signature detected.')
+          if (!verifyRes.ok || !verifyData.verified) {
+            throw new Error(verifyData.error || 'Payment verification failed.')
           }
 
-          const rzpOrderId = response.razorpay_order_id || 'N/A'
-          setOrderId(randomOrderId)
-          await saveOrderToDB(randomOrderId, `Paid - Razorpay ID: ${rzpOrderId}`)
+          setOrderId(orderData.orderId)
           setTimeout(() => {
             setIsPlacing(false)
             setOrderCompleted(true)
@@ -491,13 +500,13 @@ export default function Checkout() {
   // ─── SUCCESS SCREEN ────────────────────────────────────────────────────────
   if (orderCompleted) {
     return (
-      <div className="min-h-screen bg-[#FAF9F6] text-dark py-16 md:py-24 px-6 flex items-center justify-center font-sans bg-grain">
+      <div className="min-h-screen bg-[#FAF9F6] text-dark py-8 sm:py-16 md:py-24 px-4 sm:px-6 flex items-center justify-center font-sans bg-grain">
         <Confetti />
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-          className="max-w-xl w-full bg-white border border-[#E8E5DC] rounded-3xl p-6 md:p-12 text-center shadow-2xl relative overflow-hidden"
+          className="max-w-xl w-full bg-white border border-[#E8E5DC] rounded-3xl p-4 sm:p-8 md:p-12 text-center shadow-2xl relative overflow-hidden"
         >
           <div className="absolute top-0 left-0 right-0 h-2 bg-purple-600" />
 
@@ -505,7 +514,7 @@ export default function Checkout() {
             initial={{ scale: 0, rotate: -45 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 15, delay: 0.2 }}
-            className="w-16 h-16 md:w-20 md:h-20 bg-purple-500/15 rounded-full flex items-center justify-center mx-auto mb-6 md:mb-8 shadow-inner border border-purple-500/20 relative"
+            className="w-16 h-16 md:w-20 md:h-20 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-inner border border-purple-500/20 relative"
           >
             <motion.div
               initial={{ scale: 0.8, opacity: 0.5 }}
@@ -516,24 +525,30 @@ export default function Checkout() {
             <Check className="w-8 h-8 md:w-10 md:h-10 text-purple-600 relative z-10" />
           </motion.div>
 
-          <h1 className="font-display text-2xl md:text-4xl font-black uppercase tracking-tight text-dark mb-2">
+          <h1 className="font-sans text-xl md:text-3xl font-black uppercase tracking-tight text-dark mb-2">
             order placed
           </h1>
-          <p className="text-dark2/60 text-xs md:text-sm font-mono uppercase tracking-widest mb-6">
+          <p className="text-dark2/65 text-xs md:text-sm font-mono uppercase tracking-widest mb-4 flex items-center justify-center gap-1.5 font-bold">
+            <Tag className="w-3.5 h-3.5 text-purple-600" />
             <span className="font-black text-dark">Ref: {orderId}</span>
           </p>
-          <p className="text-dark2 text-sm leading-relaxed mb-6 md:mb-8 max-w-md mx-auto">
-            you get invoice after order delivered
-          </p>
+          
+          {/* Info Banner */}
+          <div className="bg-purple-500/5 border border-purple-500/10 rounded-2xl p-4 flex items-start gap-2.5 max-w-md mx-auto mb-6 text-left">
+            <Info className="w-4 h-4 text-purple-600 shrink-0 mt-0.5" />
+            <p className="text-dark2/80 text-xs md:text-[13px] font-mono uppercase font-bold leading-relaxed">
+              you get invoice after order delivered
+            </p>
+          </div>
 
-          <div className="bg-[#FAF9F6] border border-[#E8E5DC] rounded-2xl p-4 sm:p-6 text-left space-y-4 mb-6 md:mb-8">
+          <div className="bg-[#FAF9F6] border border-[#E8E5DC] rounded-2xl p-3.5 sm:p-6 text-left space-y-3.5 mb-6 md:mb-8">
             <div className="flex justify-between items-center text-xs sm:text-sm font-mono border-b border-[#E8E5DC]/60 pb-3">
-              <span className="text-dark2/50">ESTIMATED ARRIVAL</span>
-              <span className="font-bold text-dark">5 – 7 BUSINESS DAYS</span>
+              <span className="text-dark2/50 font-bold">ESTIMATED ARRIVAL</span>
+              <span className="font-extrabold text-dark">5 – 7 BUSINESS DAYS</span>
             </div>
             <div className="flex justify-between items-center text-xs sm:text-sm font-mono">
-              <span className="text-dark2/50">PAYMENT CHANNEL</span>
-              <span className="font-bold text-dark uppercase">
+              <span className="text-dark2/50 font-bold">PAYMENT CHANNEL</span>
+              <span className="font-extrabold text-dark uppercase">
                 {paymentMethod === 'cod' ? 'Cash on Delivery' : 'Razorpay Secure'}
               </span>
             </div>
@@ -542,13 +557,14 @@ export default function Checkout() {
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <Link
               to="/my-orders"
-              className="flex-1 py-3.5 sm:py-4 bg-dark text-[#D6FF40] hover:bg-purple-600 hover:text-white transition-colors font-mono font-bold text-xs uppercase tracking-widest rounded-lg flex items-center justify-center decoration-none"
+              className="flex-1 py-3.5 sm:py-4 bg-dark text-[#D6FF40] hover:bg-purple-600 hover:text-white transition-all font-mono font-bold text-xs uppercase tracking-widest rounded-xl flex items-center justify-center gap-2 decoration-none shadow-md cursor-pointer border-none"
             >
               View My Orders
+              <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               to="/shop"
-              className="flex-1 py-3.5 sm:py-4 border border-[#E8E5DC] hover:border-dark text-dark transition-colors font-mono font-bold text-xs uppercase tracking-widest rounded-lg flex items-center justify-center decoration-none"
+              className="flex-1 py-3.5 sm:py-4 border border-[#E8E5DC] bg-white hover:bg-neutral-50 text-dark hover:border-dark transition-all font-mono font-bold text-xs uppercase tracking-widest rounded-xl flex items-center justify-center decoration-none cursor-pointer"
             >
               Continue Shopping
             </Link>
@@ -560,8 +576,8 @@ export default function Checkout() {
 
   // ─── CHECKOUT FORM ─────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-[#FAF9F6] text-dark pt-16 pb-8 px-6 relative overflow-hidden font-sans bg-grain">
-      
+    <div className="min-h-screen bg-[#FAF9F6] text-dark pt-8 sm:pt-16 pb-8 px-4 sm:px-6 relative overflow-hidden font-sans bg-grain">
+
       {/* Gaming UI grid lines and glowing effects in light theme */}
       <style dangerouslySetInnerHTML={{
         __html: `
@@ -643,13 +659,6 @@ export default function Checkout() {
 
       <div className="checkout-scanlines" />
 
-      {/* Decorative vertical decors */}
-      <div className="absolute left-6 top-[35%] rotate-[-90deg] origin-left text-[9px] font-mono text-gray-400 tracking-[0.25em] uppercase select-none pointer-events-none">
-        FTW // SECURED_PAYMENT_SYS_V2.0
-      </div>
-      <div className="absolute right-6 top-[35%] rotate-[90deg] origin-right text-[9px] font-mono text-gray-400 tracking-[0.25em] uppercase select-none pointer-events-none">
-        TRANSACTION_ENCRYPTED_256BIT
-      </div>
 
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_50%_-10%,rgba(139,92,246,0.06),rgba(255,255,255,0))] pointer-events-none z-0" />
 
@@ -660,7 +669,7 @@ export default function Checkout() {
         className="max-w-7xl mx-auto relative z-10"
       >
         {/* Back Link */}
-        <div className="mb-3">
+        <div className="mb-3 lg:hidden">
           <Link to="/shop" className="inline-flex items-center gap-2 text-[13.5px] font-mono uppercase tracking-widest text-dark hover:text-purple-600 group transition-colors decoration-none font-bold">
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             Return to Storefront
@@ -672,22 +681,33 @@ export default function Checkout() {
           {/* ── LEFT COLUMN ────────────────────────────────────────────────── */}
           <div className="lg:col-span-7 space-y-5">
             {/* Step Navigation / Indicator */}
-            <div className="flex border-b border-[#E8E5DC]/60 pb-2 gap-6 font-mono text-[13px] uppercase tracking-wider font-bold">
+            <div className="flex w-full items-center gap-2 sm:gap-3 font-mono text-[11px] sm:text-[12px] uppercase tracking-wider font-bold">
               <button
                 type="button"
                 onClick={() => setCurrentStep(1)}
-                className={`transition-colors cursor-pointer pb-2 -mb-[11px] border-b-2 ${currentStep === 1 ? 'text-dark border-dark' : 'text-dark2/40 border-transparent hover:text-dark'}`}
+                className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-3 rounded-xl border transition-all cursor-pointer ${currentStep === 1
+                    ? 'bg-dark border-dark text-[#D6FF40] shadow-md'
+                    : 'bg-white border-purple-500/10 text-dark2/50 hover:text-dark hover:border-purple-500/25 shadow-xs'
+                  }`}
               >
-                01. Shipping Address
+                <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-500 shrink-0" />
+                <span>01. Shipping<span className="hidden sm:inline"> Address</span></span>
               </button>
+              <div className="hidden sm:block text-purple-500/30">
+                <ArrowRight className="w-4 h-4" />
+              </div>
               <button
                 type="button"
                 onClick={() => {
                   if (validateAddressStep()) setCurrentStep(2)
                 }}
-                className={`transition-colors cursor-pointer pb-2 -mb-[11px] border-b-2 ${currentStep === 2 ? 'text-dark border-dark' : 'text-dark2/40 border-transparent hover:text-dark'}`}
+                className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-3 rounded-xl border transition-all cursor-pointer ${currentStep === 2
+                    ? 'bg-dark border-dark text-[#D6FF40] shadow-md'
+                    : 'bg-white border-purple-500/10 text-dark2/50 hover:text-dark hover:border-purple-500/25 shadow-xs'
+                  }`}
               >
-                02. Payment Method
+                <CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-500 shrink-0" />
+                <span>02. Payment<span className="hidden sm:inline"> Method</span></span>
               </button>
             </div>
 
@@ -704,7 +724,7 @@ export default function Checkout() {
                   >
                     {/* SECTION 01 — Shipping Address */}
                     <div className="hud-card-border">
-                      <div className="hud-checkout-card p-6 md:p-7 space-y-4">
+                      <div className="hud-checkout-card p-4 sm:p-6 md:p-7 space-y-4">
                         <div className="hud-corner hud-tl" />
                         <div className="hud-corner hud-tr" />
                         <div className="hud-corner hud-bl" />
@@ -715,61 +735,61 @@ export default function Checkout() {
                           <h2 className="font-sans text-base font-black uppercase text-dark">SHIPPING ADDRESS</h2>
                         </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {[
-                          { label: 'First Name', name: 'firstName', placeholder: 'e.g. Virgil', type: 'text' },
-                          { label: 'Last Name', name: 'lastName', placeholder: 'e.g. Abloh', type: 'text' },
-                          { label: 'Email Address', name: 'email', placeholder: 'e.g. virgil@offwhite.com', type: 'email' },
-                          { label: 'Phone Number', name: 'phone', placeholder: 'e.g. +91 9876543210', type: 'tel' },
-                        ].map((field) => (
-                          <div key={field.name} className="space-y-1">
-                            <label className="text-[10px] text-dark2/50 uppercase tracking-widest font-mono font-bold block">{field.label}</label>
-                            <input
-                              type={field.type}
-                              name={field.name}
-                              required
-                              value={formData[field.name]}
-                              onChange={handleInputChange}
-                              placeholder={field.placeholder}
-                              disabled={field.name === 'email' && !!user?.email}
-                              className={`w-full px-3 py-3 border border-[#E8E5DC] rounded-xl text-sm focus:outline-none focus:border-purple-500 transition-colors ${field.name === 'email' && !!user?.email
-                                ? 'bg-[#F5F3EC] text-dark2/50 cursor-not-allowed'
-                                : 'bg-white'
-                                }`}
-                            />
-                          </div>
-                        ))}
-                      </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {[
+                            { label: 'First Name', name: 'firstName', placeholder: 'e.g. Virgil', type: 'text' },
+                            { label: 'Last Name', name: 'lastName', placeholder: 'e.g. Abloh', type: 'text' },
+                            { label: 'Email Address', name: 'email', placeholder: 'e.g. virgil@offwhite.com', type: 'email' },
+                            { label: 'Phone Number', name: 'phone', placeholder: 'e.g. 9876543210', type: 'tel' },
+                          ].map((field) => (
+                            <div key={field.name} className="space-y-1">
+                              <label className="text-[13px] text-dark2/50 uppercase tracking-widest font-mono font-bold block">{field.label}</label>
+                              <input
+                                type={field.type}
+                                name={field.name}
+                                required
+                                value={formData[field.name]}
+                                onChange={handleInputChange}
+                                placeholder={field.placeholder}
+                                disabled={field.name === 'email' && !!user?.email}
+                                className={`w-full px-3 py-3 border border-[#E8E5DC] rounded-xl text-sm sm:text-base focus:outline-none focus:border-purple-500 transition-colors ${field.name === 'email' && !!user?.email
+                                  ? 'bg-[#F5F3EC] text-dark2/50 cursor-not-allowed'
+                                  : 'bg-white'
+                                  }`}
+                              />
+                            </div>
+                          ))}
+                        </div>
 
-                      <div className="space-y-1">
-                        <label className="text-[10px] text-dark2/50 uppercase tracking-widest font-mono font-bold block">Street Address</label>
-                        <input type="text" name="address" required value={formData.address} onChange={handleInputChange}
-                          placeholder="e.g. 23 Fashion St"
-                          className="w-full px-3 py-3 bg-white border border-[#E8E5DC] rounded-xl text-sm focus:outline-none focus:border-purple-500 transition-colors" />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[10px] text-dark2/50 uppercase tracking-widest font-mono font-bold block">Apartment / Suite (Optional)</label>
-                        <input type="text" name="apartment" value={formData.apartment} onChange={handleInputChange}
-                          placeholder="e.g. Floor 2, Suite A"
-                          className="w-full px-3 py-3 bg-white border border-[#E8E5DC] rounded-xl text-sm focus:outline-none focus:border-purple-500 transition-colors" />
-                      </div>
+                        <div className="space-y-1">
+                          <label className="text-[13px] text-dark2/50 uppercase tracking-widest font-mono font-bold block">Street Address</label>
+                          <input type="text" name="address" required value={formData.address} onChange={handleInputChange}
+                            placeholder="e.g. 23 Fashion St"
+                            className="w-full px-3 py-3 bg-white border border-[#E8E5DC] rounded-xl text-sm sm:text-base focus:outline-none focus:border-purple-500 transition-colors" />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[13px] text-dark2/50 uppercase tracking-widest font-mono font-bold block">Apartment / Suite (Optional)</label>
+                          <input type="text" name="apartment" value={formData.apartment} onChange={handleInputChange}
+                            placeholder="e.g. Floor 2, Suite A"
+                            className="w-full px-3 py-3 bg-white border border-[#E8E5DC] rounded-xl text-sm sm:text-base focus:outline-none focus:border-purple-500 transition-colors" />
+                        </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        {[
-                          { label: 'City', name: 'city', placeholder: 'Mumbai' },
-                          { label: 'State', name: 'state', placeholder: 'Maharashtra' },
-                          { label: 'ZIP Code', name: 'zip', placeholder: '400001' },
-                        ].map((field) => (
-                          <div key={field.name} className="space-y-1">
-                            <label className="text-[10px] text-dark2/50 uppercase tracking-widest font-mono font-bold block">{field.label}</label>
-                            <input type="text" name={field.name} required value={formData[field.name]} onChange={handleInputChange}
-                              placeholder={field.placeholder}
-                              className="w-full px-3 py-3 bg-white border border-[#E8E5DC] rounded-xl text-sm focus:outline-none focus:border-purple-500 transition-colors" />
-                          </div>
-                        ))}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          {[
+                            { label: 'City', name: 'city', placeholder: 'Mumbai' },
+                            { label: 'State', name: 'state', placeholder: 'Maharashtra' },
+                            { label: 'ZIP Code', name: 'zip', placeholder: '400001' },
+                          ].map((field) => (
+                            <div key={field.name} className="space-y-1">
+                              <label className="text-[13px] text-dark2/50 uppercase tracking-widest font-mono font-bold block">{field.label}</label>
+                              <input type="text" name={field.name} required value={formData[field.name]} onChange={handleInputChange}
+                                placeholder={field.placeholder}
+                                className="w-full px-3 py-3 bg-white border border-[#E8E5DC] rounded-xl text-sm sm:text-base focus:outline-none focus:border-purple-500 transition-colors" />
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
 
                     <button
                       type="button"
@@ -777,11 +797,10 @@ export default function Checkout() {
                       onClick={() => {
                         if (validateAddressStep()) setCurrentStep(2)
                       }}
-                      className={`w-fit mx-auto px-6 sm:px-8 py-3.5 sm:py-4 font-mono font-black text-xs uppercase tracking-widest rounded-xl sm:rounded-2xl flex items-center justify-center gap-2 shadow-xl border-none ${
-                        items.length === 0
-                          ? 'bg-dark/10 text-dark2/30 cursor-not-allowed shadow-none'
-                          : 'bg-dark text-[#D6FF40] hover:bg-purple-600 hover:text-white transition-all cursor-pointer'
-                      }`}
+                      className={`w-fit mx-auto px-6 sm:px-8 py-3.5 sm:py-4 font-mono font-black text-xs uppercase tracking-widest rounded-xl sm:rounded-2xl flex items-center justify-center gap-2 shadow-xl border-none ${items.length === 0
+                        ? 'bg-dark/10 text-dark2/30 cursor-not-allowed shadow-none'
+                        : 'bg-dark text-[#D6FF40] hover:bg-purple-600 hover:text-white transition-all cursor-pointer'
+                        }`}
                     >
                       Continue to Payment
                       <CreditCard className="w-4 h-4" />
@@ -798,7 +817,7 @@ export default function Checkout() {
                   >
                     {/* SECTION 02 — Payment Gateway */}
                     <div className="hud-card-border">
-                      <div className="hud-checkout-card p-6 md:p-8 space-y-6">
+                      <div className="hud-checkout-card p-4 sm:p-6 md:p-8 space-y-6">
                         <div className="hud-corner hud-tl" />
                         <div className="hud-corner hud-tr" />
                         <div className="hud-corner hud-bl" />
@@ -809,126 +828,126 @@ export default function Checkout() {
                           <h2 className="font-sans text-lg font-black uppercase text-dark">PAYMENT GATEWAY</h2>
                         </div>
 
-                      {!dbSettings.enable_razorpay && !dbSettings.enable_cod ? (
-                        <div className="bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl p-5 text-center font-mono text-xs space-y-2">
-                          <p className="font-bold uppercase tracking-wider">⚠️ Payment Service Unavailable</p>
-                          <p className="opacity-70 leading-relaxed">Payment gateways are undergoing system updates. Please try again after some time.</p>
-                        </div>
-                      ) : (
-                        <div className="space-y-3">
-                          {/* Razorpay Option */}
-                          {dbSettings.enable_razorpay && (
-                            <button
-                              type="button"
-                              onClick={() => setPaymentMethod('razorpay')}
-                              className={`w-full flex items-center justify-between p-3.5 sm:p-4 border rounded-2xl transition-all cursor-pointer ${paymentMethod === 'razorpay'
-                                  ? 'bg-dark border-dark text-white shadow-lg'
-                                  : 'bg-white border-[#E8E5DC] text-dark hover:border-purple-500'
-                                }`}
-                            >
-                              <div className="flex items-center gap-3.5">
-                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${paymentMethod === 'razorpay' ? 'bg-purple-600 text-white' : 'bg-[#FAF9F6] text-dark'}`}>
-                                  <Zap className="w-4 h-4" />
-                                </div>
-                                <div className="text-left font-sans">
-                                  <span className="text-[13px] uppercase font-black block">Razorpay Secure Checkout</span>
-                                  <span className="text-[11px] opacity-60 block mt-0.5 font-mono">Cards · UPI · Net Banking · Wallets</span>
-                                </div>
-                              </div>
-                              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'razorpay' ? 'border-purple-500' : 'border-dark2/20'}`}>
-                                {paymentMethod === 'razorpay' && <div className="w-2 h-2 rounded-full bg-purple-500" />}
-                              </div>
-                            </button>
-                          )}
-
-                          {/* COD Option */}
-                          {dbSettings.enable_cod && (
-                            <button
-                              type="button"
-                              onClick={() => setPaymentMethod('cod')}
-                              className={`w-full flex items-center justify-between p-3.5 sm:p-4 border rounded-2xl transition-all cursor-pointer ${paymentMethod === 'cod'
-                                  ? 'bg-dark border-dark text-white shadow-lg'
-                                  : 'bg-white border-[#E8E5DC] text-dark hover:border-purple-500'
-                                }`}
-                            >
-                              <div className="flex items-center gap-3.5">
-                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${paymentMethod === 'cod' ? 'bg-purple-600 text-white' : 'bg-[#FAF9F6] text-dark'}`}>
-                                  <CreditCard className="w-4 h-4" />
-                                </div>
-                                <div className="text-left font-sans">
-                                  <span className="text-[13px] uppercase font-black block">Cash on Delivery (COD)</span>
-                                  <span className="text-[11px] opacity-60 block mt-0.5 font-mono">Pay with cash or scan on delivery</span>
-                                </div>
-                              </div>
-                              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'cod' ? 'border-purple-500' : 'border-dark2/20'}`}>
-                                {paymentMethod === 'cod' && <div className="w-2 h-2 rounded-full bg-purple-500" />}
-                              </div>
-                            </button>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Razorpay info pill */}
-                      {paymentMethod === 'razorpay' && dbSettings.enable_razorpay && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="bg-dark text-[#D6FF40] rounded-xl p-4 flex items-start gap-3 text-xs font-mono"
-                        >
-                          <Zap className="w-4 h-4 shrink-0 mt-0.5 text-purple-400 animate-pulse" />
-                          <div>
-                            <div className="font-bold uppercase tracking-wider mb-1">Razorpay Secure Checkout</div>
-                            <div className="text-white opacity-80 leading-relaxed">You will be redirected to Razorpay's encrypted payment modal. Supports UPI, Cards, Net Banking &amp; Wallets.</div>
+                        {!dbSettings.enable_razorpay && !dbSettings.enable_cod ? (
+                          <div className="bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl p-5 text-center font-mono text-xs space-y-2">
+                            <p className="font-bold uppercase tracking-wider">⚠️ Payment Service Unavailable</p>
+                            <p className="opacity-70 leading-relaxed">Payment gateways are undergoing system updates. Please try again after some time.</p>
                           </div>
-                        </motion.div>
-                      )}
+                        ) : (
+                          <div className="space-y-3">
+                            {/* Razorpay Option */}
+                            {dbSettings.enable_razorpay && (
+                              <button
+                                type="button"
+                                onClick={() => setPaymentMethod('razorpay')}
+                                className={`w-full flex items-center justify-between p-3.5 sm:p-4 border rounded-2xl transition-all cursor-pointer ${paymentMethod === 'razorpay'
+                                  ? 'bg-dark border-dark text-white shadow-lg'
+                                  : 'bg-white border-[#E8E5DC] text-dark hover:border-purple-500'
+                                  }`}
+                              >
+                                <div className="flex items-center gap-3.5">
+                                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${paymentMethod === 'razorpay' ? 'bg-purple-600 text-white' : 'bg-[#FAF9F6] text-dark'}`}>
+                                    <Zap className="w-4 h-4" />
+                                  </div>
+                                  <div className="text-left font-sans">
+                                    <span className="text-[13px] uppercase font-black block">Razorpay Secure Checkout</span>
+                                    <span className="text-[13px] opacity-65 block mt-0.5 font-mono font-bold">Cards · UPI · Net Banking · Wallets</span>
+                                  </div>
+                                </div>
+                                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'razorpay' ? 'border-purple-500' : 'border-dark2/20'}`}>
+                                  {paymentMethod === 'razorpay' && <div className="w-2 h-2 rounded-full bg-purple-500" />}
+                                </div>
+                              </button>
+                            )}
 
-                      {/* Security / Info Banner */}
-                      {(dbSettings.enable_razorpay || dbSettings.enable_cod) && (
-                        <div className="bg-[#FAF9F6] border border-[#E8E5DC]/60 rounded-2xl p-5 text-sm text-dark2/60 leading-relaxed flex items-start gap-3">
-                          <ShieldCheck className="w-5 h-5 text-purple-600 shrink-0" />
-                          <span>
-                            {paymentMethod === 'razorpay'
-                              ? 'All transactions are secured. We never store your card details.'
-                              : 'Please pay cash or scan the digital QR code with your delivery partner upon arrival.'}
-                          </span>
-                        </div>
-                      )}
+                            {/* COD Option */}
+                            {dbSettings.enable_cod && (
+                              <button
+                                type="button"
+                                onClick={() => setPaymentMethod('cod')}
+                                className={`w-full flex items-center justify-between p-3.5 sm:p-4 border rounded-2xl transition-all cursor-pointer ${paymentMethod === 'cod'
+                                  ? 'bg-dark border-dark text-white shadow-lg'
+                                  : 'bg-white border-[#E8E5DC] text-dark hover:border-purple-500'
+                                  }`}
+                              >
+                                <div className="flex items-center gap-3.5">
+                                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${paymentMethod === 'cod' ? 'bg-purple-600 text-white' : 'bg-[#FAF9F6] text-dark'}`}>
+                                    <CreditCard className="w-4 h-4" />
+                                  </div>
+                                  <div className="text-left font-sans">
+                                    <span className="text-[13px] uppercase font-black block">Cash on Delivery (COD)</span>
+                                    <span className="text-[13px] opacity-65 block mt-0.5 font-mono font-bold">Pay with cash or scan on delivery</span>
+                                  </div>
+                                </div>
+                                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'cod' ? 'border-purple-500' : 'border-dark2/20'}`}>
+                                  {paymentMethod === 'cod' && <div className="w-2 h-2 rounded-full bg-purple-500" />}
+                                </div>
+                              </button>
+                            )}
+                          </div>
+                        )}
 
-                      {/* Footer Actions inside the card */}
-                      <div className="flex flex-col-reverse sm:flex-row gap-4 items-center sm:justify-between border-t border-[#E8E5DC] pt-6 mt-6">
-                        <button
-                          type="button"
-                          onClick={() => setCurrentStep(1)}
-                          className="text-xs font-mono uppercase tracking-widest text-dark2/60 hover:text-purple-600 flex items-center justify-center gap-1.5 transition-colors font-bold w-full sm:w-fit py-2.5 sm:py-0 border-none bg-transparent cursor-pointer"
-                        >
-                          <ArrowLeft className="w-4 h-4" />
-                          Back to Address
-                        </button>
-                        <motion.button
-                          whileTap={(items.length === 0 || (!dbSettings.enable_razorpay && !dbSettings.enable_cod)) ? {} : { scale: 0.98 }}
-                          type="submit"
-                          disabled={items.length === 0 || (!dbSettings.enable_razorpay && !dbSettings.enable_cod)}
-                          className={`w-fit mx-auto px-6 sm:px-8 py-3.5 sm:py-4 font-mono font-black text-xs uppercase tracking-widest rounded-xl sm:rounded-2xl flex items-center justify-center gap-2 shadow-xl border-none ${(items.length === 0 || (!dbSettings.enable_razorpay && !dbSettings.enable_cod))
+                        {/* Razorpay info pill */}
+                        {paymentMethod === 'razorpay' && dbSettings.enable_razorpay && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-dark text-[#D6FF40] rounded-xl p-4 flex items-start gap-3 text-xs font-mono"
+                          >
+                            <Zap className="w-4 h-4 shrink-0 mt-0.5 text-purple-400 animate-pulse" />
+                            <div>
+                              <div className="font-bold uppercase tracking-wider mb-1">Razorpay Secure Checkout</div>
+                              <div className="text-white opacity-80 leading-relaxed">You will be redirected to Razorpay's encrypted payment modal. Supports UPI, Cards, Net Banking &amp; Wallets.</div>
+                            </div>
+                          </motion.div>
+                        )}
+
+                        {/* Security / Info Banner */}
+                        {(dbSettings.enable_razorpay || dbSettings.enable_cod) && (
+                          <div className="bg-[#FAF9F6] border border-[#E8E5DC]/60 rounded-2xl p-5 text-sm text-dark2/60 leading-relaxed flex items-start gap-3">
+                            <ShieldCheck className="w-5 h-5 text-purple-600 shrink-0" />
+                            <span>
+                              {paymentMethod === 'razorpay'
+                                ? 'All transactions are secured. We never store your card details.'
+                                : 'Please pay cash or scan the digital QR code with your delivery partner upon arrival.'}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Footer Actions inside the card */}
+                        <div className="flex flex-col-reverse sm:flex-row gap-4 items-center sm:justify-between border-t border-[#E8E5DC] pt-6 mt-6">
+                          <button
+                            type="button"
+                            onClick={() => setCurrentStep(1)}
+                            className="text-xs font-mono uppercase tracking-widest text-dark2/60 hover:text-dark border border-[#E8E5DC] bg-white hover:bg-neutral-50 px-5 py-3.5 rounded-xl flex items-center justify-center gap-1.5 transition-colors font-bold w-full sm:w-auto cursor-pointer"
+                          >
+                            <ArrowLeft className="w-4 h-4" />
+                            Back to Address
+                          </button>
+                          <motion.button
+                            whileTap={(items.length === 0 || (!dbSettings.enable_razorpay && !dbSettings.enable_cod)) ? {} : { scale: 0.98 }}
+                            type="submit"
+                            disabled={items.length === 0 || (!dbSettings.enable_razorpay && !dbSettings.enable_cod)}
+                            className={`w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 font-mono font-black text-xs uppercase tracking-widest rounded-xl sm:rounded-2xl flex items-center justify-center gap-2 shadow-xl border-none ${(items.length === 0 || (!dbSettings.enable_razorpay && !dbSettings.enable_cod))
                               ? 'bg-dark/10 text-dark2/30 cursor-not-allowed shadow-none'
                               : 'bg-dark hover:bg-purple-600 hover:text-white text-[#D6FF40] transition-all cursor-pointer'
-                            }`}
-                        >
-                          {(!dbSettings.enable_razorpay && !dbSettings.enable_cod) ? (
-                            <>Service Offline</>
-                          ) : paymentMethod === 'razorpay' ? (
-                            <>
-                              <Zap className="w-4 h-4" />
-                              Pay ₹{finalTotal} via Razorpay
-                            </>
-                          ) : (
-                            <>Confirm COD Order — ₹{finalTotal}</>
-                          )}
-                        </motion.button>
+                              }`}
+                          >
+                            {(!dbSettings.enable_razorpay && !dbSettings.enable_cod) ? (
+                              <>Service Offline</>
+                            ) : paymentMethod === 'razorpay' ? (
+                              <>
+                                <Zap className="w-4 h-4" />
+                                Pay ₹{finalTotal} via Razorpay
+                              </>
+                            ) : (
+                              <>Confirm COD Order — ₹{finalTotal}</>
+                            )}
+                          </motion.button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
+                  </motion.div>
                 )}
               </AnimatePresence>
             </form>
@@ -939,7 +958,7 @@ export default function Checkout() {
 
             {/* Promo Code */}
             <div className="hud-card-border">
-              <div className="hud-checkout-card p-6">
+              <div className="hud-checkout-card p-4 sm:p-6">
                 <div className="hud-corner hud-tl" />
                 <div className="hud-corner hud-tr" />
                 <div className="hud-corner hud-bl" />
@@ -953,7 +972,7 @@ export default function Checkout() {
                       value={promoCode}
                       onChange={(e) => setPromoCode(e.target.value)}
                       placeholder="DISCOUNT CODE"
-                      className="w-full pl-10 pr-4 py-3 bg-[#FAF9F6] border border-[#E8E5DC] rounded-xl text-xs font-mono uppercase tracking-wider focus:outline-none focus:border-purple-500 placeholder:text-dark2/30"
+                      className="w-full pl-10 pr-4 py-3 bg-[#FAF9F6] border border-[#E8E5DC] rounded-xl text-xs sm:text-sm font-mono uppercase tracking-wider focus:outline-none focus:border-purple-500 placeholder:text-dark2/50 placeholder:font-black"
                     />
                   </div>
                   <button type="submit" className="px-4 sm:px-6 py-3 bg-dark text-[#D6FF40] hover:bg-purple-600 hover:text-white transition-all rounded-xl text-xs font-mono font-bold uppercase tracking-wider border-none cursor-pointer">
@@ -974,7 +993,7 @@ export default function Checkout() {
 
             {/* Cart Summary */}
             <div className="hud-card-border">
-              <div className="hud-checkout-card p-8 space-y-6">
+              <div className="hud-checkout-card p-4 sm:p-8 space-y-6">
                 <div className="hud-corner hud-tl" />
                 <div className="hud-corner hud-tr" />
                 <div className="hud-corner hud-bl" />
@@ -985,111 +1004,111 @@ export default function Checkout() {
                   <span className="text-xs font-mono text-dark2/45 font-bold">[{items.length}]</span>
                 </h3>
 
-              <div className="max-h-[280px] overflow-y-auto divide-y divide-[#E8E5DC] pr-1 checkout-summary-scroll">
-                {items.length === 0 ? (
-                  <div className="py-8 text-center text-dark2/40 space-y-2">
-                    <ShoppingBag className="w-8 h-8 mx-auto opacity-30" />
-                    <span className="text-xs font-mono uppercase block">Your bag is empty</span>
-                  </div>
-                ) : items.map((item) => {
-                  const standardProductId = item.id && item.id.startsWith('ftw-') ? (item.id.split('-').length >= 4 ? item.id.split('-').slice(0, -2).join('-') : item.id) : null;
-                  return (
-                    <div key={`${item.id}-${item.size}-${item.color || ''}`} className="py-4 flex gap-4 items-center">
-                      {standardProductId ? (
-                        <Link to={`/product/${standardProductId}`} className="w-14 h-18 bg-[#F5F3EC] rounded-xl overflow-hidden shrink-0 block group">
-                          <img src={item.image} alt={item.name} className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform" />
-                        </Link>
-                      ) : (
-                        <div className="w-14 h-18 bg-[#F5F3EC] rounded-xl overflow-hidden shrink-0">
-                          <img src={item.image} alt={item.name} className="w-full h-full object-cover object-center" />
-                        </div>
-                      )}
-                      <div className="flex-grow min-w-0">
+                <div className="max-h-[280px] overflow-y-auto divide-y divide-[#E8E5DC] pr-1 checkout-summary-scroll">
+                  {items.length === 0 ? (
+                    <div className="py-8 text-center text-dark2/40 space-y-2">
+                      <ShoppingBag className="w-8 h-8 mx-auto opacity-30" />
+                      <span className="text-xs font-mono uppercase block">Your bag is empty</span>
+                    </div>
+                  ) : items.map((item) => {
+                    const standardProductId = item.id && item.id.startsWith('ftw-') ? (item.id.split('-').length >= 4 ? item.id.split('-').slice(0, -2).join('-') : item.id) : null;
+                    return (
+                      <div key={`${item.id}-${item.size}-${item.color || ''}`} className="py-4 flex gap-4 items-center">
                         {standardProductId ? (
-                          <Link to={`/product/${standardProductId}`} className="group block decoration-none">
-                            <h4 className="text-[14.5px] font-black uppercase text-dark truncate group-hover:text-purple-600 transition-colors">{item.name}</h4>
+                          <Link to={`/product/${standardProductId}`} className="w-16 h-22 bg-[#F5F3EC] rounded-xl overflow-hidden shrink-0 block group">
+                            <img src={item.image} alt={item.name} className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform" />
                           </Link>
                         ) : (
-                          <h4 className="text-[14.5px] font-black uppercase text-dark truncate">{item.name}</h4>
+                          <div className="w-16 h-22 bg-[#F5F3EC] rounded-xl overflow-hidden shrink-0">
+                            <img src={item.image} alt={item.name} className="w-full h-full object-cover object-center" />
+                          </div>
                         )}
-                        <div className="flex gap-1.5 flex-wrap items-center mt-0.5">
-                          <span className="text-[12.5px] text-purple-600 font-mono font-black uppercase">SIZE {item.size}</span>
-                          {item.color && (
-                            <span className="inline-flex items-center gap-1.5 text-[12.5px] text-dark px-2.5 py-0.5 rounded-lg bg-neutral-100 border border-neutral-200 font-mono font-black uppercase">
-                              <span 
-                                style={getColorBackgroundStyle(item.color)} 
-                                className="w-5 h-5 rounded-full border border-black/20 shadow-xs inline-block shrink-0 shadow-inner" 
-                              />
-                              COLOR {item.color.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '')}
-                            </span>
+                        <div className="flex-grow min-w-0">
+                          {standardProductId ? (
+                            <Link to={`/product/${standardProductId}`} className="group block decoration-none">
+                              <h4 className="text-[14.5px] font-black uppercase text-dark truncate group-hover:text-purple-600 transition-colors">{item.name}</h4>
+                            </Link>
+                          ) : (
+                            <h4 className="text-[14.5px] font-black uppercase text-dark truncate">{item.name}</h4>
                           )}
+                          <div className="flex gap-1.5 flex-wrap items-center mt-0.5">
+                            <span className="text-[12.5px] text-purple-600 font-mono font-black uppercase">SIZE {item.size}</span>
+                            {item.color && (
+                              <span className="inline-flex items-center gap-1.5 text-[12.5px] text-dark px-2.5 py-0.5 rounded-lg bg-neutral-100 border border-neutral-200 font-mono font-black uppercase">
+                                <span
+                                  style={getColorBackgroundStyle(item.color)}
+                                  className="w-5 h-5 rounded-full border border-black/20 shadow-xs inline-block shrink-0 shadow-inner"
+                                />
+                                COLOR {item.color.replace(/\s*\(#[0-9a-fA-F]{3,6}\)/, '')}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 mt-1.5">
+                            <button type="button" onClick={() => updateQty(item.id, item.size, item.color, item.qty - 1)}
+                              className="w-5 h-5 rounded border border-[#E8E5DC] flex items-center justify-center hover:bg-[#FAF9F6] transition-colors border-none cursor-pointer">
+                              <Minus className="w-2.5 h-2.5" />
+                            </button>
+                            <span className="text-sm font-mono font-black">{item.qty}</span>
+                            <button type="button" onClick={() => updateQty(item.id, item.size, item.color, item.qty + 1)}
+                              className="w-5 h-5 rounded border border-[#E8E5DC] flex items-center justify-center hover:bg-[#FAF9F6] transition-colors border-none cursor-pointer">
+                              <Plus className="w-2.5 h-2.5" />
+                            </button>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 mt-1.5">
-                          <button type="button" onClick={() => updateQty(item.id, item.size, item.color, item.qty - 1)}
-                            className="w-5 h-5 rounded border border-[#E8E5DC] flex items-center justify-center hover:bg-[#FAF9F6] transition-colors border-none cursor-pointer">
-                            <Minus className="w-2.5 h-2.5" />
-                          </button>
-                          <span className="text-sm font-mono font-black">{item.qty}</span>
-                          <button type="button" onClick={() => updateQty(item.id, item.size, item.color, item.qty + 1)}
-                            className="w-5 h-5 rounded border border-[#E8E5DC] flex items-center justify-center hover:bg-[#FAF9F6] transition-colors border-none cursor-pointer">
-                            <Plus className="w-2.5 h-2.5" />
+                        <div className="text-right shrink-0">
+                          <span className="text-sm font-mono font-black block">₹{item.price * item.qty}</span>
+                          <button type="button" onClick={() => removeFromCart(item.id, item.size, item.color)}
+                            className="text-dark2/30 hover:text-red-500 mt-1.5 p-0.5 transition-colors border-none bg-transparent cursor-pointer">
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       </div>
-                      <div className="text-right shrink-0">
-                        <span className="text-sm font-mono font-black block">₹{item.price * item.qty}</span>
-                        <button type="button" onClick={() => removeFromCart(item.id, item.size, item.color)}
-                          className="text-dark2/30 hover:text-red-500 mt-1.5 p-0.5 transition-colors border-none bg-transparent cursor-pointer">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                    );
+                  })}
+                </div>
+
+                {/* Shipping Threshold Progress */}
+                <div className="border-t border-[#E8E5DC] pt-5 pb-1 font-mono text-xs">
+                  {subtotal >= dbSettings.shipping_threshold ? (
+                    <div className="flex items-center gap-2 text-green-700 font-bold uppercase tracking-wider text-[10px]">
+                      <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shrink-0" />
+                      You qualify for free shipping!
+                    </div>
+                  ) : (
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-[11px] uppercase font-black tracking-wider text-dark2/50">
+                        <span>Free Shipping Goal</span>
+                        <span>Add <span className="font-extrabold text-dark">₹{dbSettings.shipping_threshold - subtotal}</span> more</span>
+                      </div>
+                      <div className="w-full h-2 bg-[#F5F3EC]/60 border border-[#E8E5DC]/30 rounded-full overflow-hidden shadow-inner p-[1px]">
+                        <div
+                          style={{ width: `${Math.min((subtotal / dbSettings.shipping_threshold) * 100, 100)}%` }}
+                          className="h-full bg-gradient-to-r from-dark via-dark/90 to-purple-600 rounded-full transition-all duration-700 ease-out shadow-sm"
+                        />
                       </div>
                     </div>
-                  );
-                })}
-              </div>
+                  )}
+                </div>
 
-              {/* Shipping Threshold Progress */}
-              <div className="border-t border-[#E8E5DC] pt-5 pb-1 font-mono text-xs">
-                {subtotal >= dbSettings.shipping_threshold ? (
-                  <div className="flex items-center gap-2 text-green-700 font-bold uppercase tracking-wider text-[10px]">
-                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shrink-0" />
-                    You qualify for free shipping!
+                {/* Price Breakdown */}
+                <div className="border-t border-[#E8E5DC] pt-5 space-y-3 font-mono text-[13px] uppercase">
+                  <div className="flex justify-between text-dark font-bold">
+                    <span>Subtotal</span><span>₹{subtotal}</span>
                   </div>
-                ) : (
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between text-[9px] uppercase font-black tracking-wider text-dark2/50">
-                      <span>Free Shipping Goal</span>
-                      <span>Add <span className="font-extrabold text-dark">₹{dbSettings.shipping_threshold - subtotal}</span> more</span>
+                  {appliedPromo && (
+                    <div className="flex justify-between text-purple-600 font-bold">
+                      <span>Discount ({appliedPromo.code})</span>
+                      <span>-₹{discountAmount.toFixed(0)}</span>
                     </div>
-                    <div className="w-full h-2 bg-[#F5F3EC]/60 border border-[#E8E5DC]/30 rounded-full overflow-hidden shadow-inner p-[1px]">
-                      <div 
-                        style={{ width: `${Math.min((subtotal / dbSettings.shipping_threshold) * 100, 100)}%` }} 
-                        className="h-full bg-gradient-to-r from-dark via-dark/90 to-purple-600 rounded-full transition-all duration-700 ease-out shadow-sm" 
-                      />
-                    </div>
+                  )}
+                  <div className="flex justify-between text-dark font-bold">
+                    <span>Shipping</span><span>{shippingFee === 0 ? <span className="text-green-700 font-bold">FREE</span> : `₹${shippingFee}`}</span>
                   </div>
-                )}
-              </div>
 
-              {/* Price Breakdown */}
-              <div className="border-t border-[#E8E5DC] pt-5 space-y-3 font-mono text-[13px] uppercase">
-                <div className="flex justify-between text-dark2/60">
-                  <span>Subtotal</span><span>₹{subtotal}</span>
-                </div>
-                {appliedPromo && (
-                  <div className="flex justify-between text-purple-600 font-bold">
-                    <span>Discount ({appliedPromo.code})</span>
-                    <span>-₹{discountAmount.toFixed(0)}</span>
+                  <div className="border-t border-[#E8E5DC] pt-4 flex justify-between items-baseline">
+                    <span className="font-display font-black text-sm text-dark">TOTAL</span>
+                    <span className="text-xl font-black text-dark">₹{finalTotal}</span>
                   </div>
-                )}
-                <div className="flex justify-between text-dark2/60">
-                  <span>Shipping</span><span>{shippingFee === 0 ? <span className="text-green-700 font-bold">FREE</span> : `₹${shippingFee}`}</span>
-                </div>
-
-                <div className="border-t border-[#E8E5DC] pt-4 flex justify-between items-baseline">
-                  <span className="font-display font-black text-sm text-dark">TOTAL</span>
-                  <span className="text-xl font-black text-dark">₹{finalTotal}</span>
-                </div>
                 </div>
               </div>
             </div>

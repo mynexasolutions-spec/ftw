@@ -51,21 +51,21 @@ export default function UsersTab({
       </div>
 
       {/* Stats Cards Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         {/* Total Customers */}
         <motion.div 
           whileHover={{ y: -4 }}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          className="bg-gradient-to-br from-violet-50/80 to-purple-100/40 border border-purple-100 p-4 sm:p-5 rounded-2xl shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[110px] sm:min-h-[135px] lg:min-h-[140px] group cursor-pointer"
+          className="bg-gradient-to-br from-violet-50/80 to-purple-100/40 border border-purple-100 p-3 sm:p-5 rounded-2xl shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[100px] sm:min-h-[135px] lg:min-h-[140px] group cursor-pointer"
         >
           <div>
-            <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans font-black text-purple-700/80 uppercase tracking-widest block">Total Accounts</span>
-            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-purple-950 mt-1 font-sans">{totalUsers}</p>
+            <span className="text-[8.5px] xs:text-[9.5px] sm:text-[10px] lg:text-xs font-sans font-black text-purple-700/80 uppercase tracking-widest block">Total Accounts</span>
+            <p className="text-lg xs:text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-purple-955 mt-0.5 sm:mt-1 font-sans">{totalUsers}</p>
           </div>
-          <div className="flex justify-between items-center mt-2 sm:mt-3">
-            <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold text-purple-600 bg-purple-50/90 px-2 py-0.5 rounded border border-purple-150/50">Registered</span>
-            <div className="p-1.5 sm:p-2 lg:p-2.5 bg-white rounded-xl shadow-xs text-purple-700 shrink-0 border border-purple-100 group-hover:scale-110 transition-transform">
-              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-4.5 lg:h-4.5" />
+          <div className="flex justify-between items-center mt-1.5 sm:mt-3">
+            <span className="text-[7.5px] xs:text-[8.5px] sm:text-[9px] lg:text-[10px] font-extrabold text-purple-600 bg-purple-50/90 px-1.5 py-0.5 rounded border border-purple-150/50">Registered</span>
+            <div className="p-1 sm:p-2 lg:p-2.5 bg-white rounded-xl shadow-xs text-purple-700 shrink-0 border border-purple-100 group-hover:scale-110 transition-transform">
+              <Users className="w-3 h-3 sm:w-4 sm:h-4 lg:w-4.5 lg:h-4.5" />
             </div>
           </div>
         </motion.div>
@@ -74,16 +74,16 @@ export default function UsersTab({
         <motion.div 
           whileHover={{ y: -4 }}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          className="bg-gradient-to-br from-amber-50/80 to-orange-100/40 border border-orange-100 p-4 sm:p-5 rounded-2xl shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[110px] sm:min-h-[135px] lg:min-h-[140px] group cursor-pointer"
+          className="bg-gradient-to-br from-amber-50/80 to-orange-100/40 border border-orange-100 p-3 sm:p-5 rounded-2xl shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[100px] sm:min-h-[135px] lg:min-h-[140px] group cursor-pointer"
         >
           <div>
-            <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans font-black text-amber-700/80 uppercase tracking-widest block">Administrators</span>
-            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-amber-955 mt-1 font-sans">{adminCount}</p>
+            <span className="text-[8.5px] xs:text-[9.5px] sm:text-[10px] lg:text-xs font-sans font-black text-amber-700/80 uppercase tracking-widest block">Administrators</span>
+            <p className="text-lg xs:text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-amber-955 mt-0.5 sm:mt-1 font-sans">{adminCount}</p>
           </div>
-          <div className="flex justify-between items-center mt-2 sm:mt-3">
-            <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold text-amber-600 bg-amber-50/90 px-2 py-0.5 rounded border border-amber-150/50">Staff access</span>
-            <div className="p-1.5 sm:p-2 lg:p-2.5 bg-white rounded-xl shadow-xs text-amber-700 shrink-0 border border-amber-100 group-hover:scale-110 transition-transform">
-              <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-4.5 lg:h-4.5" />
+          <div className="flex justify-between items-center mt-1.5 sm:mt-3">
+            <span className="text-[7.5px] xs:text-[8.5px] sm:text-[9px] lg:text-[10px] font-extrabold text-amber-600 bg-amber-50/90 px-1.5 py-0.5 rounded border border-amber-150/50">Staff access</span>
+            <div className="p-1 sm:p-2 lg:p-2.5 bg-white rounded-xl shadow-xs text-amber-700 shrink-0 border border-amber-100 group-hover:scale-110 transition-transform">
+              <Shield className="w-3 h-3 sm:w-4 sm:h-4 lg:w-4.5 lg:h-4.5" />
             </div>
           </div>
         </motion.div>
@@ -92,16 +92,16 @@ export default function UsersTab({
         <motion.div 
           whileHover={{ y: -4 }}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          className="bg-gradient-to-br from-blue-50/80 to-indigo-100/40 border border-blue-100 p-4 sm:p-5 rounded-2xl shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[110px] sm:min-h-[135px] lg:min-h-[140px] group cursor-pointer"
+          className="bg-gradient-to-br from-blue-50/80 to-indigo-100/40 border border-blue-100 p-3 sm:p-5 rounded-2xl shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[100px] sm:min-h-[135px] lg:min-h-[140px] group cursor-pointer"
         >
           <div>
-            <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans font-black text-blue-700/80 uppercase tracking-widest block">Clients</span>
-            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-blue-955 mt-1 font-sans">{customerCount}</p>
+            <span className="text-[8.5px] xs:text-[9.5px] sm:text-[10px] lg:text-xs font-sans font-black text-blue-700/80 uppercase tracking-widest block">Clients</span>
+            <p className="text-lg xs:text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-blue-955 mt-0.5 sm:mt-1 font-sans">{customerCount}</p>
           </div>
-          <div className="flex justify-between items-center mt-2 sm:mt-3">
-            <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold text-blue-600 bg-blue-50/90 px-2 py-0.5 rounded border border-blue-150/50">Shop Buyers</span>
-            <div className="p-1.5 sm:p-2 lg:p-2.5 bg-white rounded-xl shadow-xs text-blue-700 shrink-0 border border-blue-100 group-hover:scale-110 transition-transform">
-              <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-4.5 lg:h-4.5" />
+          <div className="flex justify-between items-center mt-1.5 sm:mt-3">
+            <span className="text-[7.5px] xs:text-[8.5px] sm:text-[9px] lg:text-[10px] font-extrabold text-blue-600 bg-blue-50/90 px-1.5 py-0.5 rounded border border-blue-150/50">Shop Buyers</span>
+            <div className="p-1 sm:p-2 lg:p-2.5 bg-white rounded-xl shadow-xs text-blue-700 shrink-0 border border-blue-100 group-hover:scale-110 transition-transform">
+              <User className="w-3 h-3 sm:w-4 sm:h-4 lg:w-4.5 lg:h-4.5" />
             </div>
           </div>
         </motion.div>
@@ -110,16 +110,16 @@ export default function UsersTab({
         <motion.div 
           whileHover={{ y: -4 }}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          className="bg-gradient-to-br from-emerald-550/10 to-teal-100/40 border border-teal-100 p-4 sm:p-5 rounded-2xl shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[110px] sm:min-h-[135px] lg:min-h-[140px] group cursor-pointer"
+          className="bg-gradient-to-br from-emerald-550/10 to-teal-100/40 border border-teal-100 p-3 sm:p-5 rounded-2xl shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[100px] sm:min-h-[135px] lg:min-h-[140px] group cursor-pointer"
         >
           <div>
-            <span className="text-[9px] sm:text-[10px] lg:text-xs font-sans font-black text-emerald-700/80 uppercase tracking-widest block">Active Shoppers</span>
-            <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-emerald-955 mt-1 font-sans">{activeShoppersCount}</p>
+            <span className="text-[8.5px] xs:text-[9.5px] sm:text-[10px] lg:text-xs font-sans font-black text-emerald-700/80 uppercase tracking-widest block">Active Users</span>
+            <p className="text-lg xs:text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-emerald-955 mt-0.5 sm:mt-1 font-sans">{activeShoppersCount}</p>
           </div>
-          <div className="flex justify-between items-center mt-2 sm:mt-3">
-            <span className="text-[8px] sm:text-[9px] lg:text-[10px] font-extrabold text-emerald-600 bg-emerald-550/10 px-2 py-0.5 rounded border border-teal-150/50">With Orders</span>
-            <div className="p-1.5 sm:p-2 lg:p-2.5 bg-white rounded-xl shadow-xs text-emerald-700 shrink-0 border border-teal-100 group-hover:scale-110 transition-transform">
-              <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-4.5 lg:h-4.5" />
+          <div className="flex justify-between items-center mt-1.5 sm:mt-3">
+            <span className="text-[7.5px] xs:text-[8.5px] sm:text-[9px] lg:text-[10px] font-extrabold text-emerald-600 bg-emerald-550/10 px-1.5 py-0.5 rounded border border-teal-150/50">With Orders</span>
+            <div className="p-1 sm:p-2 lg:p-2.5 bg-white rounded-xl shadow-xs text-emerald-700 shrink-0 border border-teal-100 group-hover:scale-110 transition-transform">
+              <ShoppingBag className="w-3 h-3 sm:w-4 sm:h-4 lg:w-4.5 lg:h-4.5" />
             </div>
           </div>
         </motion.div>

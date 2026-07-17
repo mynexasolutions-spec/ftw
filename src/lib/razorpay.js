@@ -18,41 +18,17 @@ export function loadRazorpayScript() {
 }
 
 /**
- * createRazorpayOrder
- * Calls the Netlify serverless function to create an order via Razorpay API.
- * The secret key never leaves the server.
- *
- * @param {number} amountPaise - Total in paise (₹1 = 100 paise)
- * @param {string} receipt - Optional receipt ID
- * @param {object} notes - Optional notes object
- * @returns {Promise<{ orderId, amount, currency }>}
- */
-export async function createRazorpayOrder(amountPaise, receipt = '', notes = {}) {
-  const res = await fetch('/api/razorpay', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ amount: amountPaise, currency: 'INR', receipt, notes }),
-  })
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    throw new Error(err.error || 'Failed to create order.')
-  }
-
-  return res.json() // { orderId, amount, currency }
-}
-
-/**
  * openRazorpayCheckout
- * 1. Loads checkout.js
- * 2. Creates a server-side order (via Netlify function)
- * 3. Opens the Razorpay checkout modal with the returned orderId
+ * Opens the Razorpay checkout modal using an order already created server-side
+ * (via /api/create-order, which computes the trusted amount). This function
+ * never talks to our backend itself — it only drives the Razorpay widget.
  *
  * @param {object} opts
  */
 export async function openRazorpayCheckout({
   keyId,
-  amount,           // in paise
+  razorpayOrderId, // order id returned by /api/create-order
+  amount,          // in paise, returned by /api/create-order
   currency = 'INR',
   name,
   description,
@@ -69,21 +45,11 @@ export async function openRazorpayCheckout({
     return
   }
 
-  // Step 1: Create order server-side
-  let order
-  try {
-    order = await createRazorpayOrder(amount, `ftw_${Date.now()}`, notes)
-  } catch (err) {
-    alert(`Payment Error: ${err.message}`)
-    return
-  }
-
-  // Step 2: Open modal with the real order_id
   const options = {
     key: keyId,
-    amount: order.amount,
-    currency: order.currency,
-    order_id: order.orderId,       // Required for proper verification
+    amount,
+    currency,
+    order_id: razorpayOrderId,       // Required for proper verification
     name,
     description,
     image,

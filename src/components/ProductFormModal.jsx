@@ -219,8 +219,19 @@ export default function ProductFormModal({
     }
   }
 
+  // Normalize the category value to match option values in categoriesList (case-insensitive name/slug match)
+  const normalizedCategory = (() => {
+    if (!productForm.category) return '';
+    const matched = categoriesList.find(cat =>
+      cat.name.toLowerCase() === productForm.category.toLowerCase() ||
+      cat.id.toLowerCase() === productForm.category.toLowerCase() ||
+      cat.slug.toLowerCase() === productForm.category.toLowerCase()
+    );
+    return matched ? matched.name : productForm.category;
+  })();
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 font-sans">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 font-sans">
       <div className="absolute inset-0 bg-dark/70 backdrop-blur-md" />
       <motion.div
         initial={{ opacity: 0, y: 30, scale: 0.96 }}
@@ -360,13 +371,14 @@ export default function ProductFormModal({
                         <div className="space-y-1.5">
                           <label className="text-xs uppercase font-black text-dark2/60 block">Parent Category *</label>
                           <select
-                            value={productForm.category} onChange={(e) => {
+                            value={normalizedCategory || ''} onChange={(e) => {
                               setProductForm({ ...productForm, category: e.target.value })
                               if (stepErrors.category) setStepErrors({ ...stepErrors, category: null })
                             }}
                             className={`w-full px-4 py-2 bg-cream2/50 border rounded-xl focus:outline-none focus:bg-white text-sm font-sans font-bold text-dark transition-all ${stepErrors.category ? 'border-red-500 bg-red-50/20 focus:border-red-500' : 'border-cream3 focus:border-dark'
                               }`}
                           >
+                            <option value="">-- Select Category --</option>
                             {categoriesList.length > 0 ? (
                               categoriesList.map(cat => (
                                 <option key={cat.id} value={cat.name}>{cat.name}</option>

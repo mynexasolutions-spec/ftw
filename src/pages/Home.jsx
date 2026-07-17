@@ -9,10 +9,11 @@ import {
   ShoppingBag, Eye, Upload, Palette, Check, ArrowRight,
   Heart, Star, Flame, Sparkles, X, Mail, Bell, Gamepad2, Zap, Swords, Target, Trophy, Laptop, Crown
 } from 'lucide-react'
-import { getHomepageConfig, getProducts, getProductRating, getProductReviewCount } from '../lib/supabase'
+import { getHomepageConfig, getProducts, getProductRating, getProductReviewCount, getPlainTshirtCombo } from '../lib/supabase'
 import Hero from '../components/Hero'
 import FeaturedCollection from '../components/FeaturedCollection'
 import SaleArchive from '../components/SaleArchive'
+import PlainTshirtCombo from '../components/PlainTshirtCombo'
 import CustomDropSection from '../components/CustomDropSection'
 import NextDropSection from '../components/NextDropSection'
 
@@ -129,6 +130,7 @@ export default function Home() {
 
   // Sale products
   const [saleProducts, setSaleProducts] = useState([])
+  const [plainTshirtComboProducts, setPlainTshirtComboProducts] = useState([])
 
   // Quick view
   const [quickViewProduct, setQuickViewProduct] = useState(null)
@@ -153,6 +155,8 @@ export default function Home() {
   const [comingSoonImages, setComingSoonImages] = useState(DEFAULT_COMING_SOON_IMAGES)
   const [heroBgBanner, setHeroBgBanner] = useState('/images/banner.webp')
   const [heroBgBannerMobile, setHeroBgBannerMobile] = useState('')
+  const [dtfVideoUrl, setDtfVideoUrl] = useState('')
+  const [dtfVideoCaption, setDtfVideoCaption] = useState('')
 
   // Mouse coordinates tracking for subtle 3D parallax on Hero model
   const [heroMouse, setHeroMouse] = useState({ x: 0, y: 0 })
@@ -261,9 +265,10 @@ export default function Home() {
   useEffect(() => {
     const loadHomepageData = async () => {
       try {
-        const [config, dbProducts] = await Promise.all([
+        const [config, dbProducts, plainTshirtIds] = await Promise.all([
           getHomepageConfig(),
-          getProducts()
+          getProducts(),
+          getPlainTshirtCombo()
         ])
 
         if (dbProducts && dbProducts.length > 0) {
@@ -288,6 +293,12 @@ export default function Home() {
           }
           if (config.hero_bg_banner_mobile) {
             setHeroBgBannerMobile(config.hero_bg_banner_mobile)
+          }
+          if (config.dtf_video_url) {
+            setDtfVideoUrl(config.dtf_video_url)
+          }
+          if (config.dtf_video_caption) {
+            setDtfVideoCaption(config.dtf_video_caption)
           }
 
           // Helper to resolve display image (front)
@@ -346,13 +357,30 @@ export default function Home() {
               imageFront: getProductDisplayImage(p),
               imageBack: getProductBackImage(p),
               salePrice: p.price,
-              originalPrice: p.originalPrice || Math.round(p.price * 1.3),
-              discountPercent: p.originalPrice ? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100) : 30,
+              originalPrice: p.originalPrice || null,
+              discountPercent: p.originalPrice ? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100) : null,
               color: p.colors?.[0] || 'Carbon Black'
             }))
             setSaleProducts(mappedSale)
           } else {
             setSaleProducts([])
+          }
+
+          // Map plain t-shirt combo products
+          if (plainTshirtIds && plainTshirtIds.length > 0 && dbProducts && dbProducts.length > 0) {
+            const combo = dbProducts.filter(p => plainTshirtIds.includes(p.id))
+            const mappedCombo = combo.map(p => ({
+              ...p,
+              imageFront: getProductDisplayImage(p),
+              imageBack: getProductBackImage(p),
+              salePrice: p.price,
+              originalPrice: p.originalPrice || null,
+              discountPercent: p.originalPrice ? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100) : null,
+              color: p.colors?.[0] || 'Carbon Black'
+            }))
+            setPlainTshirtComboProducts(mappedCombo)
+          } else {
+            setPlainTshirtComboProducts([])
           }
         }
       } catch (err) {
@@ -564,8 +592,22 @@ export default function Home() {
         />
       )}
 
+      {/* Plain Tshirt Combo Section */}
+      {plainTshirtComboProducts && plainTshirtComboProducts.length > 0 && (
+        <PlainTshirtCombo
+          plainTshirtComboProducts={plainTshirtComboProducts}
+          activeFeaturedImageIndexes={activeFeaturedImageIndexes}
+          toggleWishlist={toggleWishlist}
+          isInWishlist={isInWishlist}
+          getProductRating={getProductRating}
+          getProductReviewCount={getProductReviewCount}
+          addToCart={addToCart}
+          toast={toast}
+        />
+      )}
+
       {/* Custom Drop Section */}
-      <CustomDropSection user={user} toast={toast} navigate={navigate} />
+      <CustomDropSection user={user} toast={toast} navigate={navigate} dtfVideoUrl={dtfVideoUrl} dtfVideoCaption={dtfVideoCaption} />
       {/* Next Drop Section */}
       <NextDropSection
         comingSoonSubtitle={comingSoonSubtitle}

@@ -353,7 +353,7 @@ export default function SaleArchive({
             <Flame className="w-3.5 h-3.5" /> EXCLUSIVE OFFERS
           </span>
         </div>
-        <h2>SALE <span>ARCHIVE</span></h2>
+        <h2>OP <span>COMBO</span></h2>
         <div className="hud-tagline">
           <Gamepad2 className="w-4 h-4 text-purple-600" />
           Hot Drops. Final Drop.
@@ -443,10 +443,7 @@ export default function SaleArchive({
               {/* Info and action area */}
               <div className="px-1 py-3 flex flex-col justify-between">
                 <div>
-                  {/* Category / Status tag */}
-                  <div className="hud-card-status">
-                    SALE DROP
-                  </div>
+
 
                   <div className="flex justify-between items-start gap-4 mb-3">
                     <h3 className="hud-card-title font-black">{product.name}</h3>

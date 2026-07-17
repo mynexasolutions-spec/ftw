@@ -49,7 +49,9 @@ export const handler = async (event) => {
 
     const uploadResponse = await cloudinary.uploader.upload(image, {
       folder: folder || 'ftw_products',
-      resource_type: 'auto'
+      resource_type: 'image',
+      allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
+      max_file_size: 10 * 1024 * 1024 // 10 MB
     })
 
     return {

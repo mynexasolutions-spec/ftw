@@ -1,5 +1,5 @@
-import { createClient } from '@supabase/supabase-js'
 import crypto from 'crypto'
+import { getSupabaseAdmin, decrementStockForItems } from './lib/orderHelpers.js'
 
 export const handler = async (event) => {
   // CORS headers
@@ -26,8 +26,6 @@ export const handler = async (event) => {
   }
 
   const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET
-  const supabaseUrl = process.env.VITE_SUPABASE_URL
-  const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
 
   if (!webhookSecret) {
     console.error('Webhook verification failed: RAZORPAY_WEBHOOK_SECRET not configured.')
@@ -90,7 +88,10 @@ export const handler = async (event) => {
       }
     }
 
-    if (!supabaseUrl || !supabaseAnonKey) {
+    let supabase
+    try {
+      supabase = getSupabaseAdmin()
+    } catch (err) {
       console.error('Supabase keys missing in webhook context.')
       return {
         statusCode: 500,
@@ -98,8 +99,6 @@ export const handler = async (event) => {
         body: JSON.stringify({ error: 'Database environment missing.' }),
       }
     }
-
-    const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
     // Retrieve order
     const { data: order, error: fetchErr } = await supabase
@@ -126,12 +125,24 @@ export const handler = async (event) => {
       }
     }
 
-    // If order is unpaid or pending, update it to Paid
-    if (order.status?.toLowerCase() === 'unpaid') {
+    // Only act if this order hasn't already been finalized (e.g. by razorpay-verify.js)
+    if (!order.payment_status?.startsWith('Paid')) {
       const rzpPaymentId = payment.id || 'N/A'
+
+      // Cross-check the captured amount against our own server-computed total
+      // before trusting this event to mark the order paid.
+      if (payment.amount !== order.total * 100) {
+        console.warn(`Webhook amount mismatch for order ${dbOrderId}: got ${payment.amount}, expected ${order.total * 100}. Ignoring.`)
+        return {
+          statusCode: 200,
+          headers: corsHeaders,
+          body: JSON.stringify({ received: true, message: 'Amount mismatch, ignored.' }),
+        }
+      }
+
       const { error: updateErr } = await supabase
         .from('orders')
-        .update({ status: `Paid - Webhook Verified (ID: ${rzpPaymentId})` })
+        .update({ payment_status: `Paid - Razorpay ID: ${rzpPaymentId}` })
         .eq('id', dbOrderId)
 
       if (updateErr) {
@@ -143,9 +154,11 @@ export const handler = async (event) => {
         }
       }
 
+      await decrementStockForItems(supabase, order.items || [])
+
       console.log(`Order ${dbOrderId} successfully marked as PAID via Razorpay webhook.`)
     } else {
-      console.log(`Order ${dbOrderId} status is already '${order.status}'. No updates needed.`)
+      console.log(`Order ${dbOrderId} payment_status is already '${order.payment_status}'. No updates needed.`)
     }
   }
 

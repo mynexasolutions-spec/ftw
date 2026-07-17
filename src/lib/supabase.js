@@ -316,6 +316,16 @@ export async function deleteCategory(categoryId) {
 
 export async function updateCategory(categoryId, categoryUpdates) {
   try {
+    // 1. Fetch the category before updating to get the old name
+    const { data: oldCat, error: fetchError } = await supabase
+      .from('categories')
+      .select('name')
+      .eq('id', categoryId)
+      .single()
+
+    if (fetchError) throw fetchError
+
+    const oldName = oldCat?.name
     const updates = { ...categoryUpdates }
     if (updates.name) {
       updates.slug = updates.name
@@ -324,11 +334,33 @@ export async function updateCategory(categoryId, categoryUpdates) {
         .replace(/\s+/g, '-')
         .replace(/[^a-z0-9-]/g, '')
     }
-    const { error } = await supabase
+
+    // 2. Perform the category update
+    const { error: updateError } = await supabase
       .from('categories')
       .update(updates)
       .eq('id', categoryId)
-    if (error) throw error
+    if (updateError) throw updateError
+
+    // 3. If name was updated, update all products that used the old category name/subcategory name!
+    if (updates.name && oldName && oldName !== updates.name) {
+      // Update products where category = oldName
+      const { error: prodCatError } = await supabase
+        .from('products')
+        .update({ category: updates.name })
+        .eq('category', oldName)
+
+      if (prodCatError) console.error("Error updating product categories:", prodCatError.message)
+
+      // Update products where subcategory = oldName
+      const { error: prodSubcatError } = await supabase
+        .from('products')
+        .update({ subcategory: updates.name })
+        .eq('subcategory', oldName)
+
+      if (prodSubcatError) console.error("Error updating product subcategories:", prodSubcatError.message)
+    }
+
     return true
   } catch (err) {
     console.error("Supabase category update failed:", err.message)
@@ -576,7 +608,9 @@ export async function getHomepageConfig() {
     coming_soon_countdown: null,
     coming_soon_images: [],
     hero_bg_banner: '/images/banner.webp',
-    hero_bg_banner_mobile: '/images/mobilebanner.webp'
+    hero_bg_banner_mobile: '/images/mobilebanner.webp',
+    dtf_video_url: '',
+    dtf_video_caption: ''
   };
 
   try {
@@ -597,7 +631,9 @@ export async function getHomepageConfig() {
       coming_soon_countdown: data.coming_soon_countdown || defaultHomepage.coming_soon_countdown,
       coming_soon_images: Array.isArray(data.coming_soon_images) ? data.coming_soon_images : defaultHomepage.coming_soon_images,
       hero_bg_banner: data.hero_bg_banner || defaultHomepage.hero_bg_banner,
-      hero_bg_banner_mobile: data.hero_bg_banner_mobile || defaultHomepage.hero_bg_banner_mobile
+      hero_bg_banner_mobile: data.hero_bg_banner_mobile || defaultHomepage.hero_bg_banner_mobile,
+      dtf_video_url: data.dtf_video_url || defaultHomepage.dtf_video_url,
+      dtf_video_caption: data.dtf_video_caption || defaultHomepage.dtf_video_caption
     };
   } catch (err) {
     console.error("Supabase getHomepageConfig error:", err.message);
@@ -619,6 +655,8 @@ export async function saveHomepageConfig(config) {
       coming_soon_images: config.coming_soon_images,
       hero_bg_banner: config.hero_bg_banner,
       hero_bg_banner_mobile: config.hero_bg_banner_mobile,
+      dtf_video_url: config.dtf_video_url,
+      dtf_video_caption: config.dtf_video_caption,
       updated_at: new Date().toISOString()
     };
 
@@ -902,6 +940,35 @@ export async function deleteBlog(blogId) {
     return true
   } catch (err) {
     console.error("Supabase blog deletion failed:", err.message)
+    throw err
+  }
+}
+
+export async function getPlainTshirtCombo() {
+  try {
+    const { data, error } = await supabase
+      .from('store_settings')
+      .select('value')
+      .eq('key', 'homepage_plain_tshirt_combo')
+      .maybeSingle()
+    if (error) throw error
+    return data?.value || []
+  } catch (err) {
+    console.error("Supabase getPlainTshirtCombo error:", err.message)
+    return []
+  }
+}
+
+export async function savePlainTshirtCombo(productIds) {
+  try {
+    const { data, error } = await supabase
+      .from('store_settings')
+      .upsert({ key: 'homepage_plain_tshirt_combo', value: productIds, updated_at: new Date().toISOString() })
+      .select()
+    if (error) throw error
+    return data[0]?.value || productIds
+  } catch (err) {
+    console.error("Supabase savePlainTshirtCombo error:", err.message)
     throw err
   }
 }

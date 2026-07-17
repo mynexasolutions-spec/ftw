@@ -127,9 +127,15 @@ export default function Helpline() {
           /* HUD Card layout matching screenshot */
           .hud-helpline-card {
             background: #FFFFFF;
-            padding: 32px;
+            padding: 16px;
             position: relative;
-            clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px), 0 18px);
+            clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px);
+          }
+          @media (min-width: 640px) {
+            .hud-helpline-card {
+              padding: 32px;
+              clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px), 0 18px);
+            }
           }
           /* Keep content forward */
           .hud-helpline-card > form,
@@ -245,10 +251,6 @@ export default function Helpline() {
         `
       }} />
 
-      {/* Decorative vertical texts & decals */}
-      <div className="absolute left-6 top-[25%] rotate-[-90deg] origin-left text-[9px] font-mono text-gray-400 tracking-[0.3em] uppercase select-none pointer-events-none">
-        FTW // STREETWEAR // SYSTEMS
-      </div>
 
       <div className="absolute right-6 top-[25%] text-gray-400 font-mono text-[10px] select-none pointer-events-none text-right">
         X X X X X<br />
@@ -257,19 +259,19 @@ export default function Helpline() {
 
       {/* Large Decorative Console Gamepad Backdrop Icons */}
       <div className="absolute right-[2%] top-[10%] opacity-[0.15] text-purple-500/40 pointer-events-none z-0">
-        <Gamepad2 className="w-[180px] h-[180px] rotate-[15deg]" />
+        <Gamepad2 className="w-20 h-20 sm:w-[180px] sm:h-[180px] rotate-[15deg]" />
       </div>
       <div className="absolute left-[2%] top-[42%] opacity-[0.12] text-indigo-500/40 pointer-events-none z-0">
-        <Gamepad2 className="w-[160px] h-[160px] rotate-[-20deg]" />
+        <Gamepad2 className="w-16 h-16 sm:w-[160px] sm:h-[160px] rotate-[-20deg]" />
       </div>
       <div className="absolute right-[2%] top-[68%] opacity-[0.14] text-purple-500/40 pointer-events-none z-0">
-        <Gamepad2 className="w-[170px] h-[170px] rotate-[35deg]" />
+        <Gamepad2 className="w-20 h-20 sm:w-[170px] sm:h-[170px] rotate-[35deg]" />
       </div>
       <div className="absolute left-[2%] bottom-[2%] opacity-[0.10] text-indigo-500/40 pointer-events-none z-0">
-        <Gamepad2 className="w-[150px] h-[150px] rotate-[-10deg]" />
+        <Gamepad2 className="w-16 h-16 sm:w-[150px] sm:h-[150px] rotate-[-10deg]" />
       </div>
 
-      <main className="max-w-7xl mx-auto px-6 pt-16 pb-12 relative z-10">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-8 sm:pt-16 pb-12 relative z-10">
 
         {/* Header Layout */}
         <div className="mb-14 text-left border-b border-[#E8E5DC] pb-8">

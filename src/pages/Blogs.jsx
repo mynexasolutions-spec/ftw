@@ -34,7 +34,7 @@ export default function Blogs() {
   }, [])
 
   return (
-    <div className="bg-[#FAF9F6] text-[#161616] font-sans min-h-screen pt-16 sm:pt-24 pb-20 relative overflow-hidden selection:bg-[#161616] selection:text-white bg-grain">
+    <div className="bg-[#FAF9F6] text-[#161616] font-sans min-h-screen pt-8 sm:pt-24 pb-20 relative overflow-hidden selection:bg-[#161616] selection:text-white bg-grain">
       
       {/* Gaming UI grid lines and glowing effects in light theme */}
       <style dangerouslySetInnerHTML={{
@@ -145,10 +145,6 @@ export default function Blogs() {
       {/* Background gradients */}
       <div className="absolute top-0 left-0 w-full h-[500px] bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,rgba(139,92,246,0.06),transparent)] pointer-events-none" />
 
-      {/* Decorative vertical text */}
-      <div className="absolute left-6 top-[25%] rotate-[-90deg] origin-left text-[9px] font-mono text-gray-400 tracking-[0.3em] uppercase select-none pointer-events-none">
-        FTW // NARRATIVES // LOG
-      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
 
