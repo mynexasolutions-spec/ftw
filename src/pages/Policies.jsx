@@ -249,7 +249,7 @@ export default function Policies() {
                       </h2>
                     </div>
                     <div className="ml-auto shrink-0">
-                      <Tag green>{activeTab === 'return' || activeTab === 'exchange' ? '7-Day Window' : activeTab === 'shipping' ? 'Pan India Dispatch' : activeTab === 'payment' ? 'Secure Gateway' : 'Terms Active'}</Tag>
+                      <Tag green>{activeTab === 'return' || activeTab === 'exchange' ? '4-5 Day Window' : activeTab === 'shipping' ? 'Pan India Dispatch' : activeTab === 'payment' ? 'Secure Gateway' : 'Terms Active'}</Tag>
                     </div>
                   </div>
 
@@ -259,14 +259,14 @@ export default function Policies() {
                     {/* ── RETURN ── */}
                     {activeTab === 'return' && (<>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                        <InfoCard icon={RotateCcw} label="Return Window" value="Within 7 days of delivery" />
-                        <InfoCard icon={CheckCircle2} label="Refund Timeline" value="5–7 business days" />
+                        <InfoCard icon={RotateCcw} label="Return Window" value="Within 4-5 days of delivery" />
+                        <InfoCard icon={CheckCircle2} label="Refund Timeline" value="4–5 business days" />
                         <InfoCard icon={XCircle} label="DTF Products" value="Non-returnable" />
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                         <Section title="Eligibility Period">
-                          Returns are accepted within <strong>7 days</strong> of delivery. Requests made after this window will not be processed under any circumstance.
+                          Returns are accepted within <strong>4-5 days</strong> of delivery. Requests made after this window will not be processed under any circumstance.
                         </Section>
                         <Section title="Return Conditions">
                           <CheckList items={[
@@ -279,11 +279,11 @@ export default function Policies() {
                           <CheckList good={false} items={[
                             'Customized DTF products cannot be returned.',
                             'Products damaged due to customer misuse.',
-                            'Items returned after the 7-day window.',
+                            'Items returned after the 4-5 days window.',
                           ]} />
                         </Section>
                         <Section title="Refund Timeline">
-                          Refunds are credited to the original payment source within <strong>5–7 business days</strong> after the returned item passes inspection.
+                          Refunds are credited to the original payment source within <strong>4–5 business days</strong> after the returned item passes inspection.
                         </Section>
                       </div>
                     </>)}
@@ -291,14 +291,14 @@ export default function Policies() {
                     {/* ── EXCHANGE ── */}
                     {activeTab === 'exchange' && (<>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                        <InfoCard icon={ShieldCheck}  label="Exchange Window" value="Within 7 days of delivery" />
+                        <InfoCard icon={ShieldCheck}  label="Exchange Window" value="Within 4-5 days of delivery" />
                         <InfoCard icon={Truck}        label="Pickup"          value="Reverse pickup arranged" />
                         <InfoCard icon={CheckCircle2} label="Condition"       value="Unworn, tags intact" />
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                         <Section title="Size Exchanges">
-                          Size exchanges are allowed within <strong>7 days</strong> of delivery — subject to stock availability of the requested size.
+                          Size exchanges are allowed within <strong>4-5 days</strong> of delivery — subject to stock availability of the requested size.
                         </Section>
                         <Section title="Exchange Conditions">
                           <CheckList items={[
@@ -312,7 +312,7 @@ export default function Policies() {
                             {[
                               'Submit a request via helpline email or WhatsApp.',
                               'We arrange a reverse pickup from your address.',
-                              'Replacement is dispatched once item is received.',
+                              'In exchange / replacement, product will be delivered in 4-5 days.',
                             ].map((step, i) => (
                               <li key={i} className="flex items-start gap-3 text-sm sm:text-base lg:text-[17px] text-neutral-600">
                                 <span className="w-6 h-6 rounded-xl bg-[#161616] text-[#D6FF40] text-[10px] font-mono font-black flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
@@ -364,8 +364,8 @@ export default function Policies() {
                                   <Icon className="w-5 h-5 text-purple-600" />
                                 </div>
                                 <div className="text-left">
-                                  <span className="text-xs font-mono font-black uppercase tracking-wider text-[#161616] block">{m.name}</span>
-                                  <span className="text-[11px] text-neutral-500 font-sans block mt-0.5">{m.desc}</span>
+                                  <span className="text-sm font-mono font-black uppercase tracking-wider text-[#161616] block">{m.name}</span>
+                                  <span className="text-xs md:text-[13px] text-neutral-500 font-sans block mt-0.5">{m.desc}</span>
                                 </div>
                               </div>
                             )
@@ -379,8 +379,8 @@ export default function Policies() {
                             <Banknote className="w-5 h-5 text-[#D6FF40]" />
                           </div>
                           <div className="text-left">
-                            <span className="text-xs font-mono font-black uppercase tracking-wider text-[#D6FF40] block">Cash on Delivery (COD) — Available</span>
-                            <span className="text-[11px] text-white/60 font-sans block mt-0.5">Pay in cash or digital scan-on-delivery when your parcel arrives.</span>
+                            <span className="text-sm font-mono font-black uppercase tracking-wider text-[#D6FF40] block">Cash on Delivery (COD) — Available</span>
+                            <span className="text-xs md:text-[13px] text-white/60 font-sans block mt-0.5">Pay in cash or digital scan-on-delivery when your parcel arrives.</span>
                           </div>
                         </div>
                       </Section>

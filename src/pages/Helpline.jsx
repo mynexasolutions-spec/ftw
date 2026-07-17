@@ -71,7 +71,7 @@ export default function Helpline() {
     },
     {
       q: "What is your exchange and return policy?",
-      a: "Since our clothes are highly limited, size exchanges depend on what we have in stock. If you receive a damaged item, please contact us within 7 days."
+      a: "Since our clothes are highly limited, size exchanges depend on what we have in stock. If you receive a damaged item, please contact us within 4-5 days."
     },
     {
       q: "Can I print custom designs?",
