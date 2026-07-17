@@ -717,94 +717,97 @@ export default function Navbar() {
               </div>
             )}
 
-            {(() => {
-              const mobileNavItems = [
-                { path: '/', label: 'Home', icon: Home },
-                { path: '/shop', label: 'Shop', icon: ShoppingBag },
-                { path: '/customizer', label: 'Custom Tee', icon: Palette },
-                { path: '/blogs', label: 'Blogs', icon: BookOpen },
-                { path: '/wishlist', label: `Wishlist ${wishlistCount > 0 ? `(${wishlistCount})` : ''}`, icon: Heart },
-              ]
-              return mobileNavItems.map((item) => {
-                const IconComponent = item.icon
-                return (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setMenuOpen(false)}
-                    className={({ isActive }) => `hover:text-[#8B5CF6] transition-colors duration-300 flex items-center gap-3 ${isActive ? 'text-[#8B5CF6] font-black' : 'text-gray-800'}`}
-                  >
-                    <IconComponent className="w-4 h-4 shrink-0" />
-                    <span>{item.label}</span>
-                  </NavLink>
-                )
-              })
-            })()}
+            {/* Navigation Links Group */}
+            <div className="flex flex-col gap-1 font-mono text-[13px] font-bold uppercase tracking-wider">
+              {(() => {
+                const mobileNavItems = [
+                  { path: '/', label: 'Home', icon: Home },
+                  { path: '/shop', label: 'Shop', icon: ShoppingBag },
+                  { path: '/customizer', label: 'Custom Tee', icon: Palette },
+                  { path: '/blogs', label: 'Blogs', icon: BookOpen },
+                  { path: '/wishlist', label: `Wishlist ${wishlistCount > 0 ? `(${wishlistCount})` : ''}`, icon: Heart },
+                ]
+                return mobileNavItems.map((item) => {
+                  const IconComponent = item.icon
+                  return (
+                    <NavLink
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => setMenuOpen(false)}
+                      className={({ isActive }) => `flex items-center gap-3.5 px-3 py-2.5 rounded-xl transition-all duration-200 ${isActive ? 'bg-[#8B5CF6]/10 text-[#8B5CF6] font-black' : 'text-gray-700 hover:bg-neutral-100 hover:text-gray-900'}`}
+                    >
+                      <IconComponent className="w-4.5 h-4.5 shrink-0" />
+                      <span>{item.label}</span>
+                    </NavLink>
+                  )
+                })
+              })()}
 
-            {/* Cart Link in Mobile Menu */}
-            <button
-              onClick={() => {
-                setMenuOpen(false)
-                setCartOpen(true)
-              }}
-              className="text-left hover:text-[#8B5CF6] transition-colors duration-300 font-bold uppercase tracking-wider border-none bg-transparent cursor-pointer font-mono text-sm p-0 text-gray-800 flex items-center justify-between"
-            >
-              <div className="flex items-center gap-3">
-                <ShoppingCart className="w-4 h-4 shrink-0" />
-                <span>Cart {cartCount > 0 ? `(${cartCount})` : ''}</span>
-              </div>
-            </button>
+              {/* Cart Link in Mobile Menu */}
+              <button
+                onClick={() => {
+                  setMenuOpen(false)
+                  setCartOpen(true)
+                }}
+                className="text-left font-bold uppercase tracking-wider border-none bg-transparent cursor-pointer font-mono text-[13px] p-0 text-gray-700 hover:text-gray-900"
+              >
+                <div className="flex items-center gap-3.5 px-3 py-2.5 rounded-xl hover:bg-neutral-100 w-full">
+                  <ShoppingCart className="w-4.5 h-4.5 shrink-0" />
+                  <span>Cart {cartCount > 0 ? `(${cartCount})` : ''}</span>
+                </div>
+              </button>
 
-            {(() => {
-              const mobileNavItems2 = [
-                { path: '/about', label: 'About Us', icon: Info },
-                { path: '/helpline', label: 'Helpline', icon: HelpCircle }
-              ]
-              return mobileNavItems2.map((item) => {
-                const IconComponent = item.icon
-                return (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setMenuOpen(false)}
-                    className={({ isActive }) => `hover:text-[#8B5CF6] transition-colors duration-300 flex items-center gap-3 ${isActive ? 'text-[#8B5CF6] font-black' : 'text-gray-800'}`}
-                  >
-                    <IconComponent className="w-4 h-4 shrink-0" />
-                    <span>{item.label}</span>
-                  </NavLink>
-                )
-              })
-            })()}
+              {(() => {
+                const mobileNavItems2 = [
+                  { path: '/about', label: 'About Us', icon: Info },
+                  { path: '/helpline', label: 'Helpline', icon: HelpCircle }
+                ]
+                return mobileNavItems2.map((item) => {
+                  const IconComponent = item.icon
+                  return (
+                    <NavLink
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => setMenuOpen(false)}
+                      className={({ isActive }) => `flex items-center gap-3.5 px-3 py-2.5 rounded-xl transition-all duration-200 ${isActive ? 'bg-[#8B5CF6]/10 text-[#8B5CF6] font-black' : 'text-gray-700 hover:bg-neutral-100 hover:text-gray-900'}`}
+                    >
+                      <IconComponent className="w-4.5 h-4.5 shrink-0" />
+                      <span>{item.label}</span>
+                    </NavLink>
+                  )
+                })
+              })()}
+            </div>
 
-            <div className="border-t border-[#E8E5DC] pt-4 mt-2 space-y-4">
+            <div className="border-t border-[#E8E5DC] pt-4 mt-2 space-y-1.5 font-mono text-[13px] font-bold uppercase tracking-wider">
               {user && (
                 <>
                   {isAdmin ? (
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-2">
                       <NavLink
                         to="/admin"
                         onClick={() => setMenuOpen(false)}
-                        className="text-[#8B5CF6] font-black hover:text-[#7C3AED] transition-colors duration-300 flex items-center gap-2"
+                        className="text-[#8B5CF6] bg-[#8B5CF6]/10 hover:bg-[#8B5CF6]/15 px-3 py-2.5 rounded-xl transition-all duration-200 flex items-center gap-2 font-black justify-center"
                       >
                         <Shield className="w-4 h-4 shrink-0 text-[#8B5CF6]" />
-                        <span className="whitespace-nowrap">Admin Panel</span>
+                        <span className="whitespace-nowrap text-xs">Admin</span>
                       </NavLink>
                       <NavLink
                         to="/my-orders"
                         onClick={() => setMenuOpen(false)}
-                        className={({ isActive }) => `hover:text-[#8B5CF6] transition-colors duration-300 flex items-center gap-2 ${isActive ? 'text-[#8B5CF6] font-black' : 'text-gray-800'}`}
+                        className={({ isActive }) => `flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl transition-all duration-200 ${isActive ? 'bg-[#8B5CF6]/10 text-[#8B5CF6] font-black' : 'text-gray-700 hover:bg-neutral-100 hover:text-gray-900'}`}
                       >
                         <Package className="w-4 h-4 shrink-0" />
-                        <span className="whitespace-nowrap">My Orders</span>
+                        <span className="whitespace-nowrap text-xs">Orders</span>
                       </NavLink>
                     </div>
                   ) : (
                     <NavLink
                       to="/my-orders"
                       onClick={() => setMenuOpen(false)}
-                      className={({ isActive }) => `hover:text-[#8B5CF6] transition-colors duration-300 flex items-center gap-3 ${isActive ? 'text-[#8B5CF6] font-black' : 'text-gray-800'}`}
+                      className={({ isActive }) => `flex items-center gap-3.5 px-3 py-2.5 rounded-xl transition-all duration-200 ${isActive ? 'bg-[#8B5CF6]/10 text-[#8B5CF6] font-black' : 'text-gray-700 hover:bg-neutral-100 hover:text-gray-900'}`}
                     >
-                      <Package className="w-4 h-4 shrink-0" />
+                      <Package className="w-4.5 h-4.5 shrink-0" />
                       <span>My Orders</span>
                     </NavLink>
                   )}
@@ -813,10 +816,12 @@ export default function Navbar() {
                       handleLogout()
                       setMenuOpen(false)
                     }}
-                    className="text-left text-[#8B5CF6] hover:text-[#7C3AED] transition-colors duration-300 font-bold uppercase tracking-wider border-none bg-transparent cursor-pointer font-mono text-sm p-0 w-full flex items-center gap-3"
+                    className="w-full text-left text-gray-700 hover:text-red-500 transition-all duration-200 font-bold uppercase tracking-wider border-none bg-transparent cursor-pointer font-mono text-[13px] p-0"
                   >
-                    <LogOut className="w-4 h-4 shrink-0 text-[#8B5CF6]" />
-                    <span>Logout</span>
+                    <div className="flex items-center gap-3.5 px-3 py-2.5 rounded-xl hover:bg-red-50 w-full transition-colors">
+                      <LogOut className="w-4.5 h-4.5 shrink-0 text-current" />
+                      <span>Logout</span>
+                    </div>
                   </button>
                 </>
               )}

@@ -281,7 +281,7 @@ export default function Helpline() {
           <h1 className="hud-helpline-title">
             SUPPORT <span>HELPLINE</span>
           </h1>
-          <p className="text-dark2/50 font-mono text-[11px] md:text-sm uppercase tracking-wider mt-2">
+          <p className="text-dark2/50 font-mono text-xs md:text-sm font-bold uppercase tracking-wider mt-2">
             WE'VE GOT YOUR BACK. LET'S GET YOU BACK IN THE GAME.
           </p>
         </div>
@@ -293,14 +293,14 @@ export default function Helpline() {
             <div className="mb-8">
               <span className="text-purple-600 font-mono uppercase tracking-widest text-[10px] md:text-xs font-black block mb-1.5">/// CONTACT US</span>
               <h2 className="text-2xl md:text-3xl font-black text-[#161616] tracking-tight leading-none uppercase font-display">Send us a message</h2>
-              <p className="text-xs md:text-sm text-dark2/50 mt-1 font-sans">Fill in the form below and we will get back to you soon.</p>
+              <p className="text-sm md:text-sm text-dark2/50 mt-1 font-sans">Fill in the form below and we will get back to you soon.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6 font-sans">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Name */}
                 <div className="space-y-2">
-                  <label className="block text-[11px] md:text-xs font-mono uppercase text-[#161616] font-black">Your Name *</label>
+                  <label className="block text-xs md:text-xs font-mono uppercase text-[#161616] font-black">Your Name *</label>
                   <div className="hud-field-wrap">
                     <User className="hud-field-icon" />
                     <input
@@ -316,7 +316,7 @@ export default function Helpline() {
 
                 {/* Email */}
                 <div className="space-y-2">
-                  <label className="block text-[11px] md:text-xs font-mono uppercase text-[#161616] font-black">Email Address *</label>
+                  <label className="block text-xs md:text-xs font-mono uppercase text-[#161616] font-black">Email Address *</label>
                   <div className="hud-field-wrap">
                     <Mail className="hud-field-icon" />
                     <input
@@ -334,7 +334,7 @@ export default function Helpline() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Order ID */}
                 <div className="space-y-2">
-                  <label className="block text-[11px] md:text-xs font-mono uppercase text-[#161616] font-black">Order ID (Optional)</label>
+                  <label className="block text-xs md:text-xs font-mono uppercase text-[#161616] font-black">Order ID (Optional)</label>
                   <div className="hud-field-wrap">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-400 font-mono font-bold text-sm z-10">#</span>
                     <input
@@ -349,7 +349,7 @@ export default function Helpline() {
 
                 {/* Subject */}
                 <div className="space-y-2">
-                  <label className="block text-[11px] md:text-xs font-mono uppercase text-[#161616] font-black">Subject *</label>
+                  <label className="block text-xs md:text-xs font-mono uppercase text-[#161616] font-black">Subject *</label>
                   <select
                     value={formData.subject}
                     onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
@@ -366,7 +366,7 @@ export default function Helpline() {
 
               {/* Message */}
               <div className="space-y-2">
-                <label className="block text-[11px] md:text-xs font-mono uppercase text-[#161616] font-black">Message Details *</label>
+                <label className="block text-xs md:text-xs font-mono uppercase text-[#161616] font-black">Message Details *</label>
                 <div className="hud-field-wrap">
                   <FileText className="absolute left-4 top-5 text-purple-400 w-4 h-4 z-10" />
                   <textarea
@@ -407,8 +407,8 @@ export default function Helpline() {
                       <Mail className="w-5 h-5" />
                     </div>
                     <div className="text-left">
-                      <span className="text-[10px] md:text-[11px] text-gray-400 uppercase font-mono font-bold block mb-0.5">Email Support</span>
-                      <span className="text-xs md:text-sm text-slate-800 font-mono font-bold break-all">{settings.support_email}</span>
+                      <span className="text-xs md:text-[11px] text-gray-400 uppercase font-mono font-bold block mb-0.5">Email Support</span>
+                      <span className="text-sm md:text-sm text-slate-800 font-mono font-bold break-all">{settings.support_email}</span>
                     </div>
                   </div>
                   <ArrowRight className="w-4 h-4 text-purple-600" />
@@ -421,8 +421,8 @@ export default function Helpline() {
                       <MessageCircle className="w-5 h-5" />
                     </div>
                     <div className="text-left">
-                      <span className="text-[10px] md:text-[11px] text-gray-400 uppercase font-mono font-bold block mb-0.5">WhatsApp Support</span>
-                      <span className="text-xs md:text-sm text-slate-800 font-mono font-bold">{settings.support_whatsapp}</span>
+                      <span className="text-xs md:text-[11px] text-gray-400 uppercase font-mono font-bold block mb-0.5">WhatsApp Support</span>
+                      <span className="text-sm md:text-sm text-slate-800 font-mono font-bold">{settings.support_whatsapp}</span>
                     </div>
                   </div>
                   <ArrowRight className="w-4 h-4 text-purple-600" />
@@ -435,8 +435,8 @@ export default function Helpline() {
                       <Instagram className="w-5 h-5" />
                     </div>
                     <div className="text-left">
-                      <span className="text-[10px] md:text-[11px] text-gray-400 uppercase font-mono font-bold block mb-0.5">Instagram DM</span>
-                      <span className="text-xs md:text-sm text-slate-800 font-mono font-bold">@{settings.support_instagram}</span>
+                      <span className="text-xs md:text-[11px] text-gray-400 uppercase font-mono font-bold block mb-0.5">Instagram DM</span>
+                      <span className="text-sm md:text-sm text-slate-800 font-mono font-bold">@{settings.support_instagram}</span>
                     </div>
                   </div>
                   <ArrowRight className="w-4 h-4 text-purple-600" />
@@ -450,8 +450,8 @@ export default function Helpline() {
                 <Clock className="w-5 h-5" />
               </div>
               <div className="text-left">
-                <span className="text-[10px] md:text-[11px] text-gray-400 uppercase font-mono font-bold block mb-0.5">Our Hours</span>
-                <span className="text-xs md:text-sm text-slate-800 font-mono font-bold">{settings.support_hours}</span>
+                <span className="text-xs md:text-[11px] text-gray-400 uppercase font-mono font-bold block mb-0.5">Our Hours</span>
+                <span className="text-sm md:text-sm text-slate-800 font-mono font-bold">{settings.support_hours}</span>
               </div>
             </div>
 
@@ -461,8 +461,8 @@ export default function Helpline() {
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <div className="text-left">
-                <span className="text-[10px] text-gray-400 uppercase font-mono font-bold block mb-0.5">Returns & Exchanges</span>
-                <span className="text-xs md:text-sm text-slate-800 font-sans font-bold leading-normal block max-w-sm">
+                <span className="text-xs text-gray-400 uppercase font-mono font-bold block mb-0.5">Returns & Exchanges</span>
+                <span className="text-sm md:text-sm text-slate-800 font-sans font-bold leading-normal block max-w-sm">
                   Our items are highly limited. Sizing and exchanges depend on what we have in stock.
                 </span>
               </div>

@@ -248,6 +248,8 @@ export default function Customizer() {
   )
   const [selectedElementId, setSelectedElementId] = useState(null)
   const [isResizing, setIsResizing] = useState(false)
+  const skipMobileDrawerOpenRef = useRef(false)
+  const lastTapRef = useRef({})
 
   // Undo / redo
   const [history, setHistory] = useState([])
@@ -282,28 +284,48 @@ export default function Customizer() {
     .reduce((sum, [k]) => sum + (zonePrices[k] || 0), 0)
   const totalPrice = blankPrice + printingSubtotal
 
-  // Sync selected text element properties to text editor panel and auto-switch tabs
+  // Sync selected text element properties to text editor panel
   useEffect(() => {
-    if (activeElement) {
-      if (activeElement.type === 'text') {
-        setTextInput(activeElement.content || '')
-        setTextFont(activeElement.fontFamily || 'Inter')
-        setTextColor(activeElement.color || '#161616')
-        setTextSize(activeElement.size || 28)
-        setTextBold(activeElement.bold || false)
-        setTextItalic(activeElement.italic || false)
-        setTextUnderline(activeElement.underline || false)
-
-        // Auto-switch tabs to expose text controls (font, style, size)
-        setDesktopTab('text')
-        setMobileDrawer('text')
-      } else if (activeElement.type === 'image') {
-        // Auto-switch tabs to expose image controls
-        setDesktopTab('image')
-        setMobileDrawer('image')
-      }
+    if (activeElement && activeElement.type === 'text') {
+      setTextInput(activeElement.content || '')
+      setTextFont(activeElement.fontFamily || 'Inter')
+      setTextColor(activeElement.color || '#161616')
+      setTextSize(activeElement.size || 28)
+      setTextBold(activeElement.bold || false)
+      setTextItalic(activeElement.italic || false)
+      setTextUnderline(activeElement.underline || false)
     }
-  }, [selectedElementId, activeElement?.size, activeElement?.fontFamily, activeElement?.color, activeElement?.bold, activeElement?.italic, activeElement?.underline])
+  }, [
+    activeElement?.id,
+    activeElement?.content,
+    activeElement?.size,
+    activeElement?.fontFamily,
+    activeElement?.color,
+    activeElement?.bold,
+    activeElement?.italic,
+    activeElement?.underline
+  ])
+
+  // Auto-switch tabs ONLY on initial selection of an element (click/touch)
+  useEffect(() => {
+    if (selectedElementId) {
+      const activeEl = canvasElements[activeZone]?.find(e => e.id === selectedElementId)
+      if (activeEl) {
+        if (activeEl.type === 'text') {
+          setDesktopTab('text')
+          if (!skipMobileDrawerOpenRef.current) {
+            setMobileDrawer('text')
+          }
+        } else if (activeEl.type === 'image') {
+          setDesktopTab('image')
+          if (!skipMobileDrawerOpenRef.current) {
+            setMobileDrawer('image')
+          }
+        }
+      }
+      skipMobileDrawerOpenRef.current = false
+    }
+  }, [selectedElementId])
 
   /* ── helpers ── */
   const saveHistory = useCallback((els) => {
@@ -356,6 +378,7 @@ export default function Customizer() {
 
     const newEl = { id: `el-${Date.now()}`, x, y, scale: 1, rotation: 0, ...el }
     updateZone(activeZone, prev => [...prev, newEl])
+    skipMobileDrawerOpenRef.current = true
     setSelectedElementId(newEl.id)
     setMobileDrawer(null)
   }
@@ -399,6 +422,9 @@ export default function Customizer() {
     const startSize = el.size || 28;
 
     const handleMouseMove = (moveEvent) => {
+      if (moveEvent.cancelable) {
+        moveEvent.preventDefault();
+      }
       const currentX = moveEvent.touches ? moveEvent.touches[0].clientX : moveEvent.clientX;
       const currentY = moveEvent.touches ? moveEvent.touches[0].clientY : moveEvent.clientY;
 
@@ -598,7 +624,19 @@ export default function Customizer() {
       <motion.div
         key={el.id}
         drag={!isResizing} dragMomentum={false}
-        onClick={e => { e.stopPropagation(); setSelectedElementId(el.id) }}
+        onClick={e => {
+          e.stopPropagation()
+          setSelectedElementId(el.id)
+          if (el.type === 'text') {
+            const now = Date.now()
+            const lastTap = lastTapRef.current[el.id] || 0
+            if (now - lastTap < 300) {
+              setDesktopTab('text')
+              setMobileDrawer('text')
+            }
+            lastTapRef.current[el.id] = now
+          }
+        }}
         onDragStart={() => setSelectedElementId(el.id)}
         onDrag={(_, info) => {
           setCanvasElements(prev => ({
@@ -642,7 +680,7 @@ export default function Customizer() {
         {/* Floating mini-toolbar when selected */}
         {isSel && (
           <motion.div
-            className="absolute -top-9 left-1/2 flex items-center gap-0.5 bg-[#161616] rounded-2xl px-2 py-1.5 shadow-xl"
+            className="absolute -top-9 left-1/2 flex items-center gap-1 lg:gap-0.5 bg-[#161616] rounded-2xl px-2 py-1 lg:px-2 lg:py-1.5 shadow-xl"
             onClick={e => e.stopPropagation()}
             style={{ x: '-50%', scale: el.type === 'text' ? 1 : 1 / (el.scale || 1), transformOrigin: 'center bottom' }}
           >
@@ -655,7 +693,7 @@ export default function Customizer() {
                 }
               }}
               title="Increase Size"
-              className="p-1 text-white/70 hover:text-orange-400 border-none bg-transparent cursor-pointer"
+              className="p-1 text-white/70 hover:text-orange-400 border-none bg-transparent cursor-pointer flex items-center justify-center"
             >
               <Plus className="w-3.5 h-3.5" />
             </button>
@@ -668,14 +706,14 @@ export default function Customizer() {
                 }
               }}
               title="Decrease Size"
-              className="p-1 text-white/70 hover:text-orange-400 border-none bg-transparent cursor-pointer"
+              className="p-1 text-white/70 hover:text-orange-400 border-none bg-transparent cursor-pointer flex items-center justify-center"
             >
               <Minus className="w-3.5 h-3.5" />
             </button>
-            <button onClick={() => updateElement({ rotation: (el.rotation + 15) % 360 })} title="Rotate" className="p-1 text-white/70 hover:text-orange-400 border-none bg-transparent cursor-pointer"><RotateCw className="w-3.5 h-3.5" /></button>
-            <button onClick={() => duplicateElement(el.id)} title="Duplicate" className="p-1 text-white/70 hover:text-orange-400 border-none bg-transparent cursor-pointer"><Copy className="w-3.5 h-3.5" /></button>
+            <button onClick={() => updateElement({ rotation: (el.rotation + 15) % 360 })} title="Rotate" className="p-1 text-white/70 hover:text-orange-400 border-none bg-transparent cursor-pointer flex items-center justify-center"><RotateCw className="w-3.5 h-3.5" /></button>
+            <button onClick={() => duplicateElement(el.id)} title="Duplicate" className="p-1 text-white/70 hover:text-orange-400 border-none bg-transparent cursor-pointer flex items-center justify-center"><Copy className="w-3.5 h-3.5" /></button>
             <div className="w-px h-3.5 bg-white/20" />
-            <button onClick={() => deleteElement(el.id)} title="Delete" className="p-1 text-white/70 hover:text-red-400  border-none bg-transparent cursor-pointer"><Trash2 className="w-3.5 h-3.5" /></button>
+            <button onClick={() => deleteElement(el.id)} title="Delete" className="p-1 text-white/70 hover:text-red-400  border-none bg-transparent cursor-pointer flex items-center justify-center"><Trash2 className="w-3.5 h-3.5" /></button>
           </motion.div>
         )}
       </motion.div>
@@ -866,7 +904,7 @@ export default function Customizer() {
       <button onClick={handleAddText}
         className="w-full py-4 rounded-xl font-bold text-xs uppercase tracking-widest border-none cursor-pointer transition-all duration-300 flex items-center justify-center gap-2 bg-purple-600 text-white hover:bg-purple-700 hover:shadow-glow shadow-md hover:scale-[1.01] active:scale-[0.99]"
       >
-        <span>Add Text to Canvas</span>
+        <span>Add Text</span>
       </button>
     </div>
   )
@@ -932,8 +970,8 @@ export default function Customizer() {
                   <div
                     key={i}
                     className={`relative aspect-square border border-cream3 rounded-xl overflow-hidden transition-all duration-300 p-1 bg-cream2 group/img ${isReadOnly
-                        ? 'cursor-default hover:border-accent/40'
-                        : 'hover:border-accent cursor-pointer hover:scale-105 hover:shadow-md'
+                      ? 'cursor-default hover:border-accent/40'
+                      : 'hover:border-accent cursor-pointer hover:scale-105 hover:shadow-md'
                       }`}
                     onClick={!isReadOnly ? () => addElement({ type: 'image', url: img, name: `gallery-${i}` }) : undefined}
                   >
@@ -1286,7 +1324,6 @@ export default function Customizer() {
     { key: 'color', label: 'Color', icon: <Palette className="w-4 h-4" /> },
     { key: 'text', label: 'Text', icon: <Type className="w-4 h-4" /> },
     { key: 'image', label: 'Image', icon: <ImageIcon className="w-4 h-4" /> },
-    { key: 'presets', label: 'Graphics', icon: <Sparkles className="w-4 h-4" /> },
     { key: 'layers', label: 'Layers', icon: <Layers className="w-4 h-4" /> },
     { key: 'designs', label: 'Saved', icon: <Grid3X3 className="w-4 h-4" /> },
   ]
@@ -1552,7 +1589,6 @@ export default function Customizer() {
               { key: 'color', label: 'Color', icon: <Palette className="w-6 h-6" /> },
               { key: 'text', label: 'Text', icon: <Type className="w-6 h-6" /> },
               { key: 'image', label: 'Image', icon: <ImageIcon className="w-6 h-6" /> },
-              { key: 'presets', label: 'Graphics', icon: <Sparkles className="w-6 h-6" /> },
               { key: 'layers', label: 'Layers', icon: <Layers className="w-6 h-6" /> },
               { key: 'designs', label: 'Saved', icon: <Grid3X3 className="w-6 h-6" /> },
             ].map(item => (
