@@ -312,7 +312,7 @@ export default function Policies() {
                             {[
                               'Submit a request via helpline email or WhatsApp.',
                               'We arrange a reverse pickup from your address.',
-                              'In exchange / replacement, product will be delivered in 4-5 days.',
+                              'Exchange / replacement, product will be delivered in 4-5 days.',
                             ].map((step, i) => (
                               <li key={i} className="flex items-start gap-3 text-sm sm:text-base lg:text-[17px] text-neutral-600">
                                 <span className="w-6 h-6 rounded-xl bg-[#161616] text-[#D6FF40] text-[10px] font-mono font-black flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
